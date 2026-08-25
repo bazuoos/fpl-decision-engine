@@ -14,6 +14,7 @@ from .gameweek_transform import (
     transform_fixtures_for_snapshot,
     transform_player_history_for_snapshot,
 )
+from .historical import HistoricalIngestionError, build_historical_datasets
 from .official_data import (
     DEFAULT_HISTORY_DELAY_SECONDS,
     OfficialDataError,
@@ -37,6 +38,7 @@ COMMANDS = {
     "evaluate-xfp",
     "refresh",
     "refresh-unlock",
+    "build-historical",
 }
 
 
@@ -253,6 +255,23 @@ def build_parser() -> argparse.ArgumentParser:
         help="Exact snapshot whose .refresh.lock should be removed.",
     )
     _add_raw_root(unlock_parser)
+
+    historical_parser = subparsers.add_parser(
+        "build-historical",
+        help="Build pinned restricted/pseudo-backtest historical datasets.",
+    )
+    historical_parser.add_argument(
+        "--raw-data-root",
+        type=Path,
+        default=Path("data/historical/raw"),
+        help="Cache for immutable pinned historical source files (default: %(default)s).",
+    )
+    historical_parser.add_argument(
+        "--clean-data-root",
+        type=Path,
+        default=Path("data/historical/clean"),
+        help="Root for immutable historical Parquet outputs (default: %(default)s).",
+    )
     return parser
 
 
@@ -400,7 +419,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         except RefreshError as exc:
             logging.error("FPL refresh failed: %s", exc)
             return 1
-    else:
+    elif args.command == "refresh-unlock":
         try:
             result = unlock_refresh_snapshot(
                 raw_data_root=args.raw_data_root,
@@ -410,6 +429,17 @@ def main(argv: Sequence[str] | None = None) -> int:
             logging.info("Refresh lock removed: %s", result.lock_path)
         except RefreshError as exc:
             logging.error("Refresh unlock failed: %s", exc)
+            return 1
+    else:
+        try:
+            result = build_historical_datasets(
+                raw_data_root=args.raw_data_root,
+                clean_data_root=args.clean_data_root,
+            )
+            logging.info("Historical datasets saved to %s", result.directory)
+            logging.info("Historical manifest: %s", result.manifest_path)
+        except HistoricalIngestionError as exc:
+            logging.error("Historical ingestion failed: %s", exc)
             return 1
     return 0
 

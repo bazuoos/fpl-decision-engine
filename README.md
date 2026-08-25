@@ -427,6 +427,85 @@ realized-source paths, hashes, timestamps, and baseline provenance. Player rows
 preserve doubles through fixture-level actual scoring before aggregation and
 retain blank-gameweek players with zero actual points.
 
+## Restricted historical datasets
+
+The historical builder supports restricted/pseudo-backtesting for 2023/24 and
+2024/25. It retrieves community-preserved official FPL files only from these
+audited, commit-pinned sources:
+
+- Vaastav `Fantasy-Premier-League` at
+  `c2add969e11ec19002a091f8aa60164c9a255854`
+- Randdalf `fplcache` at
+  `36bdcddc5764628ec8ef9429dcdc1aafe4f6a867`
+
+Every source has an approved SHA-256 in the source catalogue and is rejected
+before parsing if its observed hash differs. The 76 selected Randdalf snapshots
+(38 per season) are verified as strictly pre-deadline, with the target event
+marked `is_next` and the exact stored deadline. They provide genuinely
+pre-deadline player state such as status, news, price, ownership, cumulative
+statistics, and benchmark-only `ep_next`.
+
+Vaastav performance values are fixture-level archived actuals. Its fixture
+table provides the finalized event assignment, which is useful for reconstructing
+actuals but is explicitly labelled `finalized_fixture_assignment`; the project
+does not claim that assignment was historically known before the deadline.
+Consequently these outputs are restricted/pseudo-backtest data, not a perfect
+historical deadline replay.
+
+Build the immutable source cache and Parquet datasets with:
+
+```bash
+python -m fpl_decision_engine build-historical
+```
+
+Pinned raw files are cached under `data/historical/raw/`. Typed outputs and an
+ingestion/provenance manifest are written under:
+
+```text
+data/historical/clean/historical-v2/<season>/
+```
+
+The player-fixture, fixture, identity, pre-deadline state, prediction-feature,
+separately labelled actual, and reconciliation-exception datasets are all
+Parquet. Existing `historical-v2` output is never overwritten. Both generated
+historical roots are Git-ignored.
+
+Within a season, player identity is `(season, element_id)`. FPL `code` is only
+the audited candidate bridge across seasons; `element_id` alone must never join
+seasons. Predictor performance must be known before the frozen target deadline:
+the source row must have `gameweek < target_gameweek` and its fixture kickoff
+must be strictly before the target deadline from the selected Randdalf snapshot.
+The finalized event number alone never establishes temporal eligibility.
+
+This guard excludes a postponed or rearranged lower-event fixture when its
+kickoff is at or after the target deadline. A double contributes each eligible
+fixture separately; if only part of a historical double had kicked off, only
+that known portion can enter prior aggregates and the previous-GW context is
+marked partial. A finalized blank has no fixture and remains an explicitly
+verified blank rather than a chronological exclusion. Archived fixture actuals
+and their finalized event assignments remain intact in the separate actual
+datasets. The archives do not expose an exact match-completion timestamp, so
+the machine-enforced chronology boundary is the strict kickoff cutoff.
+
+Previous-GW minutes mean the sum from the calendar gameweek immediately before
+the target, including all double-GW fixtures—not the most recent fixture. A
+verified team blank remains null with an explicit blank flag; a zero-minute
+fixture and a player absent from the prior pre-deadline universe are separate
+states.
+
+Historical total points remain exactly those awarded under that season's FPL
+rules. The independent v0.1-compatible actual section reconstructs only
+appearance, historical-position goal, and assist points. It does not retrofit
+DEFCON, 2026/27 BPS, or modern assist rules. Missing expected statistics remain
+null, assistant-manager pseudo-elements are excluded by position semantics, and
+source reconciliation differences are reported without altering fixture data.
+For the pinned 2024/25 sources, Evan Ferguson's differences are traced to GW27
+fixture 266: `merged_gw.csv` row 18254 has 17 minutes, xA 0.00, xGI 0.11, and
+xGC 0.06, whereas the pinned official cumulative snapshots advance across GW27
+by 34 minutes, xA 0.01, xGI 0.12, and xGC 0.80. `players_raw.csv` retains the
+later corrected totals. The fixture row is preserved and the exception is
+classified as an upstream archived-row/later-correction inconsistency.
+
 ## Run tests
 
 ```bash

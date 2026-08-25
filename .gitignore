@@ -18,6 +18,9 @@ data/predictions/
 # Immutable model-evaluation outputs
 data/evaluations/
 
+# Generated/cache-only community-preserved historical FPL archives
+data/historical/
+
 # C extensions
 *.so
 

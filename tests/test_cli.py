@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from fpl_decision_engine.__main__ import main
+from fpl_decision_engine.historical import HistoricalBuildResult
 from fpl_decision_engine.predictions import PredictionOutputs
 from fpl_decision_engine.refresh import RefreshResult, RefreshUnlockResult
 
@@ -188,6 +189,28 @@ class CLITests(unittest.TestCase):
             raw_data_root=Path("custom/raw"),
             season="2026-27",
             snapshot_timestamp="20260826T010203.456789Z",
+        )
+
+    @patch("fpl_decision_engine.__main__.build_historical_datasets")
+    def test_build_historical_dispatches_separate_roots(self, build) -> None:
+        build.return_value = HistoricalBuildResult(
+            directory=Path("custom/clean/restricted-pseudo-backtest-v1"),
+            manifest_path=Path("custom/clean/restricted-pseudo-backtest-v1/manifest.json"),
+            row_counts={},
+        )
+        self.assertEqual(
+            main(
+                [
+                    "build-historical",
+                    "--raw-data-root", "custom/raw",
+                    "--clean-data-root", "custom/clean",
+                ]
+            ),
+            0,
+        )
+        build.assert_called_once_with(
+            raw_data_root=Path("custom/raw"),
+            clean_data_root=Path("custom/clean"),
         )
 
 
