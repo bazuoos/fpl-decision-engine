@@ -9,6 +9,12 @@ data/raw/
 # Clean analytical datasets
 data/clean/
 
+# Prediction-ready feature datasets
+data/features/
+
+# Generated expected-points predictions
+data/predictions/
+
 # C extensions
 *.so
 

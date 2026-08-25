@@ -28,6 +28,14 @@ from .gameweek_transform import (
     transform_fixtures_for_snapshot,
     transform_player_history_for_snapshot,
 )
+from .features import FeatureBuildError, build_player_gameweek_features
+from .predictions import (
+    MODEL_VERSION,
+    PredictionError,
+    PredictionOutputs,
+    predict_xfp_v01,
+    predict_xfp_v01_from_feature,
+)
 
 __all__ = [
     "FPL_BOOTSTRAP_STATIC_URL",
@@ -50,4 +58,11 @@ __all__ = [
     "fetch_player_histories_for_snapshot",
     "transform_fixtures_for_snapshot",
     "transform_player_history_for_snapshot",
+    "FeatureBuildError",
+    "build_player_gameweek_features",
+    "MODEL_VERSION",
+    "PredictionError",
+    "PredictionOutputs",
+    "predict_xfp_v01",
+    "predict_xfp_v01_from_feature",
 ]

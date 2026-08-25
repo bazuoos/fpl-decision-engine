@@ -8,6 +8,7 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
+from .features import build_player_gameweek_features
 from .gameweek_transform import (
     transform_fixtures_for_snapshot,
     transform_player_history_for_snapshot,
@@ -19,6 +20,7 @@ from .official_data import (
     fetch_player_histories_for_snapshot,
 )
 from .pipeline import FetchError, fetch_bootstrap_static
+from .predictions import predict_xfp_v01
 from .transform import TransformationError, transform_latest_players
 
 COMMANDS = {
@@ -28,6 +30,8 @@ COMMANDS = {
     "fetch-player-history",
     "transform-fixtures",
     "transform-player-history",
+    "build-features",
+    "predict-xfp",
 }
 
 
@@ -136,6 +140,52 @@ def build_parser() -> argparse.ArgumentParser:
     _add_snapshot_arguments(history_transform_parser)
     _add_raw_root(history_transform_parser)
     _add_clean_root(history_transform_parser)
+
+    feature_parser = subparsers.add_parser(
+        "build-features",
+        help="Build leakage-safe player features for a target gameweek.",
+    )
+    feature_parser.add_argument(
+        "--target-gameweek",
+        type=int,
+        required=True,
+        help="Prediction target; history is restricted to earlier gameweeks.",
+    )
+    _add_snapshot_arguments(feature_parser)
+    _add_raw_root(feature_parser)
+    _add_clean_root(feature_parser)
+    feature_parser.add_argument(
+        "--feature-data-root",
+        type=Path,
+        default=Path("data/features/fpl"),
+        help="Root directory for prediction features (default: %(default)s).",
+    )
+
+    prediction_parser = subparsers.add_parser(
+        "predict-xfp",
+        help="Generate explainable fixture and gameweek xFP v0.1 predictions.",
+    )
+    prediction_parser.add_argument(
+        "--target-gameweek",
+        type=int,
+        required=True,
+        help="Gameweek to predict from strictly earlier historical data.",
+    )
+    _add_snapshot_arguments(prediction_parser)
+    _add_raw_root(prediction_parser)
+    _add_clean_root(prediction_parser)
+    prediction_parser.add_argument(
+        "--feature-data-root",
+        type=Path,
+        default=Path("data/features/fpl"),
+        help="Root directory for prediction features (default: %(default)s).",
+    )
+    prediction_parser.add_argument(
+        "--prediction-data-root",
+        type=Path,
+        default=Path("data/predictions/fpl"),
+        help="Root directory for xFP outputs (default: %(default)s).",
+    )
     return parser
 
 
@@ -194,7 +244,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         except (OfficialDataError, TransformationError) as exc:
             logging.error("Fixture transformation failed: %s", exc)
             return 1
-    else:
+    elif args.command == "transform-player-history":
         try:
             transform_player_history_for_snapshot(
                 raw_data_root=args.raw_data_root,
@@ -204,6 +254,44 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
         except (OfficialDataError, TransformationError) as exc:
             logging.error("Player-history transformation failed: %s", exc)
+            return 1
+    elif args.command == "build-features":
+        try:
+            output_path = build_player_gameweek_features(
+                target_gameweek=args.target_gameweek,
+                raw_data_root=args.raw_data_root,
+                clean_data_root=args.clean_data_root,
+                feature_data_root=args.feature_data_root,
+                season=args.season,
+                snapshot_timestamp=args.snapshot_timestamp,
+            )
+            logging.info("Feature dataset saved to %s", output_path)
+        except TransformationError as exc:
+            logging.error("Feature build failed: %s", exc)
+            return 1
+    else:
+        try:
+            outputs = predict_xfp_v01(
+                target_gameweek=args.target_gameweek,
+                raw_data_root=args.raw_data_root,
+                clean_data_root=args.clean_data_root,
+                feature_data_root=args.feature_data_root,
+                prediction_data_root=args.prediction_data_root,
+                season=args.season,
+                snapshot_timestamp=args.snapshot_timestamp,
+            )
+            logging.info(
+                "Fixture predictions saved to %s (%s rows)",
+                outputs.fixture_path,
+                outputs.fixture_rows,
+            )
+            logging.info(
+                "Gameweek predictions saved to %s (%s rows)",
+                outputs.gameweek_path,
+                outputs.gameweek_rows,
+            )
+        except TransformationError as exc:
+            logging.error("xFP v0.1 prediction failed: %s", exc)
             return 1
     return 0
 

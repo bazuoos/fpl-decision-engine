@@ -5,6 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from fpl_decision_engine.__main__ import main
+from fpl_decision_engine.predictions import PredictionOutputs
 
 
 class CLITests(unittest.TestCase):
@@ -43,6 +44,60 @@ class CLITests(unittest.TestCase):
             season="2026-27",
             snapshot_timestamp="20260825T073532.450889Z",
             delay_seconds=0.1,
+        )
+
+    @patch("fpl_decision_engine.__main__.build_player_gameweek_features")
+    def test_build_features_dispatches_target_gameweek(self, build) -> None:
+        build.return_value = Path("features.parquet")
+        self.assertEqual(
+            main(
+                [
+                    "build-features",
+                    "--target-gameweek",
+                    "2",
+                    "--snapshot-timestamp",
+                    "20260825T073532.450889Z",
+                ]
+            ),
+            0,
+        )
+        build.assert_called_once_with(
+            target_gameweek=2,
+            raw_data_root=Path("data/raw/fpl"),
+            clean_data_root=Path("data/clean/fpl"),
+            feature_data_root=Path("data/features/fpl"),
+            season="2026-27",
+            snapshot_timestamp="20260825T073532.450889Z",
+        )
+
+    @patch("fpl_decision_engine.__main__.predict_xfp_v01")
+    def test_predict_xfp_dispatches_without_fetching(self, predict) -> None:
+        predict.return_value = PredictionOutputs(
+            fixture_path=Path("fixtures.parquet"),
+            gameweek_path=Path("gameweek.parquet"),
+            fixture_rows=12,
+            gameweek_rows=10,
+        )
+        self.assertEqual(
+            main(
+                [
+                    "predict-xfp",
+                    "--target-gameweek",
+                    "2",
+                    "--snapshot-timestamp",
+                    "20260825T073532.450889Z",
+                ]
+            ),
+            0,
+        )
+        predict.assert_called_once_with(
+            target_gameweek=2,
+            raw_data_root=Path("data/raw/fpl"),
+            clean_data_root=Path("data/clean/fpl"),
+            feature_data_root=Path("data/features/fpl"),
+            prediction_data_root=Path("data/predictions/fpl"),
+            season="2026-27",
+            snapshot_timestamp="20260825T073532.450889Z",
         )
 
 

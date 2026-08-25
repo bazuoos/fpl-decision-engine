@@ -154,6 +154,136 @@ rows = duckdb.sql("""
 """).fetchall()
 ```
 
+## Prediction-ready features
+
+A feature row represents one player, one target gameweek, and one target
+fixture. This slightly finer physical grain supports double gameweeks; a player
+with no target fixture receives one row with null fixture context. All historical
+performance calculations apply `history_gameweek < target_gameweek` before any
+prior or rolling aggregation.
+
+The builder also requires the bootstrap snapshot, fixture retrieval, and player-
+history retrieval to have completed before the target deadline. This makes the
+included status and news fields genuinely pre-deadline state. FPL's
+`chance_of_playing_next_round` is populated only when the target is the
+snapshot's official `is_next` gameweek; otherwise it remains null and the
+reference gameweek is exposed explicitly. Missing history remains null, while
+an official zero-minute gameweek remains a real zero. Sample counts and
+historical minutes are exposed alongside every rolling rate.
+
+Build GW2 features from the specified pre-deadline snapshot:
+
+```bash
+python -m fpl_decision_engine build-features \
+  --target-gameweek 2 \
+  --snapshot-timestamp 20260825T073532.450889Z
+```
+
+Without `--snapshot-timestamp`, the latest complete snapshot whose inputs were
+all collected before the target deadline is selected. Output is partitioned by
+target gameweek so multiple historical targets can coexist:
+
+```text
+data/features/fpl/2026-27/<snapshot_timestamp>/gameweek=2/player_gameweek_features.parquet
+```
+
+Query low-sample attacking features with DuckDB:
+
+```python
+import duckdb
+
+rows = duckdb.sql("""
+    SELECT web_name, target_opponent_team_name, target_home_away,
+           prior_total_minutes, previous_gw_xg, prior_xg_per_90,
+           prior_gameweeks_with_data
+    FROM read_parquet(
+        'data/features/fpl/2026-27/*/gameweek=2/*.parquet'
+    )
+    ORDER BY prior_xg_per_90 DESC NULLS LAST
+    LIMIT 10
+""").fetchall()
+```
+
+## xFP v0.1 predictions
+
+xFP v0.1 is an intentionally incomplete, event-based baseline. It closes the
+first features → prediction → explanation → later evaluation loop; it is not a
+trustworthy recommendation engine. For each player and target fixture it uses:
+
+```text
+expected_minutes_v01 = clamp(previous_gameweek_minutes, 0, 90)
+expected_goals_v01   = prior_xg_per_90 × expected_minutes_v01 / 90
+expected_assists_v01 = prior_xa_per_90 × expected_minutes_v01 / 90
+
+fixture_xfp_v01 = appearance_xfp_v01
+                 + expected_goals_v01 × positional_goal_points
+                 + expected_assists_v01 × 3
+```
+
+Appearance points are deterministic: 0 minutes scores 0, 1–59 scores 1, and
+60–90 scores 2. Goal points are the official positional values: 10 for a
+goalkeeper, 6 for a defender, 5 for a midfielder, and 4 for a forward. The
+small explicit mapping makes this model rule visible. Assist points are 3 for
+every position.
+
+Previous-gameweek minutes are persistence, not a calibrated minutes forecast.
+An explicit zero chance of playing for the target next gameweek, or a safely
+observed suspended/unavailable status, gates minutes to zero; uncertain 25/50/75
+percent values are not multiplied into minutes. With no prior record, expected
+minutes and the fixture total remain null. With usable expected minutes but no
+attacking rate, the missing goal/assist contributions count as zero in the total
+while `attacking_rate_available` and `prediction_complete` expose the gap.
+
+Only historical xG/90 and xA/90 calculated from gameweeks strictly before the
+target are used. FPL `ep_next`, form, target-gameweek events, points, and fixture
+scores are never inputs. GW2 has only one prior gameweek, so every player with
+that evidence is marked `low_sample`; the factual rule is fewer than three prior
+gameweeks, not a calibrated confidence score.
+
+Generate GW2 predictions from already-collected data (no network fetch occurs):
+
+```bash
+python -m fpl_decision_engine predict-xfp \
+  --target-gameweek 2 \
+  --snapshot-timestamp 20260825T073532.450889Z
+```
+
+If the safe feature file is absent, the command builds it from matching local
+raw and clean inputs. Existing feature and prediction outputs are never
+overwritten. Outputs are written to:
+
+```text
+data/predictions/fpl/2026-27/<snapshot_timestamp>/gameweek=2/xfp_v01_fixtures.parquet
+data/predictions/fpl/2026-27/<snapshot_timestamp>/gameweek=2/xfp_v01_gameweek.parquet
+```
+
+The fixture file keeps every component and its inputs. The gameweek file sums
+fixture predictions, so doubles sum both fixtures and blanks retain the player
+with zero xFP. Its component columns also prepare for later comparison with a
+component-matched actual target (appearance/goals/assists) and full actual FPL
+points. FPL `ep_next` can later be an external full-points baseline.
+
+Query the gameweek output with DuckDB:
+
+```python
+import duckdb
+
+rows = duckdb.sql("""
+    SELECT web_name, position, gameweek_xfp_v01, low_sample
+    FROM read_parquet(
+        'data/predictions/fpl/2026-27/*/gameweek=2/xfp_v01_gameweek.parquet'
+    )
+    ORDER BY gameweek_xfp_v01 DESC NULLS LAST
+    LIMIT 10
+""").fetchall()
+```
+
+Excluded from v0.1 are clean sheets, defensive contribution, saves, bonus,
+goals-conceded deductions, cards, fixture strength, home/away adjustments,
+shrinkage, positional priors, and machine learning. A future appearance model
+should replace the deterministic rule with estimates of `P(minutes > 0)` and
+`P(minutes >= 60)`.
+
 ## Run tests
 
 ```bash
