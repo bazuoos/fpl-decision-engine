@@ -284,6 +284,61 @@ shrinkage, positional priors, and machine learning. A future appearance model
 should replace the deterministic rule with estimates of `P(minutes > 0)` and
 `P(minutes >= 60)`.
 
+## Leakage-safe evaluation
+
+The evaluation methodology is defined before results are available so GW2
+outcomes cannot influence metric choice or change the frozen model. Evaluation
+reads an immutable gameweek prediction and a separate, later realized-data
+snapshot; it never recalibrates or rewrites xFP.
+
+Two targets are kept distinct:
+
+- `actual_modeled_points_v01` independently scores only appearance, goals, and
+  assists using official positional rules. This tests what v0.1 actually models.
+- `actual_total_fpl_points` sums official realized FPL points. This tests how
+  useful the incomplete baseline is for the full game.
+
+For both targets, MAE is the average absolute miss, RMSE penalizes large misses
+more heavily, and bias is `prediction - actual`; positive bias therefore means
+overprediction. Outputs report evaluated counts, coverage, and missing
+predictions/actuals rather than silently dropping them. Metrics are also split
+by FPL position and by three concise diagnostics: actual minutes band,
+`low_sample`, and attacking-rate availability.
+
+Ranking diagnostics use tie-aware Spearman rank correlation plus deterministic
+top-N lists and overlap. Ranking is secondary to the point-error metrics. FPL
+`ep_next` is compared only with full FPL points and only when its matching
+pre-deadline `is_next` snapshot and hashes can be proven. Leakage-safe previous-
+gameweek and average-prior-points baselines are read from the frozen feature
+input. A later snapshot is never used to reconstruct a missing baseline.
+
+Evaluation requires the official event to have both `finished=true` and
+`data_checked=true`, every target fixture to be finished and data-checked, and
+realized fixture/history retrieval to have occurred after the deadline. Until
+those conditions hold, refusal is the expected successful behavior.
+
+Once a finalized realized snapshot has been collected and transformed, run:
+
+```bash
+python -m fpl_decision_engine evaluate-xfp \
+  --target-gameweek 2 \
+  --model-version v0.1 \
+  --prediction-snapshot-timestamp 20260825T073532.450889Z \
+  --realized-snapshot-timestamp <post-gameweek-snapshot>
+```
+
+No network request is made. Immutable results are written under:
+
+```text
+data/evaluations/fpl/<season>/gameweek=<gw>/<model_version>/<evaluation_timestamp>/
+```
+
+The directory contains player-level errors, overall metrics, position metrics,
+diagnostic metrics, ranking results, and a manifest recording prediction and
+realized-source paths, hashes, timestamps, and baseline provenance. Player rows
+preserve doubles through fixture-level actual scoring before aggregation and
+retain blank-gameweek players with zero actual points.
+
 ## Run tests
 
 ```bash

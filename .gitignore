@@ -15,6 +15,9 @@ data/features/
 # Generated expected-points predictions
 data/predictions/
 
+# Immutable model-evaluation outputs
+data/evaluations/
+
 # C extensions
 *.so
 

@@ -29,6 +29,13 @@ from .gameweek_transform import (
     transform_player_history_for_snapshot,
 )
 from .features import FeatureBuildError, build_player_gameweek_features
+from .evaluation import (
+    EvaluationError,
+    EvaluationOutputs,
+    GameweekNotFinalizedError,
+    evaluate_xfp,
+    evaluate_xfp_from_paths,
+)
 from .predictions import (
     MODEL_VERSION,
     PredictionError,
@@ -60,6 +67,11 @@ __all__ = [
     "transform_player_history_for_snapshot",
     "FeatureBuildError",
     "build_player_gameweek_features",
+    "EvaluationError",
+    "EvaluationOutputs",
+    "GameweekNotFinalizedError",
+    "evaluate_xfp",
+    "evaluate_xfp_from_paths",
     "MODEL_VERSION",
     "PredictionError",
     "PredictionOutputs",

@@ -9,6 +9,7 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from .features import build_player_gameweek_features
+from .evaluation import evaluate_xfp
 from .gameweek_transform import (
     transform_fixtures_for_snapshot,
     transform_player_history_for_snapshot,
@@ -32,6 +33,7 @@ COMMANDS = {
     "transform-player-history",
     "build-features",
     "predict-xfp",
+    "evaluate-xfp",
 }
 
 
@@ -186,6 +188,34 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("data/predictions/fpl"),
         help="Root directory for xFP outputs (default: %(default)s).",
     )
+
+    evaluation_parser = subparsers.add_parser(
+        "evaluate-xfp",
+        help="Evaluate frozen xFP predictions against finalized realized data.",
+    )
+    evaluation_parser.add_argument("--target-gameweek", type=int, required=True)
+    evaluation_parser.add_argument("--model-version", default="v0.1")
+    evaluation_parser.add_argument("--prediction-snapshot-timestamp")
+    evaluation_parser.add_argument("--realized-snapshot-timestamp")
+    evaluation_parser.add_argument("--top-n", type=int, default=10)
+    evaluation_parser.add_argument("--season", default="2026-27")
+    _add_raw_root(evaluation_parser)
+    _add_clean_root(evaluation_parser)
+    evaluation_parser.add_argument(
+        "--feature-data-root",
+        type=Path,
+        default=Path("data/features/fpl"),
+    )
+    evaluation_parser.add_argument(
+        "--prediction-data-root",
+        type=Path,
+        default=Path("data/predictions/fpl"),
+    )
+    evaluation_parser.add_argument(
+        "--evaluation-data-root",
+        type=Path,
+        default=Path("data/evaluations/fpl"),
+    )
     return parser
 
 
@@ -269,7 +299,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         except TransformationError as exc:
             logging.error("Feature build failed: %s", exc)
             return 1
-    else:
+    elif args.command == "predict-xfp":
         try:
             outputs = predict_xfp_v01(
                 target_gameweek=args.target_gameweek,
@@ -292,6 +322,30 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
         except TransformationError as exc:
             logging.error("xFP v0.1 prediction failed: %s", exc)
+            return 1
+    else:
+        try:
+            outputs = evaluate_xfp(
+                target_gameweek=args.target_gameweek,
+                model_version=args.model_version,
+                prediction_snapshot_timestamp=args.prediction_snapshot_timestamp,
+                realized_snapshot_timestamp=args.realized_snapshot_timestamp,
+                raw_data_root=args.raw_data_root,
+                clean_data_root=args.clean_data_root,
+                feature_data_root=args.feature_data_root,
+                prediction_data_root=args.prediction_data_root,
+                evaluation_data_root=args.evaluation_data_root,
+                season=args.season,
+                top_n=args.top_n,
+            )
+            logging.info(
+                "Evaluation saved to %s (%s player rows; %s evaluated)",
+                outputs.directory,
+                outputs.player_rows,
+                outputs.evaluated_players,
+            )
+        except TransformationError as exc:
+            logging.error("xFP evaluation failed: %s", exc)
             return 1
     return 0
 

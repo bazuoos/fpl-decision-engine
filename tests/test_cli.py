@@ -100,6 +100,42 @@ class CLITests(unittest.TestCase):
             snapshot_timestamp="20260825T073532.450889Z",
         )
 
+    @patch("fpl_decision_engine.__main__.evaluate_xfp")
+    def test_evaluate_xfp_dispatches_without_fetching(self, evaluate) -> None:
+        output = type("Output", (), {
+            "directory": Path("evaluation"),
+            "player_rows": 10,
+            "evaluated_players": 8,
+        })()
+        evaluate.return_value = output
+        self.assertEqual(
+            main(
+                [
+                    "evaluate-xfp",
+                    "--target-gameweek", "2",
+                    "--model-version", "v0.1",
+                    "--prediction-snapshot-timestamp",
+                    "20260825T073532.450889Z",
+                    "--realized-snapshot-timestamp",
+                    "20260901T120000.000000Z",
+                ]
+            ),
+            0,
+        )
+        evaluate.assert_called_once_with(
+            target_gameweek=2,
+            model_version="v0.1",
+            prediction_snapshot_timestamp="20260825T073532.450889Z",
+            realized_snapshot_timestamp="20260901T120000.000000Z",
+            raw_data_root=Path("data/raw/fpl"),
+            clean_data_root=Path("data/clean/fpl"),
+            feature_data_root=Path("data/features/fpl"),
+            prediction_data_root=Path("data/predictions/fpl"),
+            evaluation_data_root=Path("data/evaluations/fpl"),
+            season="2026-27",
+            top_n=10,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
