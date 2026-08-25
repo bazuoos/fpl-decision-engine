@@ -15,6 +15,7 @@ from fpl_decision_engine.evaluation import (
     evaluate_xfp_from_paths,
 )
 from fpl_decision_engine.transform import CleanOutputExistsError
+from fpl_decision_engine.transform import DataQualityError
 
 
 def sha256(path: Path) -> str:
@@ -49,6 +50,7 @@ class EvaluationTests(unittest.TestCase):
         self.temporary_directory = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary_directory.name)
         self.prediction = self.root / "prediction.parquet"
+        self.prediction_fixtures = self.root / "prediction-fixtures.parquet"
         self.realized_bootstrap = self.root / "realized-bootstrap.json"
         self.realized_fixtures = self.root / "realized-fixtures.parquet"
         self.realized_history = self.root / "realized-history.parquet"
@@ -103,7 +105,11 @@ class EvaluationTests(unittest.TestCase):
     def tearDown(self) -> None:
         self.temporary_directory.cleanup()
 
-    def _write_prediction(self, players_hash: str | None = None) -> None:
+    def _write_prediction(
+        self,
+        players_hash: str | None = None,
+        score_overrides: dict[int, float] | None = None,
+    ) -> None:
         prediction_schema = (
             ("season", "VARCHAR"),
             ("snapshot_timestamp", "VARCHAR"),
@@ -130,7 +136,9 @@ class EvaluationTests(unittest.TestCase):
             (3, "Blank", 3, "Midfielder", 0, 0.0, 0.0, True, False),
             (4, "Bench", 4, "Forward", 1, 2.0, 90.0, True, False),
             (5, "Missing prediction", 2, "Defender", 1, None, None, True, False),
+            (7, "Missing actual", 3, "Midfielder", 1, 100.0, 90.0, True, True),
         )
+        score_overrides = score_overrides or {}
         rows = [
             (
                 self.season,
@@ -144,7 +152,7 @@ class EvaluationTests(unittest.TestCase):
                 1,
                 "Team",
                 fixture_count,
-                prediction,
+                score_overrides.get(player, prediction),
                 expected_minutes,
                 low_sample,
                 attack,
@@ -158,6 +166,74 @@ class EvaluationTests(unittest.TestCase):
             ) in values
         ]
         write_parquet(self.prediction, prediction_schema, rows)
+        self._write_fixture_predictions(
+            players_hash=players_hash,
+            score_overrides=score_overrides,
+        )
+
+    def _write_fixture_predictions(
+        self,
+        *,
+        players_hash: str | None = None,
+        score_overrides: dict[int, float] | None = None,
+        omit_player: int | None = None,
+    ) -> None:
+        schema = (
+            ("season", "VARCHAR"),
+            ("snapshot_timestamp", "VARCHAR"),
+            ("model_version", "VARCHAR"),
+            ("target_gameweek", "INTEGER"),
+            ("fixture_id", "BIGINT"),
+            ("target_has_fixture", "BOOLEAN"),
+            ("target_fixture_count", "BIGINT"),
+            ("fpl_player_id", "BIGINT"),
+            ("position_id", "INTEGER"),
+            ("position", "VARCHAR"),
+            ("team_id", "INTEGER"),
+            ("fixture_xfp_v01", "DOUBLE"),
+            ("feature_input_sha256", "VARCHAR"),
+            ("players_input_sha256", "VARCHAR"),
+            ("bootstrap_sha256", "VARCHAR"),
+        )
+        score_overrides = score_overrides or {}
+        fixture_values = [
+            (20, True, 1, 1, 1, "Goalkeeper", 4.0),
+            (20, True, 2, 2, 2, "Defender", 2.0),
+            (21, True, 2, 2, 2, "Defender", 4.0),
+            (None, False, 0, 3, 3, "Midfielder", None),
+            (20, True, 1, 4, 4, "Forward", 2.0),
+            (20, True, 1, 5, 2, "Defender", None),
+            (20, True, 1, 7, 3, "Midfielder", 100.0),
+        ]
+        overridden_fixture_values = []
+        for fixture_id, has_fixture, count, player, position_id, position, value in fixture_values:
+            if player == omit_player:
+                continue
+            if player in score_overrides:
+                if count == 2:
+                    value = score_overrides[player] * (1 / 3 if fixture_id == 20 else 2 / 3)
+                elif has_fixture:
+                    value = score_overrides[player]
+            overridden_fixture_values.append(
+                (
+                    self.season,
+                    self.prediction_snapshot,
+                    "v0.1",
+                    2,
+                    fixture_id,
+                    has_fixture,
+                    count,
+                    player,
+                    position_id,
+                    position,
+                    1,
+                    value,
+                    sha256(self.features),
+                    players_hash or sha256(self.pre_players),
+                    sha256(self.pre_bootstrap),
+                )
+            )
+        write_parquet(self.prediction_fixtures, schema, overridden_fixture_values)
 
     def _write_realized_inputs(self, keeper_total: int = 17) -> None:
         fixture_schema = (
@@ -198,7 +274,7 @@ class EvaluationTests(unittest.TestCase):
              True, True, "2026-09-01T11:05:00Z"),
             (2, 21, 2, "Double", 2, "Defender", 30, 0, 1, 4,
              True, True, "2026-09-01T11:05:00Z"),
-            (4, 20, 2, "Bench", 4, "Forward", 30, 1, 0, 5,
+            (4, 20, 2, "Bench", 1, "Goalkeeper", 30, 1, 0, 5,
              True, True, "2026-09-01T11:05:00Z"),
             (5, 20, 2, "Missing prediction", 2, "Defender", 90, 0, 0, 6,
              True, True, "2026-09-01T11:05:00Z"),
@@ -210,6 +286,7 @@ class EvaluationTests(unittest.TestCase):
     def evaluate(self, output_name: str = "evaluations"):
         return evaluate_xfp_from_paths(
             prediction_path=self.prediction,
+            prediction_fixture_path=self.prediction_fixtures,
             realized_bootstrap_path=self.realized_bootstrap,
             realized_fixtures_path=self.realized_fixtures,
             realized_history_path=self.realized_history,
@@ -230,13 +307,14 @@ class EvaluationTests(unittest.TestCase):
         original_inputs = {
             path: path.read_bytes()
             for path in (
-                self.prediction, self.realized_bootstrap, self.realized_fixtures,
+                self.prediction, self.prediction_fixtures,
+                self.realized_bootstrap, self.realized_fixtures,
                 self.realized_history, self.pre_bootstrap, self.pre_players,
                 self.features,
             )
         }
         outputs = self.evaluate()
-        self.assertEqual(outputs.player_rows, 6)
+        self.assertEqual(outputs.player_rows, 7)
         self.assertEqual(outputs.evaluated_players, 4)
         connection = duckdb.connect(":memory:")
         try:
@@ -248,16 +326,47 @@ class EvaluationTests(unittest.TestCase):
                               actual_goal_points_v01,
                               actual_assist_points_v01,
                               actual_modeled_points_v01,
-                              actual_total_fpl_points
+                              actual_total_fpl_points,
+                              frozen_position, realized_position,
+                              gameweek_xfp_v01, expected_minutes_v01,
+                              low_sample, attacking_rate_available,
+                              modeled_points_error
                        FROM read_parquet(?)""",
                     [str(outputs.player_path)],
                 ).fetchall()
             }
-            self.assertEqual(rows[1], (90, 2, 10, 3, 15, 17))
-            self.assertEqual(rows[2], (90, 3, 6, 3, 12, 12))
-            self.assertEqual(rows[3], (0, 0, 0, 0, 0, 0))
-            self.assertEqual(rows[4], (30, 1, 4, 0, 5, 5))
-            self.assertEqual(rows[6], (90, 2, 5, 0, 7, 7))
+            self.assertEqual(rows[1][:6], (90, 2, 10, 3, 15, 17))
+            self.assertEqual(rows[2][:6], (90, 3, 6, 3, 12, 12))
+            self.assertEqual(rows[3][:6], (0, 0, 0, 0, 0, 0))
+            self.assertEqual(rows[4][:8], (30, 1, 4, 0, 5, 5, "Forward", "Goalkeeper"))
+            self.assertEqual(rows[4][8:12], (2.0, 90.0, True, False))
+            self.assertEqual(rows[6][2:6], (None, 0, None, 7))
+            self.assertIsNone(rows[7][0])
+            self.assertEqual(rows[7][8], 100.0)
+            self.assertIsNone(rows[7][12])
+
+            frozen_double = connection.execute(
+                """SELECT list(fixture_xfp_v01 ORDER BY fixture_id),
+                          sum(fixture_xfp_v01)
+                   FROM read_parquet(?) WHERE fpl_player_id = 2""",
+                [str(self.prediction_fixtures)],
+            ).fetchone()
+            self.assertEqual(frozen_double, ([2.0, 4.0], 6.0))
+            self.assertEqual(rows[2][8], 6.0)
+            realized_double = connection.execute(
+                """SELECT list(
+                              CASE WHEN minutes = 0 THEN 0
+                                   WHEN minutes < 60 THEN 1 ELSE 2 END
+                              + goals_scored * 6 + assists * 3
+                              ORDER BY fixture_id),
+                          sum(CASE WHEN minutes = 0 THEN 0
+                                   WHEN minutes < 60 THEN 1 ELSE 2 END
+                              + goals_scored * 6 + assists * 3)
+                   FROM read_parquet(?) WHERE fpl_player_id = 2""",
+                [str(self.realized_history)],
+            ).fetchone()
+            self.assertEqual(realized_double, ([8, 4], 12))
+            self.assertEqual(rows[2][4], 12)
 
             modeled = connection.execute(
                 """SELECT evaluated_players, missing_prediction_count,
@@ -267,8 +376,8 @@ class EvaluationTests(unittest.TestCase):
                    WHERE target_name='modeled_points' AND predictor='xfp_v01'""",
                 [str(outputs.metrics_path)],
             ).fetchone()
-            self.assertEqual(modeled[:3], (4, 2, 0))
-            self.assertAlmostEqual(modeled[3], 100 * 4 / 6)
+            self.assertEqual(modeled[:3], (4, 2, 2))
+            self.assertAlmostEqual(modeled[3], 100 * 5 / 7)
             self.assertAlmostEqual(modeled[4], 5.0)
             self.assertAlmostEqual(modeled[5], math.sqrt(41.5))
             self.assertAlmostEqual(modeled[6], -5.0)
@@ -281,6 +390,23 @@ class EvaluationTests(unittest.TestCase):
             self.assertAlmostEqual(full[0], 5.5)
             self.assertAlmostEqual(full[1], math.sqrt(53.5))
             self.assertAlmostEqual(full[2], -5.5)
+
+            populations = connection.execute(
+                """SELECT predictor, evaluated_players,
+                          missing_prediction_count, prediction_coverage_pct,
+                          evaluation_coverage_pct
+                   FROM read_parquet(?)
+                   WHERE target_name='full_fpl_points'
+                     AND predictor IN ('xfp_v01', 'fpl_ep_next')
+                   ORDER BY predictor""",
+                [str(outputs.metrics_path)],
+            ).fetchall()
+            self.assertEqual(populations[0][:3], ("fpl_ep_next", 5, 2))
+            self.assertAlmostEqual(populations[0][3], 100 * 5 / 7)
+            self.assertAlmostEqual(populations[0][4], 100 * 5 / 6)
+            self.assertEqual(populations[1][:3], ("xfp_v01", 4, 2))
+            self.assertAlmostEqual(populations[1][3], 100 * 5 / 7)
+            self.assertAlmostEqual(populations[1][4], 100 * 4 / 6)
 
             positions = connection.execute(
                 """SELECT count(DISTINCT position) FROM read_parquet(?)
@@ -354,6 +480,7 @@ class EvaluationTests(unittest.TestCase):
 
     def test_later_actuals_do_not_change_frozen_predictions_or_overwrite(self) -> None:
         prediction_before = self.prediction.read_bytes()
+        fixture_prediction_before = self.prediction_fixtures.read_bytes()
         first = self.evaluate("first")
         self._write_realized_inputs(keeper_total=99)
         second = self.evaluate("second")
@@ -371,8 +498,47 @@ class EvaluationTests(unittest.TestCase):
         finally:
             connection.close()
         self.assertEqual(self.prediction.read_bytes(), prediction_before)
+        self.assertEqual(
+            self.prediction_fixtures.read_bytes(), fixture_prediction_before
+        )
         with self.assertRaises(CleanOutputExistsError):
             self.evaluate("second")
+
+    def test_corrupt_missing_fixture_row_is_not_treated_as_blank(self) -> None:
+        self._write_fixture_predictions(omit_player=3)
+        with self.assertRaisesRegex(DataQualityError, "blank evidence"):
+            self.evaluate()
+
+    def test_strict_top_n_uses_player_id_at_tied_cutoff(self) -> None:
+        self._write_prediction(score_overrides={1: 6.0, 2: 6.0, 4: 6.0})
+        outputs = evaluate_xfp_from_paths(
+            prediction_path=self.prediction,
+            prediction_fixture_path=self.prediction_fixtures,
+            realized_bootstrap_path=self.realized_bootstrap,
+            realized_fixtures_path=self.realized_fixtures,
+            realized_history_path=self.realized_history,
+            evaluation_data_root=self.root / "tied-ranking",
+            season=self.season,
+            target_gameweek=2,
+            model_version="v0.1",
+            prediction_snapshot_timestamp=self.prediction_snapshot,
+            realized_snapshot_timestamp=self.realized_snapshot,
+            predeadline_bootstrap_path=self.pre_bootstrap,
+            predeadline_players_path=self.pre_players,
+            feature_path=self.features,
+            top_n=2,
+            evaluation_time=self.evaluation_time,
+        )
+        connection = duckdb.connect(":memory:")
+        try:
+            predicted_ids = connection.execute(
+                """SELECT predicted_top_n_player_ids FROM read_parquet(?)
+                   WHERE target_name='modeled_points' AND predictor='xfp_v01'""",
+                [str(outputs.ranking_path)],
+            ).fetchone()[0]
+            self.assertEqual(predicted_ids, [1, 2])
+        finally:
+            connection.close()
 
 
 if __name__ == "__main__":

@@ -300,13 +300,33 @@ Two targets are kept distinct:
 
 For both targets, MAE is the average absolute miss, RMSE penalizes large misses
 more heavily, and bias is `prediction - actual`; positive bias therefore means
-overprediction. Outputs report evaluated counts, coverage, and missing
-predictions/actuals rather than silently dropping them. Metrics are also split
-by FPL position and by three concise diagnostics: actual minutes band,
-`low_sample`, and attacking-rate availability.
+overprediction. Each metric includes only rows where that predictor and actual
+target are both non-null; missing values are never replaced with zero. Outputs
+separately report eligible/evaluated players, missing predictions, missing
+actuals, predictor coverage, and coverage among players with actuals. This is
+reported independently for xFP, `ep_next`, and other baselines so headline
+metrics cannot hide different populations.
 
-Ranking diagnostics use tie-aware Spearman rank correlation plus deterministic
-top-N lists and overlap. Ranking is secondary to the point-error metrics. FPL
+The evaluator requires both frozen prediction files. It verifies that fixture-
+level xFP sums exactly to gameweek xFP before comparing it with independently
+fixture-scored realized points. This makes double-gameweek aggregation explicit.
+A blank is zero only when the frozen fixture file contains the player's single
+verified no-fixture row; missing or corrupt fixture evidence is rejected rather
+than interpreted as a blank.
+
+Actual goal points use the position preserved in the frozen pre-target
+prediction, never a position from a later player/history snapshot. Expected
+minutes, `low_sample`, and attacking-rate availability are likewise copied from
+the frozen prediction and are not recomputed from realized data. Metrics are
+also split by FPL position and by three concise diagnostics: actual minutes
+band, `low_sample`, and attacking-rate availability.
+
+The primary ranking population is every player with both frozen xFP and a
+realized target-gameweek result, including zero-minute players. An appeared-only
+ranking may be added later as a separate diagnostic, but is not the primary
+metric. Ranking diagnostics use tie-aware Spearman correlation plus strict
+N-player top-N sets (default 10); `fpl_player_id` is the final deterministic
+tie-breaker at the cutoff. Ranking is secondary to the point-error metrics. FPL
 `ep_next` is compared only with full FPL points and only when its matching
 pre-deadline `is_next` snapshot and hashes can be proven. Leakage-safe previous-
 gameweek and average-prior-points baselines are read from the frozen feature

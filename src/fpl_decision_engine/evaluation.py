@@ -208,6 +208,123 @@ def _validate_prediction(
     return identity[10], identity[12], identity[14]
 
 
+def _validate_fixture_prediction_grain(
+    connection: duckdb.DuckDBPyConnection,
+    *,
+    season: str,
+    target_gameweek: int,
+    model_version: str,
+    prediction_snapshot_timestamp: str,
+    expected_feature_hash: str,
+    expected_players_hash: str,
+    expected_bootstrap_hash: str,
+) -> None:
+    identity = connection.execute(
+        """SELECT count(*), count(DISTINCT season), min(season),
+                  count(DISTINCT target_gameweek), min(target_gameweek),
+                  count(DISTINCT model_version), min(model_version),
+                  count(DISTINCT snapshot_timestamp), min(snapshot_timestamp),
+                  count(DISTINCT feature_input_sha256), min(feature_input_sha256),
+                  count(DISTINCT players_input_sha256), min(players_input_sha256),
+                  count(DISTINCT bootstrap_sha256), min(bootstrap_sha256)
+           FROM fixture_prediction_input"""
+    ).fetchone()
+    if not (
+        identity[0] > 0
+        and identity[1:9]
+        == (
+            1,
+            season,
+            1,
+            target_gameweek,
+            1,
+            model_version,
+            1,
+            prediction_snapshot_timestamp,
+        )
+        and identity[9:15]
+        == (
+            1,
+            expected_feature_hash,
+            1,
+            expected_players_hash,
+            1,
+            expected_bootstrap_hash,
+        )
+    ):
+        raise EvaluationError(
+            "frozen fixture prediction provenance does not match the gameweek prediction"
+        )
+
+    connection.execute(
+        """CREATE TEMP TABLE fixture_prediction_summary AS
+           SELECT fpl_player_id,
+                  min(position_id) AS position_id,
+                  min(position) AS position,
+                  count(*) AS physical_rows,
+                  count(*) FILTER (WHERE target_has_fixture) AS fixture_count,
+                  count(*) FILTER (WHERE NOT target_has_fixture) AS blank_rows,
+                  count(fixture_xfp_v01) FILTER (WHERE target_has_fixture)
+                    AS scored_fixture_count,
+                  sum(fixture_xfp_v01) FILTER (WHERE target_has_fixture)
+                    AS summed_fixture_xfp_v01,
+                  min(target_fixture_count) AS minimum_declared_fixture_count,
+                  max(target_fixture_count) AS maximum_declared_fixture_count,
+                  count(fixture_id) AS nonnull_fixture_ids
+           FROM fixture_prediction_input
+           GROUP BY fpl_player_id"""
+    )
+    invalid_keys = connection.execute(
+        """SELECT count(*) FROM (
+               SELECT fpl_player_id, coalesce(fixture_id, -1), count(*) AS n
+               FROM fixture_prediction_input
+               GROUP BY fpl_player_id, coalesce(fixture_id, -1)
+               HAVING n > 1
+           )"""
+    ).fetchone()[0]
+    if invalid_keys:
+        raise DataQualityError("frozen fixture prediction keys are not unique")
+
+    inconsistent = connection.execute(
+        """SELECT count(*)
+           FROM prediction_input p
+           FULL OUTER JOIN fixture_prediction_summary f USING (fpl_player_id)
+           WHERE p.fpl_player_id IS NULL OR f.fpl_player_id IS NULL
+              OR p.position_id IS DISTINCT FROM f.position_id
+              OR p.position IS DISTINCT FROM f.position
+              OR p.fixture_count IS DISTINCT FROM f.fixture_count
+              OR f.minimum_declared_fixture_count IS DISTINCT FROM p.fixture_count
+              OR f.maximum_declared_fixture_count IS DISTINCT FROM p.fixture_count
+              OR (p.fixture_count = 0 AND (
+                     f.physical_rows <> 1 OR f.blank_rows <> 1
+                     OR f.nonnull_fixture_ids <> 0
+                     OR p.gameweek_xfp_v01 IS DISTINCT FROM 0))
+              OR (p.fixture_count > 0 AND (
+                     f.physical_rows <> p.fixture_count OR f.blank_rows <> 0
+                     OR f.nonnull_fixture_ids <> p.fixture_count
+                     OR (p.gameweek_xfp_v01 IS NULL
+                         AND f.scored_fixture_count = p.fixture_count)
+                     OR (p.gameweek_xfp_v01 IS NOT NULL AND (
+                           f.scored_fixture_count <> p.fixture_count
+                           OR abs(p.gameweek_xfp_v01
+                                  - f.summed_fixture_xfp_v01) > 1e-10))))"""
+    ).fetchone()[0]
+    if inconsistent:
+        raise DataQualityError(
+            "frozen fixture predictions do not aggregate consistently to the "
+            "gameweek prediction, or blank evidence is missing/corrupt"
+        )
+
+    connection.execute(
+        """CREATE TEMP TABLE verified_blank_players AS
+           SELECT p.fpl_player_id
+           FROM prediction_input p
+           JOIN fixture_prediction_summary f USING (fpl_player_id)
+           WHERE p.fixture_count = 0 AND f.physical_rows = 1
+             AND f.blank_rows = 1 AND f.nonnull_fixture_ids = 0"""
+    )
+
+
 def _load_baselines(
     connection: duckdb.DuckDBPyConnection,
     *,
@@ -342,6 +459,8 @@ def _create_player_evaluation(
     realized_snapshot_timestamp: str,
     prediction_path: Path,
     prediction_hash: str,
+    fixture_prediction_path: Path,
+    fixture_prediction_hash: str,
     history_path: Path,
     history_hash: str,
     evaluation_generated_at: datetime,
@@ -361,20 +480,14 @@ def _create_player_evaluation(
         """CREATE TEMP TABLE actual_by_player AS
            SELECT fpl_player_id,
                   min(web_name) AS web_name,
-                  min(position_id) AS position_id,
-                  min(position) AS position,
+                  min(position_id) AS realized_position_id,
+                  min(position) AS realized_position,
                   count(*) AS realized_fixture_count,
                   sum(minutes) AS actual_minutes,
                   sum(CASE WHEN minutes = 0 THEN 0
                            WHEN minutes < 60 THEN 1 ELSE 2 END)
                       AS actual_appearance_points_v01,
                   sum(goals_scored) AS actual_goals,
-                  sum(goals_scored * CASE position
-                        WHEN 'Goalkeeper' THEN 10
-                        WHEN 'Defender' THEN 6
-                        WHEN 'Midfielder' THEN 5
-                        WHEN 'Forward' THEN 4 END)
-                      AS actual_goal_points_v01,
                   sum(assists) AS actual_assists,
                   sum(assists * 3) AS actual_assist_points_v01,
                   sum(total_points) AS actual_total_fpl_points
@@ -384,19 +497,23 @@ def _create_player_evaluation(
         [target_gameweek],
     )
     invalid_positions = connection.execute(
-        """SELECT count(*) FROM actual_by_player
-           WHERE actual_goal_points_v01 IS NULL"""
+        """SELECT count(*) FROM prediction_input
+           WHERE position NOT IN ('Goalkeeper', 'Defender', 'Midfielder', 'Forward')"""
     ).fetchone()[0]
     if invalid_positions:
-        raise DataQualityError("realized history contains an unknown FPL position")
+        raise DataQualityError("frozen prediction contains an unknown FPL position")
 
     connection.execute(
         """CREATE TABLE player_evaluation AS
            WITH joined AS (
                SELECT coalesce(p.fpl_player_id, a.fpl_player_id) AS fpl_player_id,
                       coalesce(p.web_name, a.web_name) AS web_name,
-                      coalesce(p.position_id, a.position_id) AS position_id,
-                      coalesce(p.position, a.position) AS position,
+                      coalesce(p.position_id, a.realized_position_id) AS position_id,
+                      coalesce(p.position, a.realized_position) AS position,
+                      p.position_id AS frozen_position_id,
+                      p.position AS frozen_position,
+                      a.realized_position_id,
+                      a.realized_position,
                       p.team_id,
                       p.team_name,
                       p.fixture_count AS predicted_fixture_count,
@@ -406,32 +523,40 @@ def _create_player_evaluation(
                       p.low_sample,
                       p.attacking_rate_available,
                       CASE WHEN a.fpl_player_id IS NOT NULL THEN a.actual_minutes
-                           WHEN p.fixture_count = 0 THEN 0 END AS actual_minutes,
+                           WHEN vb.fpl_player_id IS NOT NULL THEN 0 END AS actual_minutes,
                       CASE WHEN a.fpl_player_id IS NOT NULL
                              THEN a.actual_appearance_points_v01
-                           WHEN p.fixture_count = 0 THEN 0 END
+                           WHEN vb.fpl_player_id IS NOT NULL THEN 0 END
                            AS actual_appearance_points_v01,
                       CASE WHEN a.fpl_player_id IS NOT NULL THEN a.actual_goals
-                           WHEN p.fixture_count = 0 THEN 0 END AS actual_goals,
-                      CASE WHEN a.fpl_player_id IS NOT NULL
-                             THEN a.actual_goal_points_v01
-                           WHEN p.fixture_count = 0 THEN 0 END
+                           WHEN vb.fpl_player_id IS NOT NULL THEN 0 END AS actual_goals,
+                      CASE WHEN a.fpl_player_id IS NOT NULL AND p.position IS NOT NULL
+                             THEN a.actual_goals * CASE p.position
+                               WHEN 'Goalkeeper' THEN 10
+                               WHEN 'Defender' THEN 6
+                               WHEN 'Midfielder' THEN 5
+                               WHEN 'Forward' THEN 4 END
+                           WHEN vb.fpl_player_id IS NOT NULL THEN 0 END
                            AS actual_goal_points_v01,
                       CASE WHEN a.fpl_player_id IS NOT NULL THEN a.actual_assists
-                           WHEN p.fixture_count = 0 THEN 0 END AS actual_assists,
+                           WHEN vb.fpl_player_id IS NOT NULL THEN 0 END AS actual_assists,
                       CASE WHEN a.fpl_player_id IS NOT NULL
                              THEN a.actual_assist_points_v01
-                           WHEN p.fixture_count = 0 THEN 0 END
+                           WHEN vb.fpl_player_id IS NOT NULL THEN 0 END
                            AS actual_assist_points_v01,
                       CASE WHEN a.fpl_player_id IS NOT NULL
                              THEN a.actual_appearance_points_v01
-                                  + a.actual_goal_points_v01
+                                  + a.actual_goals * CASE p.position
+                                      WHEN 'Goalkeeper' THEN 10
+                                      WHEN 'Defender' THEN 6
+                                      WHEN 'Midfielder' THEN 5
+                                      WHEN 'Forward' THEN 4 END
                                   + a.actual_assist_points_v01
-                           WHEN p.fixture_count = 0 THEN 0 END
+                           WHEN vb.fpl_player_id IS NOT NULL THEN 0 END
                            AS actual_modeled_points_v01,
                       CASE WHEN a.fpl_player_id IS NOT NULL
                              THEN a.actual_total_fpl_points
-                           WHEN p.fixture_count = 0 THEN 0 END
+                           WHEN vb.fpl_player_id IS NOT NULL THEN 0 END
                            AS actual_total_fpl_points,
                       b.fpl_ep_next,
                       coalesce(b.ep_next_available, false) AS ep_next_available,
@@ -441,6 +566,8 @@ def _create_player_evaluation(
                         AS historical_points_baselines_available
                FROM prediction_input p
                FULL OUTER JOIN actual_by_player a USING (fpl_player_id)
+               LEFT JOIN verified_blank_players vb
+                 ON coalesce(p.fpl_player_id, a.fpl_player_id) = vb.fpl_player_id
                LEFT JOIN baselines b
                  ON coalesce(p.fpl_player_id, a.fpl_player_id) = b.fpl_player_id
            )
@@ -451,6 +578,8 @@ def _create_player_evaluation(
                   ?::VARCHAR AS realized_snapshot_timestamp,
                   ?::VARCHAR AS prediction_source_path,
                   ?::VARCHAR AS prediction_sha256,
+                  ?::VARCHAR AS fixture_prediction_source_path,
+                  ?::VARCHAR AS fixture_prediction_sha256,
                   ?::VARCHAR AS realized_history_source_path,
                   ?::VARCHAR AS realized_history_sha256,
                   ?::TIMESTAMPTZ AS evaluation_generated_at,
@@ -476,6 +605,8 @@ def _create_player_evaluation(
             realized_snapshot_timestamp,
             str(prediction_path),
             prediction_hash,
+            str(fixture_prediction_path),
+            fixture_prediction_hash,
             str(history_path),
             history_hash,
             evaluation_generated_at,
@@ -520,9 +651,15 @@ def _create_metric_tables(connection: duckdb.DuckDBPyConnection) -> None:
            count(*) FILTER (WHERE actual IS NULL) AS missing_actual_count,
            100.0 * count(prediction) / nullif(count(*), 0)
              AS prediction_coverage_pct,
-           avg(abs(prediction - actual)) AS mae,
-           sqrt(avg(pow(prediction - actual, 2))) AS rmse,
-           avg(prediction - actual) AS bias"""
+           100.0 * count(*) FILTER (
+               WHERE prediction IS NOT NULL AND actual IS NOT NULL)
+             / nullif(count(actual), 0) AS evaluation_coverage_pct,
+           avg(abs(prediction - actual)) FILTER (
+               WHERE prediction IS NOT NULL AND actual IS NOT NULL) AS mae,
+           sqrt(avg(pow(prediction - actual, 2)) FILTER (
+               WHERE prediction IS NOT NULL AND actual IS NOT NULL)) AS rmse,
+           avg(prediction - actual) FILTER (
+               WHERE prediction IS NOT NULL AND actual IS NOT NULL) AS bias"""
     connection.execute(
         f"""CREATE TABLE metrics AS
             SELECT target_name, predictor, {metric_columns}
@@ -739,6 +876,7 @@ def _write_outputs(
 def evaluate_xfp_from_paths(
     *,
     prediction_path: Path,
+    prediction_fixture_path: Path,
     realized_bootstrap_path: Path,
     realized_fixtures_path: Path,
     realized_history_path: Path,
@@ -762,6 +900,7 @@ def evaluate_xfp_from_paths(
     _require_files(
         [
             prediction_path,
+            prediction_fixture_path,
             realized_bootstrap_path,
             realized_fixtures_path,
             realized_history_path,
@@ -785,6 +924,7 @@ def evaluate_xfp_from_paths(
 
     paths_to_hash = [
         prediction_path,
+        prediction_fixture_path,
         realized_bootstrap_path,
         realized_fixtures_path,
         realized_history_path,
@@ -803,6 +943,10 @@ def evaluate_xfp_from_paths(
         connection.execute(
             "CREATE TABLE prediction_input AS SELECT * FROM read_parquet(?)",
             [str(prediction_path)],
+        )
+        connection.execute(
+            "CREATE TABLE fixture_prediction_input AS SELECT * FROM read_parquet(?)",
+            [str(prediction_fixture_path)],
         )
         connection.execute(
             "CREATE TABLE realized_fixtures AS SELECT * FROM read_parquet(?)",
@@ -828,6 +972,16 @@ def evaluate_xfp_from_paths(
                 deadline=deadline,
             )
         )
+        _validate_fixture_prediction_grain(
+            connection,
+            season=season,
+            target_gameweek=target_gameweek,
+            model_version=model_version,
+            prediction_snapshot_timestamp=prediction_snapshot_timestamp,
+            expected_feature_hash=expected_feature_hash,
+            expected_players_hash=expected_players_hash,
+            expected_bootstrap_hash=expected_bootstrap_hash,
+        )
         baseline_metadata = _load_baselines(
             connection,
             predeadline_bootstrap_path=predeadline_bootstrap_path,
@@ -849,6 +1003,8 @@ def evaluate_xfp_from_paths(
             realized_snapshot_timestamp=realized_snapshot_timestamp,
             prediction_path=prediction_path,
             prediction_hash=initial_hashes[prediction_path],
+            fixture_prediction_path=prediction_fixture_path,
+            fixture_prediction_hash=initial_hashes[prediction_fixture_path],
             history_path=realized_history_path,
             history_hash=initial_hashes[realized_history_path],
             evaluation_generated_at=generated_at,
@@ -874,13 +1030,26 @@ def evaluate_xfp_from_paths(
             "model_version": model_version,
             "evaluation_generated_at": generated_at.isoformat().replace("+00:00", "Z"),
             "bias_sign_convention": "prediction - actual; positive means overprediction",
+            "metric_missing_value_policy": (
+                "include only rows where predictor and actual are both non-null; "
+                "never impute missing values"
+            ),
+            "ranking_population": (
+                "all players with both frozen prediction and realized actual, "
+                "including zero-minute players"
+            ),
             "top_n": top_n,
+            "top_n_policy": (
+                "strict N-player set; fpl_player_id ascending breaks cutoff ties"
+            ),
             "prediction": {
                 "snapshot_timestamp": prediction_snapshot_timestamp,
                 "source_path": str(prediction_path),
                 "sha256": initial_hashes[prediction_path],
                 "generation_timestamp": None,
                 "generation_timestamp_note": "not present in frozen v0.1 output",
+                "fixture_source_path": str(prediction_fixture_path),
+                "fixture_sha256": initial_hashes[prediction_fixture_path],
             },
             "realized_data": {
                 "snapshot_timestamp": realized_snapshot_timestamp,
@@ -920,7 +1089,7 @@ def _resolve_prediction_snapshot(
     season: str,
     target_gameweek: int,
     snapshot_timestamp: str | None,
-) -> tuple[str, Path]:
+) -> tuple[str, Path, Path]:
     if snapshot_timestamp:
         candidates = [snapshot_timestamp]
     else:
@@ -937,8 +1106,9 @@ def _resolve_prediction_snapshot(
             / f"gameweek={target_gameweek}"
             / "xfp_v01_gameweek.parquet"
         )
-        if path.is_file():
-            return candidate, path
+        fixture_path = path.with_name("xfp_v01_fixtures.parquet")
+        if path.is_file() and fixture_path.is_file():
+            return candidate, path, fixture_path
     raise EvaluationError("no frozen xFP v0.1 prediction was found")
 
 
@@ -980,11 +1150,13 @@ def evaluate_xfp(
     top_n: int = 10,
 ) -> EvaluationOutputs:
     """Resolve local frozen/realized inputs and evaluate without network access."""
-    selected_prediction, prediction_path = _resolve_prediction_snapshot(
+    selected_prediction, prediction_path, prediction_fixture_path = (
+        _resolve_prediction_snapshot(
         prediction_data_root,
         season,
         target_gameweek,
         prediction_snapshot_timestamp,
+        )
     )
     selected_realized, bootstrap, fixtures, history = _resolve_realized_snapshot(
         raw_data_root,
@@ -1007,6 +1179,7 @@ def evaluate_xfp(
     )
     return evaluate_xfp_from_paths(
         prediction_path=prediction_path,
+        prediction_fixture_path=prediction_fixture_path,
         realized_bootstrap_path=bootstrap,
         realized_fixtures_path=fixtures,
         realized_history_path=history,
