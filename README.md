@@ -94,6 +94,66 @@ rows = duckdb.sql("""
 """).fetchall()
 ```
 
+## Fixtures and gameweek history
+
+The pipeline uses only these official FPL JSON endpoints:
+
+- `https://fantasy.premierleague.com/api/fixtures/`
+- `https://fantasy.premierleague.com/api/element-summary/<fpl_player_id>/`
+
+Every ingestion run is tied to an existing bootstrap snapshot. Fetch fixtures
+and one element-summary response for every player in that snapshot with:
+
+```bash
+python -m fpl_decision_engine fetch-fixtures \
+  --snapshot-timestamp 20260825T073532.450889Z
+python -m fpl_decision_engine fetch-player-history \
+  --snapshot-timestamp 20260825T073532.450889Z
+```
+
+Fixture bytes are stored unchanged in the snapshot directory as `fixtures.json`.
+Player responses are stored separately as
+`player_history/<fpl_player_id>.json`. Provenance manifests record retrieval
+timestamps, response hashes, progress, and every failed player ID. The history
+fetch is paced and retried, and a partial run is rejected by the clean
+transformation rather than silently treated as complete.
+
+Create typed Parquet datasets with:
+
+```bash
+python -m fpl_decision_engine transform-fixtures \
+  --snapshot-timestamp 20260825T073532.450889Z
+python -m fpl_decision_engine transform-player-history \
+  --snapshot-timestamp 20260825T073532.450889Z
+```
+
+Outputs are written alongside `players.parquet` in the matching clean snapshot:
+
+```text
+data/clean/fpl/2026-27/<snapshot_timestamp>/fixtures.parquet
+data/clean/fpl/2026-27/<snapshot_timestamp>/player_gameweek_history.parquet
+```
+
+Gameweek history contains realized player/fixture results. Keeping its snapshot
+time, realized gameweek, fixture, and official gameweek-finalization flags makes
+future rolling features and backtests possible without confusing a completed
+match with a finalized FPL gameweek.
+
+Query a few realized rows with DuckDB:
+
+```python
+import duckdb
+
+rows = duckdb.sql("""
+    SELECT gameweek_id, web_name, team_name, opponent_team_name, total_points
+    FROM read_parquet(
+        'data/clean/fpl/2026-27/*/player_gameweek_history.parquet'
+    )
+    ORDER BY gameweek_id, total_points DESC
+    LIMIT 10
+""").fetchall()
+```
+
 ## Run tests
 
 ```bash

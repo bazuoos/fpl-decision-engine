@@ -24,6 +24,27 @@ class CLITests(unittest.TestCase):
             season="2026-27",
         )
 
+    @patch("fpl_decision_engine.__main__.fetch_player_histories_for_snapshot")
+    def test_player_history_fetch_dispatches_snapshot_and_pacing(self, fetch) -> None:
+        self.assertEqual(
+            main(
+                [
+                    "fetch-player-history",
+                    "--snapshot-timestamp",
+                    "20260825T073532.450889Z",
+                    "--delay-seconds",
+                    "0.1",
+                ]
+            ),
+            0,
+        )
+        fetch.assert_called_once_with(
+            raw_data_root=Path("data/raw/fpl"),
+            season="2026-27",
+            snapshot_timestamp="20260825T073532.450889Z",
+            delay_seconds=0.1,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
