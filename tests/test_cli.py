@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 from fpl_decision_engine.__main__ import main
 from fpl_decision_engine.predictions import PredictionOutputs
+from fpl_decision_engine.refresh import RefreshResult, RefreshUnlockResult
 
 
 class CLITests(unittest.TestCase):
@@ -134,6 +135,59 @@ class CLITests(unittest.TestCase):
             evaluation_data_root=Path("data/evaluations/fpl"),
             season="2026-27",
             top_n=10,
+        )
+
+    @patch("fpl_decision_engine.__main__.refresh_fpl_data")
+    def test_refresh_dispatches_explicit_resume_and_roots(self, refresh) -> None:
+        refresh.return_value = RefreshResult(
+            snapshot_timestamp="20260826T010203.456789Z",
+            raw_directory=Path("raw/snapshot"),
+            clean_directory=Path("clean/snapshot"),
+            manifest_path=Path("raw/snapshot/refresh.manifest.json"),
+            player_count=611,
+            fixture_count=380,
+            history_row_count=611,
+        )
+        self.assertEqual(
+            main(
+                [
+                    "refresh",
+                    "--resume", "20260826T010203.456789Z",
+                    "--delay-seconds", "0.1",
+                ]
+            ),
+            0,
+        )
+        refresh.assert_called_once_with(
+            raw_data_root=Path("data/raw/fpl"),
+            clean_data_root=Path("data/clean/fpl"),
+            season="2026-27",
+            resume_snapshot_timestamp="20260826T010203.456789Z",
+            history_delay_seconds=0.1,
+        )
+
+    @patch("fpl_decision_engine.__main__.unlock_refresh_snapshot")
+    def test_refresh_unlock_dispatches_exact_snapshot(self, unlock) -> None:
+        unlock.return_value = RefreshUnlockResult(
+            snapshot_timestamp="20260826T010203.456789Z",
+            lock_path=Path("raw/20260826T010203.456789Z/.refresh.lock"),
+            lock_metadata={"pid": 123},
+        )
+        self.assertEqual(
+            main(
+                [
+                    "refresh-unlock",
+                    "--season", "2026-27",
+                    "--snapshot", "20260826T010203.456789Z",
+                    "--raw-data-root", "custom/raw",
+                ]
+            ),
+            0,
+        )
+        unlock.assert_called_once_with(
+            raw_data_root=Path("custom/raw"),
+            season="2026-27",
+            snapshot_timestamp="20260826T010203.456789Z",
         )
 
 

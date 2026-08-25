@@ -17,6 +17,7 @@ from fpl_decision_engine.official_data import (
     FPL_ELEMENT_SUMMARY_URL,
     FPL_FIXTURES_URL,
     PartialHistoryFetchError,
+    SourceRequestError,
     fetch_fixtures_for_snapshot,
     fetch_player_histories_for_snapshot,
 )
@@ -337,14 +338,19 @@ class GameweekDataTests(unittest.TestCase):
         self.assertFalse((self.snapshot.parent / "player_history/2.json").exists())
 
     def test_fixture_validation_rejects_duplicate_ids(self) -> None:
-        self.ingest_complete_data(fixtures=[fixture(), fixture()])
-        with self.assertRaisesRegex(DataQualityError, "unique"):
-            transform_fixtures_for_snapshot(
+        opener = RoutingOpener(
+            {FPL_FIXTURES_URL: json_bytes([fixture(), fixture()])}
+        )
+        with self.assertRaisesRegex(SourceRequestError, "duplicate fixture IDs"):
+            fetch_fixtures_for_snapshot(
                 raw_data_root=self.raw_root,
-                clean_data_root=self.clean_root,
                 season=self.season,
                 snapshot_timestamp=self.timestamp,
+                opener=opener,
+                clock=lambda: self.fixed_time,
+                sleeper=lambda seconds: None,
             )
+        self.assertFalse((self.snapshot.parent / "fixtures.json").exists())
 
     def test_history_validation_rejects_unknown_fixture(self) -> None:
         self.ingest_complete_data(

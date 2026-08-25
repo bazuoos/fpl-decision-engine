@@ -154,6 +154,74 @@ rows = duckdb.sql("""
 """).fetchall()
 ```
 
+## Reliable snapshot refresh
+
+The high-level refresh command collects and transforms one coherent official
+FPL snapshot:
+
+```bash
+python -m fpl_decision_engine refresh --season 2026-27
+```
+
+It fetches bootstrap-static, fixtures, and one element-summary response for
+every player in that refresh's bootstrap, then creates players, fixtures, and
+player-gameweek-history Parquet files under the same snapshot timestamp. Player
+IDs are always derived dynamically; new signings require no code or fixed count.
+
+Refresh deliberately does not build features, generate predictions, or run an
+evaluation. Those remain explicit commands, so frozen predictions cannot be
+changed by data collection.
+
+Every raw response is preserved byte-for-byte. Writes use a temporary file,
+file `fsync`, and an atomic rename, which prevents a process interruption from
+exposing a torn destination file. The containing directory is not `fsync`ed, so
+this is not a claim of full durability against sudden power loss. A
+`refresh.manifest.json` records stages, start/completion times, endpoints,
+counts, failures, request/retry summaries, source/output hashes, and software
+provenance. Transformations begin only after raw collection is complete. Only a
+fully validated raw and clean snapshot receives `status: complete`.
+
+Player-history collection is sequential and conservatively paced. Resume an
+explicit incomplete snapshot with:
+
+```bash
+python -m fpl_decision_engine refresh \
+  --resume 20260826T010203.456789Z
+```
+
+Resume validates existing responses against their hashes and JSON/player
+identity, reuses valid files, and requests only missing or failed players. A
+corrupt partial response is quarantined before being fetched again. Completed
+refreshes and clean outputs remain immutable, while a normal new refresh always
+uses a new timestamp.
+
+A per-snapshot `.refresh.lock` prevents two processes from refreshing or
+resuming the same snapshot concurrently; different new snapshot timestamps do
+not share a lock. Locks are removed after handled success or failure. After a
+hard process termination, inspect the recorded PID and verify that no refresh is
+running before explicitly unlocking it:
+
+```bash
+python -m fpl_decision_engine refresh-unlock \
+  --season 2026-27 \
+  --snapshot 20260826T010203.456789Z
+```
+
+The command displays available lock metadata and removes only that snapshot's
+`.refresh.lock`. It never infers staleness from age, deletes a lock
+automatically, or kills a process.
+
+For non-empty player history, response identity is checked using the official
+`element` value on every history row. The element-summary payload has no
+top-level player ID, so a legitimate empty history has no stronger direct
+content identity; it remains tied to the requested player-specific endpoint and
+immutable player-ID filename.
+
+HTTPS certificate and hostname verification are always required. The workflow
+uses Python/platform trust and augments it with `certifi` only when already
+installed. If no usable CA trust is available, refresh fails with an actionable
+error; it never disables TLS verification.
+
 ## Prediction-ready features
 
 A feature row represents one player, one target gameweek, and one target

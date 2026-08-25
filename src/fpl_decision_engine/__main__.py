@@ -22,6 +22,7 @@ from .official_data import (
 )
 from .pipeline import FetchError, fetch_bootstrap_static
 from .predictions import predict_xfp_v01
+from .refresh import RefreshError, refresh_fpl_data, unlock_refresh_snapshot
 from .transform import TransformationError, transform_latest_players
 
 COMMANDS = {
@@ -34,6 +35,8 @@ COMMANDS = {
     "build-features",
     "predict-xfp",
     "evaluate-xfp",
+    "refresh",
+    "refresh-unlock",
 }
 
 
@@ -216,6 +219,40 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=Path("data/evaluations/fpl"),
     )
+
+    refresh_parser = subparsers.add_parser(
+        "refresh",
+        help="Create or explicitly resume one coherent official FPL snapshot.",
+    )
+    refresh_parser.add_argument("--season", default="2026-27")
+    refresh_parser.add_argument(
+        "--resume",
+        dest="resume_snapshot_timestamp",
+        metavar="SNAPSHOT_TIMESTAMP",
+        help="Resume this incomplete refresh; completed snapshots are immutable.",
+    )
+    _add_raw_root(refresh_parser)
+    _add_clean_root(refresh_parser)
+    refresh_parser.add_argument(
+        "--delay-seconds",
+        type=float,
+        default=DEFAULT_HISTORY_DELAY_SECONDS,
+        help="Pacing delay between player-history requests (default: %(default)s).",
+    )
+
+    unlock_parser = subparsers.add_parser(
+        "refresh-unlock",
+        help="Manually remove one snapshot lock after verifying no refresh is running.",
+    )
+    unlock_parser.add_argument("--season", default="2026-27")
+    unlock_parser.add_argument(
+        "--snapshot",
+        dest="snapshot_timestamp",
+        required=True,
+        metavar="SNAPSHOT_TIMESTAMP",
+        help="Exact snapshot whose .refresh.lock should be removed.",
+    )
+    _add_raw_root(unlock_parser)
     return parser
 
 
@@ -323,7 +360,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         except TransformationError as exc:
             logging.error("xFP v0.1 prediction failed: %s", exc)
             return 1
-    else:
+    elif args.command == "evaluate-xfp":
         try:
             outputs = evaluate_xfp(
                 target_gameweek=args.target_gameweek,
@@ -346,6 +383,33 @@ def main(argv: Sequence[str] | None = None) -> int:
             )
         except TransformationError as exc:
             logging.error("xFP evaluation failed: %s", exc)
+            return 1
+    elif args.command == "refresh":
+        try:
+            result = refresh_fpl_data(
+                raw_data_root=args.raw_data_root,
+                clean_data_root=args.clean_data_root,
+                season=args.season,
+                resume_snapshot_timestamp=args.resume_snapshot_timestamp,
+                history_delay_seconds=args.delay_seconds,
+            )
+            logging.info("Snapshot timestamp: %s", result.snapshot_timestamp)
+            logging.info("Raw snapshot: %s", result.raw_directory)
+            logging.info("Clean snapshot: %s", result.clean_directory)
+            logging.info("Refresh manifest: %s", result.manifest_path)
+        except RefreshError as exc:
+            logging.error("FPL refresh failed: %s", exc)
+            return 1
+    else:
+        try:
+            result = unlock_refresh_snapshot(
+                raw_data_root=args.raw_data_root,
+                season=args.season,
+                snapshot_timestamp=args.snapshot_timestamp,
+            )
+            logging.info("Refresh lock removed: %s", result.lock_path)
+        except RefreshError as exc:
+            logging.error("Refresh unlock failed: %s", exc)
             return 1
     return 0
 

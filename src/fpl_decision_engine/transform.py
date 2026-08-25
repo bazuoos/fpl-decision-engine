@@ -6,6 +6,8 @@ import hashlib
 import json
 import logging
 import math
+import os
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -274,21 +276,31 @@ def _validate_players(
             raise DataQualityError(message)
 
 
-def transform_latest_players(
+def transform_players_for_snapshot(
     *,
     raw_data_root: Path = Path("data/raw/fpl"),
     clean_data_root: Path = Path("data/clean/fpl"),
     season: str = "2026-27",
+    snapshot_timestamp: str | None = None,
 ) -> Path:
-    """Transform the latest raw FPL snapshot into a validated player Parquet file."""
-    snapshot_path = find_latest_snapshot(raw_data_root, season)
+    """Transform one explicit raw FPL snapshot into validated player Parquet."""
+    if snapshot_timestamp is None:
+        snapshot_path = find_latest_snapshot(raw_data_root, season)
+    else:
+        snapshot_path = (
+            raw_data_root / season / snapshot_timestamp / "bootstrap-static.json"
+        )
+        if not snapshot_path.is_file():
+            raise RawSnapshotNotFoundError(
+                f"bootstrap-static snapshot does not exist: {snapshot_path}"
+            )
     snapshot_timestamp = snapshot_path.parent.name
     output_dir = clean_data_root / season / snapshot_timestamp
     output_path = output_dir / "players.parquet"
 
-    if output_dir.exists():
+    if output_path.exists():
         raise CleanOutputExistsError(
-            f"clean snapshot already exists and will not be overwritten: {output_dir}"
+            f"clean output already exists and will not be overwritten: {output_path}"
         )
 
     logger.info("Transforming players from %s", snapshot_path)
@@ -342,18 +354,42 @@ def transform_latest_players(
         if _sha256(snapshot_path) != raw_sha256:
             raise DataQualityError("raw snapshot changed during transformation")
 
-        try:
-            output_dir.mkdir(parents=True, exist_ok=False)
-        except FileExistsError as exc:
-            raise CleanOutputExistsError(
-                f"clean snapshot already exists and will not be overwritten: {output_dir}"
-            ) from exc
-        connection.execute(
-            "COPY players TO ? (FORMAT PARQUET, COMPRESSION ZSTD)", [str(output_path)]
+        output_dir.mkdir(parents=True, exist_ok=True)
+        temporary_path = output_path.with_name(
+            f".{output_path.name}.{uuid.uuid4().hex}.tmp"
         )
+        try:
+            connection.execute(
+                "COPY players TO ? (FORMAT PARQUET, COMPRESSION ZSTD)",
+                [str(temporary_path)],
+            )
+            try:
+                os.link(temporary_path, output_path)
+            except FileExistsError as exc:
+                raise CleanOutputExistsError(
+                    "clean output already exists and will not be overwritten: "
+                    f"{output_path}"
+                ) from exc
+        finally:
+            temporary_path.unlink(missing_ok=True)
     finally:
         connection.close()
 
     logger.info("Player transformation succeeded with %d rows", len(players))
     logger.info("Clean player dataset saved to %s", output_path)
     return output_path
+
+
+def transform_latest_players(
+    *,
+    raw_data_root: Path = Path("data/raw/fpl"),
+    clean_data_root: Path = Path("data/clean/fpl"),
+    season: str = "2026-27",
+) -> Path:
+    """Transform the latest raw FPL snapshot into a validated player Parquet."""
+    return transform_players_for_snapshot(
+        raw_data_root=raw_data_root,
+        clean_data_root=clean_data_root,
+        season=season,
+        snapshot_timestamp=None,
+    )

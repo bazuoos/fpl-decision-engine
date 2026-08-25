@@ -48,7 +48,7 @@ class PipelineTests(unittest.TestCase):
         return opener
 
     def test_saves_exact_response_in_timestamped_season_directory(self) -> None:
-        body = b'{\n  "events": [], "elements": []\n}\n'
+        body = b'{\n  "events": [], "elements": [{"id": 1}]\n}\n'
 
         with self.assertLogs(level=logging.INFO) as logs:
             path = fetch_bootstrap_static(
@@ -71,7 +71,7 @@ class PipelineTests(unittest.TestCase):
         self.assertTrue(any(str(path) in line for line in logs.output))
 
     def test_never_overwrites_an_existing_snapshot(self) -> None:
-        first_body = b'{"version": 1}'
+        first_body = b'{"version": 1, "elements": [{"id": 1}]}'
         path = fetch_bootstrap_static(
             data_root=self.data_root,
             opener=self.opener_for(first_body),
@@ -81,7 +81,9 @@ class PipelineTests(unittest.TestCase):
         with self.assertRaises(SnapshotExistsError):
             fetch_bootstrap_static(
                 data_root=self.data_root,
-                opener=self.opener_for(b'{"version": 2}'),
+                opener=self.opener_for(
+                    b'{"version": 2, "elements": [{"id": 2}]}'
+                ),
                 now=self.now,
             )
 
@@ -116,7 +118,15 @@ class PipelineTests(unittest.TestCase):
             )
         self.assertEqual(list(self.data_root.iterdir()), [])
 
+    def test_rejects_valid_json_with_wrong_bootstrap_schema(self) -> None:
+        with self.assertRaisesRegex(InvalidJSONError, "elements"):
+            fetch_bootstrap_static(
+                data_root=self.data_root,
+                opener=self.opener_for(b'{"error": "temporarily unavailable"}'),
+                now=self.now,
+            )
+        self.assertEqual(list(self.data_root.iterdir()), [])
+
 
 if __name__ == "__main__":
     unittest.main()
-
