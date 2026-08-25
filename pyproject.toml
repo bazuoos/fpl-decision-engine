@@ -9,10 +9,12 @@ description = "A small data pipeline for Fantasy Premier League data."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { file = "LICENSE" }
+dependencies = [
+    "duckdb>=1.0",
+]
 
 [project.scripts]
 fpl-fetch = "fpl_decision_engine.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-

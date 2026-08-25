@@ -6,6 +6,9 @@ __pycache__/
 # Raw pipeline snapshots
 data/raw/
 
+# Clean analytical datasets
+data/clean/
+
 # C extensions
 *.so
 
