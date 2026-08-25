@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 from fpl_decision_engine.__main__ import main
 from fpl_decision_engine.historical import HistoricalBuildResult
+from fpl_decision_engine.historical_backtest import HistoricalBacktestResult
 from fpl_decision_engine.predictions import PredictionOutputs
 from fpl_decision_engine.refresh import RefreshResult, RefreshUnlockResult
 
@@ -211,6 +212,30 @@ class CLITests(unittest.TestCase):
         build.assert_called_once_with(
             raw_data_root=Path("custom/raw"),
             clean_data_root=Path("custom/clean"),
+        )
+
+    @patch("fpl_decision_engine.__main__.build_historical_xfp_v01_backtest")
+    def test_historical_backtest_dispatches_separate_roots(self, build) -> None:
+        build.return_value = HistoricalBacktestResult(
+            directory=Path("custom/backtests/xfp-v01-baseline-v1"),
+            manifest_path=Path("custom/backtests/xfp-v01-baseline-v1/manifest.json"),
+            player_gameweek_path=Path("custom/backtests/xfp-v01-baseline-v1/players.parquet"),
+            observations=100,
+            modeled_complete_pairs=90,
+        )
+        self.assertEqual(
+            main(
+                [
+                    "backtest-xfp-v01",
+                    "--historical-clean-root", "custom/clean",
+                    "--backtest-root", "custom/backtests",
+                ]
+            ),
+            0,
+        )
+        build.assert_called_once_with(
+            historical_clean_root=Path("custom/clean"),
+            backtest_root=Path("custom/backtests"),
         )
 
 

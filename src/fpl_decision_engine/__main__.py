@@ -15,6 +15,10 @@ from .gameweek_transform import (
     transform_player_history_for_snapshot,
 )
 from .historical import HistoricalIngestionError, build_historical_datasets
+from .historical_backtest import (
+    HistoricalBacktestError,
+    build_historical_xfp_v01_backtest,
+)
 from .official_data import (
     DEFAULT_HISTORY_DELAY_SECONDS,
     OfficialDataError,
@@ -39,6 +43,7 @@ COMMANDS = {
     "refresh",
     "refresh-unlock",
     "build-historical",
+    "backtest-xfp-v01",
 }
 
 
@@ -272,6 +277,23 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("data/historical/clean"),
         help="Root for immutable historical Parquet outputs (default: %(default)s).",
     )
+
+    backtest_parser = subparsers.add_parser(
+        "backtest-xfp-v01",
+        help="Measure frozen xFP v0.1 against immutable historical-v2 inputs.",
+    )
+    backtest_parser.add_argument(
+        "--historical-clean-root",
+        type=Path,
+        default=Path("data/historical/clean"),
+        help="Root containing historical-v2 inputs (default: %(default)s).",
+    )
+    backtest_parser.add_argument(
+        "--backtest-root",
+        type=Path,
+        default=Path("data/historical/backtests"),
+        help="Root for immutable backtest artifacts (default: %(default)s).",
+    )
     return parser
 
 
@@ -430,7 +452,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         except RefreshError as exc:
             logging.error("Refresh unlock failed: %s", exc)
             return 1
-    else:
+    elif args.command == "build-historical":
         try:
             result = build_historical_datasets(
                 raw_data_root=args.raw_data_root,
@@ -440,6 +462,21 @@ def main(argv: Sequence[str] | None = None) -> int:
             logging.info("Historical manifest: %s", result.manifest_path)
         except HistoricalIngestionError as exc:
             logging.error("Historical ingestion failed: %s", exc)
+            return 1
+    else:
+        try:
+            result = build_historical_xfp_v01_backtest(
+                historical_clean_root=args.historical_clean_root,
+                backtest_root=args.backtest_root,
+            )
+            logging.info(
+                "Historical xFP v0.1 backtest saved to %s (%s observations; %s pairs)",
+                result.directory,
+                result.observations,
+                result.modeled_complete_pairs,
+            )
+        except HistoricalBacktestError as exc:
+            logging.error("Historical xFP v0.1 backtest failed: %s", exc)
             return 1
     return 0
 

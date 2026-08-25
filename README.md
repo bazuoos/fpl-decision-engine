@@ -506,6 +506,49 @@ by 34 minutes, xA 0.01, xGI 0.12, and xGC 0.80. `players_raw.csv` retains the
 later corrected totals. The fixture row is preserved and the exception is
 classified as an upstream archived-row/later-correction inconsistency.
 
+## Frozen xFP v0.1 historical baseline
+
+The historical backtest measures the existing xFP v0.1 formula without tuning
+or recalibration. It reads only immutable `historical-v2` inputs for 2023/24 and
+2024/25, target GWs 2–38, and retains the
+`restricted_pseudo_backtest` classification. Finalized fixture assignments are
+useful for pseudo-historical measurement but are not claimed to be a perfect
+deadline replay.
+
+Run it once with:
+
+```bash
+python -m fpl_decision_engine backtest-xfp-v01
+```
+
+Immutable artifacts are written under:
+
+```text
+data/historical/backtests/xfp-v01-baseline-v1/
+```
+
+Fixture predictions are produced before player-gameweek aggregation. Doubles
+sum their fixture predictions; verified blanks remain explicit zero prediction
+and zero actual rows. Actual modeled points are independently reconstructed at
+fixture grain from appearance, frozen-position goal points, and three points per
+assist. Archived full FPL points remain under their historical season rules.
+
+The predictor preserves the live v0.1 expected-minutes and availability gates,
+including its documented incomplete-attacking-rate behavior. Missing expected
+goal/assist events remain null and `prediction_complete=false`; v0.1's numeric
+appearance-only total remains available as a separately flagged incomplete
+prediction. Missing expected minutes leave xFP null. Metrics never impute a
+missing prediction or actual as zero, and coverage is reported separately.
+
+Outputs include player-GW observations, fixture predictions/actuals, overall,
+season, position and per-GW metrics, expected-minutes and component diagnostics,
+fixed prior-sample/availability bands, fixed calibration bins, zero and
+pre-deadline `ep_next` baselines, and strict top-10/25/50 overlap. Rankings are
+calculated within each season/gameweek, with `element_id` ascending as the final
+deterministic tie-breaker. The manifest records every historical-v2 input hash,
+the ingestion-manifest hash, cutoff and coverage policies, output hashes, and
+generation time. A completed backtest version is never overwritten.
+
 ## Run tests
 
 ```bash
