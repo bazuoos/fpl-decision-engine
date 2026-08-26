@@ -11,6 +11,7 @@ requires-python = ">=3.10"
 license = { file = "LICENSE" }
 dependencies = [
     "duckdb>=1.0",
+    "highspy>=1.7,<2",
 ]
 
 [project.scripts]

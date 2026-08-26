@@ -34,8 +34,9 @@ source .venv/bin/activate
 python -m pip install --editable .
 ```
 
-DuckDB is the only runtime dependency. It provides typed analytical validation
-and Parquet output without requiring pandas or PyArrow.
+DuckDB provides typed analytical validation and Parquet output without pandas
+or PyArrow. The lightweight HiGHS mixed-integer solver is used only by the
+decision layer for exact squad optimization.
 
 ## Fetch data
 
@@ -351,6 +352,76 @@ goals-conceded deductions, cards, fixture strength, home/away adjustments,
 shrinkage, positional priors, and machine learning. A future appearance model
 should replace the deterministic rule with estimates of `P(minutes > 0)` and
 `P(minutes >= 60)`.
+
+## Decision and optimization foundation
+
+The decision layer consumes immutable projection artifacts through a versioned
+provider interface. Ranking and optimization do not import or recompute the xFP
+formula. The first provider adapts an existing xFP v0.1 player-gameweek Parquet
+and joins price/availability from the clean player artifact with the same frozen
+snapshot. Both input paths and SHA-256 hashes are retained in every output.
+
+xFP v0.1 is labelled `modeled_components_only`: it predicts appearance, goal,
+and assist components, not total FPL points. Decision output therefore means
+only “optimal according to the supplied projection model”; optimization cannot
+make that projection model more accurate. Results are explicitly classified as:
+
+```text
+experimental_decision_output_using_xfp_v01_modeled_components_only
+```
+
+Projection eligibility is conservative and visible: complete predictions are
+eligible; a fixture-verified blank is eligible with an explicit zero; incomplete
+and missing predictions are excluded and counted. Neither missing state is
+converted to zero.
+
+Show deterministic top-10 rankings separately within GK, DEF, MID, and FWD:
+
+```bash
+python -m fpl_decision_engine rank-players \
+  --season 2026-27 --target-gameweek 2 --limit 10
+```
+
+Build a legal 15-player squad under the default £100.0m budget, then select its
+XI, captain, and vice-captain:
+
+```bash
+python -m fpl_decision_engine optimize-squad \
+  --season 2026-27 --target-gameweek 2 --budget 100.0
+```
+
+To select an XI from an existing squad, pass exactly 15 explicit player IDs:
+
+```bash
+python -m fpl_decision_engine optimize-xi \
+  --season 2026-27 --target-gameweek 2 \
+  --player-ids 1 4 12 23 34 45 56 67 78 89 90 101 112 123 134
+```
+
+All commands accept `--projection-artifact` and `--players-artifact` for fully
+explicit provenance, and `--json` for machine-readable output. The full-pool
+command writes immutable Parquet plus a JSON manifest under:
+
+```text
+data/decisions/fpl/<season>/<snapshot>/gameweek=<gw>/decision-engine-v2/<generated_at>/
+```
+
+The full-pool optimizer uses one joint MIP with explicit squad, starter, captain,
+and vice-captain binary variables. It enforces 2 GK / 5 DEF / 5 MID / 3 FWD, at
+most three players per club, integer £0.1m budget units, and a valid 11-player
+formation (exactly one GK, at least 3 DEF, 2 MID, and 1 FWD). Its objective is
+starter projections plus one extra captain copy; the vice-captain contributes
+nothing to the objective. Captain and vice are the two highest-projected
+starters, with player ID resolving projection ties. It does not simulate
+substitutions.
+
+Full-squad ties are resolved by maximum objective, lower squad cost within the
+declared `1e-8` objective tolerance, then the lexicographically lower sorted
+player-ID tuple. Starting-XI and captain/vice ties are also resolved by player
+ID. Every HiGHS stage must terminate with proven `Optimal` status; incumbents
+from limits or solver errors are refused. This foundation intentionally excludes
+transfers, chips, multi-gameweek planning, ownership, risk weights, and account
+login.
 
 ## Leakage-safe evaluation
 

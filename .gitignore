@@ -15,6 +15,9 @@ data/features/
 # Generated expected-points predictions
 data/predictions/
 
+# Generated decision-layer outputs
+data/decisions/
+
 # Immutable model-evaluation outputs
 data/evaluations/
 

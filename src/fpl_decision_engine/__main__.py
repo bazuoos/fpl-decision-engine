@@ -3,12 +3,24 @@
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import sys
 from collections.abc import Sequence
 from pathlib import Path
 
 from .features import build_player_gameweek_features
+from .decision import (
+    DECISION_OUTPUT_CLASSIFICATION,
+    DecisionError,
+    budget_m_to_units,
+    decision_result_dict,
+    optimize_squad,
+    optimize_xi,
+    rank_players,
+    resolve_existing_squad,
+    write_decision_artifacts,
+)
 from .evaluation import evaluate_xfp
 from .gameweek_transform import (
     transform_fixtures_for_snapshot,
@@ -43,6 +55,7 @@ from .official_data import (
 )
 from .pipeline import FetchError, fetch_bootstrap_static
 from .predictions import predict_xfp_v01
+from .projection_provider import ProjectionProviderError, XfpV01ParquetProvider
 from .refresh import RefreshError, refresh_fpl_data, unlock_refresh_snapshot
 from .transform import TransformationError, transform_latest_players
 
@@ -64,6 +77,9 @@ COMMANDS = {
     "experiment-attacking-rates-v02",
     "experiment-calibration-v02",
     "experiment-opponent-strength-v02",
+    "rank-players",
+    "optimize-xi",
+    "optimize-squad",
 }
 
 
@@ -95,6 +111,75 @@ def _add_clean_root(parser: argparse.ArgumentParser) -> None:
         default=Path("data/clean/fpl"),
         help="Root directory for clean FPL datasets (default: %(default)s).",
     )
+
+
+def _add_decision_provider_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--season", default="2026-27")
+    parser.add_argument("--target-gameweek", type=int, required=True)
+    parser.add_argument(
+        "--provider",
+        choices=("xfp-v01",),
+        default="xfp-v01",
+        help="Projection provider (default: %(default)s).",
+    )
+    parser.add_argument(
+        "--projection-artifact",
+        type=Path,
+        help="Explicit immutable player-GW projection Parquet; defaults to latest.",
+    )
+    parser.add_argument(
+        "--players-artifact",
+        type=Path,
+        help="Explicit matching clean players Parquet; inferred from snapshot by default.",
+    )
+    parser.add_argument(
+        "--prediction-data-root",
+        type=Path,
+        default=Path("data/predictions/fpl"),
+    )
+    parser.add_argument(
+        "--clean-data-root",
+        type=Path,
+        default=Path("data/clean/fpl"),
+    )
+    parser.add_argument(
+        "--json", action="store_true", help="Print machine-readable JSON."
+    )
+
+
+def _decision_provider(args: argparse.Namespace) -> XfpV01ParquetProvider:
+    return XfpV01ParquetProvider(
+        projection_artifact=args.projection_artifact,
+        players_artifact=args.players_artifact,
+        prediction_data_root=args.prediction_data_root,
+        clean_data_root=args.clean_data_root,
+    )
+
+
+def _print_decision_summary(payload: dict[str, object]) -> None:
+    print(DECISION_OUTPUT_CLASSIFICATION)
+    print(
+        f"Formation {payload['formation']} | captain {payload['captain']} | "
+        f"vice {payload['vice_captain']}"
+    )
+    print(
+        f"Cost £{payload['squad_cost_m']:.1f}m | remaining "
+        f"£{payload['remaining_budget_m']:.1f}m"
+    )
+    print(
+        f"Base XI {payload['base_xi_projection']:.3f} + captain bonus "
+        f"{payload['captain_bonus']:.3f} = {payload['total_objective']:.3f}"
+    )
+    for row in payload["players"]:  # type: ignore[index]
+        role = "XI" if row["starter"] else "BENCH"
+        if row["captain"]:
+            role += " C"
+        elif row["vice_captain"]:
+            role += " VC"
+        print(
+            f"{role:8} {row['position']:3} {row['player_name']:<20} "
+            f"{row['team']:<4} £{row['price_m']:.1f}m  {row['projection']:.3f}"
+        )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -393,6 +478,37 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("data/historical/experiments"),
         help="Root for immutable experiment artifacts (default: %(default)s).",
     )
+
+    rank_parser = subparsers.add_parser(
+        "rank-players", help="Rank eligible projections within each FPL position."
+    )
+    _add_decision_provider_arguments(rank_parser)
+    rank_parser.add_argument(
+        "--limit", type=int, default=10, help="Rows to display per position."
+    )
+
+    xi_parser = subparsers.add_parser(
+        "optimize-xi", help="Select an optimal XI/captain from 15 explicit player IDs."
+    )
+    _add_decision_provider_arguments(xi_parser)
+    xi_parser.add_argument("--player-ids", type=int, nargs="+", required=True)
+    xi_parser.add_argument(
+        "--budget",
+        help="Optional squad budget in £m, in exact £0.1m increments.",
+    )
+
+    squad_parser = subparsers.add_parser(
+        "optimize-squad", help="Select an optimal legal squad, XI and captain."
+    )
+    _add_decision_provider_arguments(squad_parser)
+    squad_parser.add_argument(
+        "--budget", default="100.0", help="Squad budget in £m (default: %(default)s)."
+    )
+    squad_parser.add_argument(
+        "--decision-data-root",
+        type=Path,
+        default=Path("data/decisions/fpl"),
+    )
     return parser
 
 
@@ -550,6 +666,97 @@ def main(argv: Sequence[str] | None = None) -> int:
             logging.info("Refresh lock removed: %s", result.lock_path)
         except RefreshError as exc:
             logging.error("Refresh unlock failed: %s", exc)
+            return 1
+    elif args.command in {"rank-players", "optimize-xi", "optimize-squad"}:
+        try:
+            dataset = _decision_provider(args).load(
+                season=args.season, target_gameweek=args.target_gameweek
+            )
+            rankings = rank_players(dataset)
+            if args.command == "rank-players":
+                payload = {
+                    "classification": DECISION_OUTPUT_CLASSIFICATION,
+                    "season": dataset.season,
+                    "target_gameweek": dataset.target_gameweek,
+                    "projection_provider_id": dataset.provider_id,
+                    "projection_model_id": dataset.source_model_id,
+                    "projection_model_scope": dataset.model_scope,
+                    "source_artifact_path": dataset.source_artifact_path,
+                    "source_artifact_sha256": dataset.source_artifact_sha256,
+                    "excluded_player_counts": rankings.excluded_counts,
+                    "rankings": [
+                        {
+                            "position": row.player.position,
+                            "rank": row.position_rank,
+                            "fpl_player_id": row.player.fpl_player_id,
+                            "player_name": row.player.player_name,
+                            "team": row.player.team_short_name,
+                            "price_m": row.player.price_m,
+                            "projection": row.player.projection,
+                            "projection_state": row.player.projection_state.value,
+                            "availability_status": row.player.availability_status,
+                        }
+                        for row in rankings.rows
+                    ],
+                }
+                if args.json:
+                    print(json.dumps(payload, indent=2, sort_keys=True))
+                else:
+                    print(DECISION_OUTPUT_CLASSIFICATION)
+                    for position in ("GK", "DEF", "MID", "FWD"):
+                        print(f"\n{position}")
+                        shown = 0
+                        for row in rankings.rows:
+                            if row.player.position != position or shown >= args.limit:
+                                continue
+                            print(
+                                f"{row.position_rank:>2}. {row.player.player_name:<20} "
+                                f"{row.player.team_short_name:<4} "
+                                f"£{row.player.price_m:.1f}m  {float(row.player.projection):.3f}"
+                            )
+                            shown += 1
+                    print(f"\nExcluded: {rankings.excluded_counts}")
+            elif args.command == "optimize-xi":
+                budget_units = (
+                    budget_m_to_units(args.budget) if args.budget is not None else None
+                )
+                squad = resolve_existing_squad(
+                    dataset, args.player_ids, budget_units=budget_units
+                )
+                result = optimize_xi(
+                    squad,
+                    budget_units=budget_units,
+                    excluded_counts=rankings.excluded_counts,
+                )
+                payload = decision_result_dict(dataset, result)
+                if args.json:
+                    print(json.dumps(payload, indent=2, sort_keys=True))
+                else:
+                    _print_decision_summary(payload)
+            else:
+                budget_units = budget_m_to_units(args.budget)
+                result = optimize_squad(dataset, budget_units=budget_units)
+                artifacts = write_decision_artifacts(
+                    dataset,
+                    rankings,
+                    result,
+                    decision_data_root=args.decision_data_root,
+                )
+                payload = decision_result_dict(dataset, result)
+                payload["artifact_directory"] = str(artifacts.directory)
+                payload["artifact_hashes"] = {
+                    "within_position_rankings.parquet": artifacts.rankings_sha256,
+                    "optimized_squad.parquet": artifacts.squad_sha256,
+                    "decision_manifest.json": artifacts.manifest_sha256,
+                }
+                if args.json:
+                    print(json.dumps(payload, indent=2, sort_keys=True))
+                else:
+                    _print_decision_summary(payload)
+                    print(f"Artifacts: {artifacts.directory}")
+                    print(f"Excluded: {rankings.excluded_counts}")
+        except (ProjectionProviderError, DecisionError) as exc:
+            logging.error("Decision operation failed: %s", exc)
             return 1
     elif args.command == "build-historical":
         try:
