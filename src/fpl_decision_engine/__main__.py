@@ -29,6 +29,7 @@ from .editable_manager import (
     create_manual_editable_state,
     editable_decision_payload,
     evaluate_editable_squad,
+    load_manual_editable_state,
     load_task014_benchmark,
     parse_manual_pick,
     write_editable_decision,
@@ -81,6 +82,15 @@ from .predictions import predict_xfp_v01
 from .projection_provider import ProjectionProviderError, XfpV01ParquetProvider
 from .refresh import RefreshError, refresh_fpl_data, unlock_refresh_snapshot
 from .transform import TransformationError, transform_latest_players
+from .transfer_decision import (
+    APPEARANCE_ONLY_ALLOWED_POLICY,
+    SELLING_PRICE_SOURCE,
+    TransferDecisionError,
+    evaluate_one_transfer,
+    one_transfer_payload,
+    selling_price_map,
+    write_one_transfer_decision,
+)
 
 COMMANDS = {
     "fetch",
@@ -105,6 +115,7 @@ COMMANDS = {
     "optimize-squad",
     "evaluate-entry",
     "evaluate-editable-squad",
+    "evaluate-one-transfer",
 }
 
 
@@ -636,6 +647,49 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("data/manager/decisions/fpl"),
     )
     editable_parser.add_argument("--json", action="store_true")
+
+    transfer_parser = subparsers.add_parser(
+        "evaluate-one-transfer",
+        help="Compare ROLL with every legal one-free-transfer editable squad.",
+    )
+    transfer_parser.add_argument(
+        "--manual-state-artifact",
+        type=Path,
+        required=True,
+        help="Existing immutable Task 015B/015E manual editable-state JSON.",
+    )
+    transfer_parser.add_argument(
+        "--selling-price",
+        action="append",
+        required=True,
+        help="Repeat exactly once per owned player as element_id:price_m.",
+    )
+    transfer_parser.add_argument(
+        "--selling-prices-transcribed-from-official-fpl-screenshot",
+        action="store_true",
+        required=True,
+        help="Acknowledge manual transcription from the official Transfers-page screenshot.",
+    )
+    transfer_parser.add_argument(
+        "--decision-policy",
+        choices=(APPEARANCE_ONLY_ALLOWED_POLICY,),
+        required=True,
+        help="Task 016 requires explicit selection of appearance_only_allowed.",
+    )
+    transfer_parser.add_argument("--projection-artifact", type=Path)
+    transfer_parser.add_argument("--players-artifact", type=Path)
+    transfer_parser.add_argument(
+        "--prediction-data-root", type=Path, default=Path("data/predictions/fpl")
+    )
+    transfer_parser.add_argument(
+        "--clean-data-root", type=Path, default=Path("data/clean/fpl")
+    )
+    transfer_parser.add_argument(
+        "--manager-decision-root",
+        type=Path,
+        default=Path("data/manager/decisions/fpl"),
+    )
+    transfer_parser.add_argument("--json", action="store_true")
     return parser
 
 
@@ -1075,6 +1129,73 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print(f"Decision artifact: {artifacts.decision_path}")
         except (EditableManagerError, ProjectionProviderError, DecisionError) as exc:
             logging.error("Editable-squad evaluation failed: %s", exc)
+            return 1
+    elif args.command == "evaluate-one-transfer":
+        try:
+            state = load_manual_editable_state(args.manual_state_artifact)
+            projections = XfpV01ParquetProvider(
+                projection_artifact=args.projection_artifact,
+                players_artifact=args.players_artifact,
+                prediction_data_root=args.prediction_data_root,
+                clean_data_root=args.clean_data_root,
+            ).load(
+                season=state.season,
+                target_gameweek=state.target_gameweek,
+            )
+            decision = evaluate_one_transfer(
+                state,
+                projections,
+                selling_price_map(args.selling_price),
+                decision_policy=args.decision_policy,
+                selling_price_source=SELLING_PRICE_SOURCE,
+            )
+            artifacts = write_one_transfer_decision(
+                decision,
+                decision_data_root=args.manager_decision_root,
+            )
+            payload = one_transfer_payload(decision)
+            if args.json:
+                payload["decision_artifact_path"] = str(artifacts.decision_path)
+                payload["decision_artifact_sha256"] = artifacts.decision_sha256
+                payload["candidates_artifact_path"] = str(artifacts.candidates_path)
+                payload["candidates_artifact_sha256"] = artifacts.candidates_sha256
+                print(json.dumps(payload, indent=2, sort_keys=True))
+            else:
+                comparison = payload["comparison"]
+                roll = payload["roll"]
+                best = payload["best_transfer"]
+                print(payload["model_caveat"])
+                print(payload["interpretation"])
+                print(
+                    f"ROLL: {roll['base_xi_projection']:.3f} + "
+                    f"{roll['captain_bonus']:.3f} = {roll['total_objective']:.3f}"
+                )
+                if best is not None:
+                    print(
+                        f"Best transfer: {best['out']['name']} OUT, "
+                        f"{best['in']['name']} IN; bank "
+                        f"£{best['resulting_bank_units'] / 10:.1f}m; objective "
+                        f"{best['total_objective']:.3f}; gain "
+                        f"{best['gain_vs_roll']:.3f}"
+                    )
+                print(f"Recommended action: {comparison['recommended_action']}")
+                print(f"Legal one-transfer candidates: {payload['legal_transfer_candidate_count']}")
+                for rank, row in enumerate(payload["top_10_legal_transfers"], start=1):
+                    print(
+                        f"{rank:>2}. {row['out']['name']} -> {row['in']['name']}; "
+                        f"bank £{row['resulting_bank_units'] / 10:.1f}m; "
+                        f"objective {row['total_objective']:.3f}; "
+                        f"gain {row['gain_vs_roll']:.3f}"
+                    )
+                print(f"Decision artifact: {artifacts.decision_path}")
+                print(f"Candidate artifact: {artifacts.candidates_path}")
+        except (
+            EditableManagerError,
+            ProjectionProviderError,
+            DecisionError,
+            TransferDecisionError,
+        ) as exc:
+            logging.error("One-transfer evaluation failed: %s", exc)
             return 1
     elif args.command == "build-historical":
         try:

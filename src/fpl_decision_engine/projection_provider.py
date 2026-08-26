@@ -60,6 +60,7 @@ class ProjectionPlayer:
     model_scope: str
     source_artifact_path: str
     source_artifact_sha256: str
+    expected_minutes: float | None = None
 
     @property
     def eligible(self) -> bool:
@@ -239,7 +240,8 @@ class XfpV01ParquetProvider:
                           p.web_name, p.team_id, p.team_name,
                           c.team_short_name, p.position_id, p.position,
                           c.price_m, p.gameweek_xfp_v01, p.fixture_count,
-                          p.prediction_complete, c.status,
+                          p.prediction_complete, p.gameweek_expected_minutes_v01,
+                          c.status,
                           c.chance_of_playing_next_round,
                           c.team_id, c.position_id
                      FROM read_parquet(?) AS p
@@ -270,6 +272,7 @@ class XfpV01ParquetProvider:
                 projection,
                 fixture_count,
                 prediction_complete,
+                expected_minutes,
                 availability_status,
                 chance,
                 clean_team_id,
@@ -307,6 +310,15 @@ class XfpV01ParquetProvider:
                 raise ProjectionProviderError(
                     f"player {player_id} has a non-finite projection"
                 )
+            numeric_expected_minutes = (
+                float(expected_minutes) if expected_minutes is not None else None
+            )
+            if numeric_expected_minutes is not None and not math.isfinite(
+                numeric_expected_minutes
+            ):
+                raise ProjectionProviderError(
+                    f"player {player_id} has non-finite expected minutes"
+                )
             state = _projection_state(
                 fixture_count=int(fixture_count),
                 projection=numeric_projection,
@@ -339,6 +351,7 @@ class XfpV01ParquetProvider:
                     model_scope=XFP_V01_MODEL_SCOPE,
                     source_artifact_path=str(projection_path),
                     source_artifact_sha256=projection_hash,
+                    expected_minutes=numeric_expected_minutes,
                 )
             )
 

@@ -171,16 +171,20 @@ def projection_eligible_for_policy(
         raise DecisionError(f"unsupported decision policy: {decision_policy!r}")
     if decision_policy == STRICT_COMPLETE_ONLY_POLICY:
         return player.eligible
-    return (
-        player.projection_state
-        in {
-            ProjectionState.VALID,
-            ProjectionState.VERIFIED_BLANK,
-            ProjectionState.INCOMPLETE,
-        }
-        and player.projection is not None
-        and math.isfinite(player.projection)
-    )
+    if player.projection is None or not math.isfinite(player.projection):
+        return False
+    if player.projection_state == ProjectionState.INCOMPLETE:
+        if player.expected_minutes != 0.0:
+            raise DecisionError(
+                "appearance_only_allowed invariant failed: numeric incomplete "
+                f"projection for player {player.fpl_player_id} must have exactly "
+                "zero expected minutes"
+            )
+        return True
+    return player.projection_state in {
+        ProjectionState.VALID,
+        ProjectionState.VERIFIED_BLANK,
+    }
 
 
 def _policy_projection(player: ProjectionPlayer, decision_policy: str) -> float:

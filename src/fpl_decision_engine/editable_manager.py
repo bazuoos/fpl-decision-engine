@@ -371,6 +371,79 @@ def create_manual_editable_state(
     )
 
 
+def load_manual_editable_state(path: Path) -> ManualEditableState:
+    """Load and validate an existing immutable manual editable-state artifact."""
+    if not path.is_file():
+        raise EditableManagerError(f"manual editable-state artifact is absent: {path}")
+    try:
+        payload = json.loads(path.read_bytes())
+    except (OSError, json.JSONDecodeError) as exc:
+        raise EditableManagerError(
+            f"could not read manual editable-state artifact: {exc}"
+        ) from exc
+    if not isinstance(payload, dict) or payload.get("version") != MANUAL_STATE_VERSION:
+        raise EditableManagerError("manual editable-state version is unsupported")
+    try:
+        selling_prices_verified = payload["selling_prices_verified"]
+        if not isinstance(selling_prices_verified, bool):
+            raise EditableManagerError("selling_prices_verified must be boolean")
+        picks = _validated_picks(
+            (ManualEditablePick(**row) for row in payload["picks"]),
+            selling_prices_verified=selling_prices_verified,
+        )
+        entry_id = int(payload["entry_id"])
+        target_gameweek = int(payload["target_gameweek"])
+        bank_units = int(payload["bank_units"])
+        free_transfers = int(payload["free_transfers"])
+        transfer_cost = int(payload["current_transfer_cost_points"])
+        verification_source = str(payload["verification_source"])
+        recorded_timestamp = str(payload["recorded_timestamp"])
+        season = str(payload["season"])
+        post_deadline_known = payload["post_deadline_transfers_known"]
+        current_selection_verified = payload["current_selection_verified"]
+    except (KeyError, TypeError, ValueError) as exc:
+        raise EditableManagerError(
+            f"manual editable-state structure is invalid: {exc}"
+        ) from exc
+    if entry_id <= 0 or not 1 <= target_gameweek <= 38 or not season:
+        raise EditableManagerError("manual editable-state identity is invalid")
+    _nonnegative_int(bank_units, "bank_units")
+    _nonnegative_int(free_transfers, "free_transfers")
+    _nonnegative_int(transfer_cost, "current_transfer_cost_points")
+    if verification_source != MANUAL_VERIFICATION_SOURCE:
+        raise EditableManagerError("manual editable-state verification source is invalid")
+    _validate_optional_timestamp(recorded_timestamp)
+    verification_timestamp = _validate_optional_timestamp(
+        payload.get("verification_timestamp")
+    )
+    if not isinstance(post_deadline_known, bool) or not isinstance(
+        current_selection_verified, bool
+    ):
+        raise EditableManagerError("manual editable-state boolean field is invalid")
+    third_party = payload.get("third_party_price_change_metadata")
+    if third_party is not None and not isinstance(third_party, dict):
+        raise EditableManagerError("third-party metadata must be an object or null")
+    return ManualEditableState(
+        version=MANUAL_STATE_VERSION,
+        entry_id=entry_id,
+        season=season,
+        target_gameweek=target_gameweek,
+        verification_source=verification_source,
+        verification_timestamp=verification_timestamp,
+        recorded_timestamp=recorded_timestamp,
+        bank_units=bank_units,
+        free_transfers=free_transfers,
+        current_transfer_cost_points=transfer_cost,
+        post_deadline_transfers_known=post_deadline_known,
+        selling_prices_verified=selling_prices_verified,
+        picks=picks,
+        current_selection_verified=current_selection_verified,
+        third_party_price_change_metadata=third_party,
+        artifact_path=path.resolve(),
+        artifact_sha256=sha256_file(path),
+    )
+
+
 def _require_close(actual: object, expected: float, field: str) -> None:
     if not isinstance(actual, (int, float)) or isinstance(actual, bool) or not math.isclose(
         float(actual), expected, rel_tol=0.0, abs_tol=OBJECTIVE_TOLERANCE
@@ -537,6 +610,9 @@ def evaluate_editable_squad(
                 ),
                 "projection_state": status,
                 "projection": projection,
+                "expected_minutes": (
+                    projected.expected_minutes if projected is not None else None
+                ),
                 "projection_team_id": (
                     projected.team_id if projected is not None else None
                 ),

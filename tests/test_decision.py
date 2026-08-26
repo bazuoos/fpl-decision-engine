@@ -604,13 +604,14 @@ class XfpV01ProviderTests(unittest.TestCase):
         try:
             connection.execute(
                 """CREATE TABLE projection AS SELECT * FROM (VALUES
-                    ('2026-27', 2, 'snapshot', 'v0.1', 1, 'Valid', 1, 'Team', 1, 'Goalkeeper', 1, 2.5, true),
-                    ('2026-27', 2, 'snapshot', 'v0.1', 2, 'Blank', 2, 'Team', 2, 'Defender', 0, 0.0, true),
-                    ('2026-27', 2, 'snapshot', 'v0.1', 3, 'Incomplete', 3, 'Team', 3, 'Midfielder', 1, 1.0, false),
-                    ('2026-27', 2, 'snapshot', 'v0.1', 4, 'Missing', 4, 'Team', 4, 'Forward', 1, NULL, false)
+                    ('2026-27', 2, 'snapshot', 'v0.1', 1, 'Valid', 1, 'Team', 1, 'Goalkeeper', 1, 2.5, true, 90.0),
+                    ('2026-27', 2, 'snapshot', 'v0.1', 2, 'Blank', 2, 'Team', 2, 'Defender', 0, 0.0, true, 0.0),
+                    ('2026-27', 2, 'snapshot', 'v0.1', 3, 'Incomplete', 3, 'Team', 3, 'Midfielder', 1, 1.0, false, 0.0),
+                    ('2026-27', 2, 'snapshot', 'v0.1', 4, 'Missing', 4, 'Team', 4, 'Forward', 1, NULL, false, 0.0)
                 ) AS t(season, target_gameweek, snapshot_timestamp, model_version,
                        fpl_player_id, web_name, team_id, team_name, position_id,
-                       position, fixture_count, gameweek_xfp_v01, prediction_complete)"""
+                       position, fixture_count, gameweek_xfp_v01, prediction_complete,
+                       gameweek_expected_minutes_v01)"""
             )
             connection.execute("COPY projection TO ? (FORMAT PARQUET)", [str(projection)])
             connection.execute(
@@ -646,6 +647,9 @@ class XfpV01ProviderTests(unittest.TestCase):
                 ],
             )
             self.assertEqual([row.price_units for row in data.players], [45, 50, 55, 60])
+            self.assertEqual(
+                [row.expected_minutes for row in data.players], [90.0, 0.0, 0.0, 0.0]
+            )
             self.assertEqual(data.source_artifact_sha256, projection_before)
             self.assertEqual(data.players_artifact_sha256, players_before)
             self.assertEqual(projection_before, hashlib.sha256(projection.read_bytes()).hexdigest())

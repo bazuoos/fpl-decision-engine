@@ -216,7 +216,8 @@ class EditableManagerTests(unittest.TestCase):
             benchmark, _ = self.make_benchmark(root, valid)
             rows = list(valid.players)
             rows[0] = replace(
-                rows[0], projection=0.0, projection_state=ProjectionState.INCOMPLETE
+                rows[0], projection=0.0, projection_state=ProjectionState.INCOMPLETE,
+                expected_minutes=0.0,
             )
             rows[1] = replace(
                 rows[1], projection=None, projection_state=ProjectionState.MISSING
@@ -238,7 +239,8 @@ class EditableManagerTests(unittest.TestCase):
             benchmark, _ = self.make_benchmark(root, valid)
             rows = list(valid.players)
             rows[0] = replace(
-                rows[0], projection=0.0, projection_state=ProjectionState.INCOMPLETE
+                rows[0], projection=0.0, projection_state=ProjectionState.INCOMPLETE,
+                expected_minutes=0.0,
             )
             projections = dataset(tuple(rows))
             state = self.make_state(root)
@@ -277,7 +279,8 @@ class EditableManagerTests(unittest.TestCase):
             ):
                 rows = list(valid.players)
                 rows[index] = replace(
-                    rows[index], projection=projection, projection_state=state_name
+                    rows[index], projection=projection, projection_state=state_name,
+                    expected_minutes=0.0,
                 )
                 result = evaluate_editable_squad(
                     self.make_state(root, microsecond=index + 1),
@@ -295,7 +298,8 @@ class EditableManagerTests(unittest.TestCase):
             benchmark, _ = self.make_benchmark(root, valid)
             rows = list(valid.players)
             rows[-1] = replace(
-                rows[-1], projection=25.0, projection_state=ProjectionState.INCOMPLETE
+                rows[-1], projection=25.0, projection_state=ProjectionState.INCOMPLETE,
+                expected_minutes=0.0,
             )
             result = evaluate_editable_squad(
                 self.make_state(root),
@@ -339,7 +343,8 @@ class EditableManagerTests(unittest.TestCase):
             benchmark, _ = self.make_benchmark(root, valid)
             rows = list(valid.players)
             rows[0] = replace(
-                rows[0], projection=0.0, projection_state=ProjectionState.INCOMPLETE
+                rows[0], projection=0.0, projection_state=ProjectionState.INCOMPLETE,
+                expected_minutes=0.0,
             )
             projections = dataset(tuple(rows))
             first = evaluate_editable_squad(

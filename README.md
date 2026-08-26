@@ -546,6 +546,50 @@ All editable-squad outputs retain the caveat that xFP v0.1 models appearance,
 goals, and assists only. It is not expected total FPL points and omits material
 goalkeeper/defender scoring such as clean sheets, saves, and goals conceded.
 
+### Experimental legal one-transfer decision
+
+`evaluate-one-transfer` compares ROLL with every legal same-position one-free-
+transfer squad from an existing immutable manual editable state. It requires an
+explicit `appearance_only_allowed` policy selection and a manual-price provenance
+acknowledgement; strict complete-only remains the default everywhere else.
+
+```bash
+python -m fpl_decision_engine evaluate-one-transfer \
+  --manual-state-artifact <manual_editable_state.json> \
+  --selling-price <element_id>:<verified_sell_price_m> \
+  --selling-prices-transcribed-from-official-fpl-screenshot \
+  --decision-policy appearance_only_allowed
+```
+
+Supply `--selling-price` exactly once for each of the 15 owned players. These are
+manager-specific values manually transcribed from the official FPL Transfers-
+page screenshot. They are never inferred from current price, purchase price, or
+third-party price-change data. Incoming purchase prices come from the clean
+official player snapshot aligned to the frozen projection.
+
+The one-transfer evaluator preserves squad composition, enforces the three-per-
+club limit, rejects already-owned incoming players, and uses integer £0.1m units
+for affordability and resulting bank. It reuses Task 014's `optimize_xi` for
+ROLL and every legal candidate. The frozen deterministic tie-break is:
+
+1. prefer ROLL when its objective is tied with the best transfer within the
+   established numerical tolerance;
+2. rank tied transfers by outgoing FPL player ID, then incoming FPL player ID,
+   both ascending.
+
+Under the current xFP v0.1 formula, every numeric incomplete projection admitted
+by `appearance_only_allowed` must have expected minutes exactly zero. The
+decision layer fails loudly if this invariant changes. Null, missing, NaN, and
+infinite projections remain ineligible.
+
+Outputs are immutable beneath `data/manager/decisions/fpl/` and include the
+decision, top 10 candidates, and a compact summary of every legal transfer. They
+remain experimental modeled-component outputs: appearance, goals, and assists
+only. In particular, goalkeeper and defender clean sheets, saves, goals-
+conceded deductions, bonus, and defensive-contribution scoring are omitted.
+The selected action is therefore not claimed to be the definitively best FPL
+transfer.
+
 ## Leakage-safe evaluation
 
 The evaluation methodology is defined before results are available so GW2
