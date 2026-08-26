@@ -423,6 +423,58 @@ from limits or solver errors are refused. This foundation intentionally excludes
 transfers, chips, multi-gameweek planning, ownership, risk weights, and account
 login.
 
+## Public manager-state evaluation
+
+The public manager integration reads an entry's latest locked squad using only
+unauthenticated official FPL GET endpoints:
+
+```text
+/api/bootstrap-static/
+/api/entry/<entry_id>/
+/api/entry/<entry_id>/history/
+/api/entry/<entry_id>/transfers/
+/api/entry/<entry_id>/event/<event>/picks/
+```
+
+It resolves the most recent past deadline with publicly available picks, stores
+the exact response bytes and hashes, validates all 15 players against the live
+same-season bootstrap universe, and then requires a projection artifact for that
+exact represented event. It never regenerates or substitutes projections when
+the event does not align.
+
+```bash
+python -m fpl_decision_engine evaluate-entry \
+  --entry-id <entry_id> \
+  --season 2026-27
+```
+
+Use `--event` and `--target-gameweek` for explicit alignment, and
+`--projection-artifact` plus `--players-artifact` for explicit immutable model
+provenance. Manager-specific raw and decision artifacts are written beneath
+`data/manager/` and are Git-ignored and immutable.
+
+Every result states:
+
+```text
+PUBLIC MANAGER STATE IS LOCKED AS OF THE REPRESENTED DEADLINE
+Transfers made after that deadline may not be represented.
+```
+
+The engine compares the manager's locked XI/captain/vice with the Task 014
+optimal XI from the same 15 owned players. Differences are labelled
+`modeled_component_projection_difference`, not guaranteed FPL-point gains. A
+separate full-pool result is labelled
+`informational_unconstrained_projection_benchmark`; it is not a transfer plan.
+Incomplete or missing owned projections are never changed to zero and block the
+owned-squad optimization. Verified blanks retain their explicit zero.
+
+Transfer recommendations remain
+`not_available_in_public_manager_state_v1`. Transfer optimization is not
+performed because public locked state does not reliably supply the current
+editable squad, current manager-specific selling prices, or free-transfer count.
+A future manual-input transfer design must require current squad confirmation,
+explicit sell values, bank, and free transfers before evaluating transfers.
+
 ## Leakage-safe evaluation
 
 The evaluation methodology is defined before results are available so GW2

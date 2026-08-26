@@ -18,6 +18,9 @@ data/predictions/
 # Generated decision-layer outputs
 data/decisions/
 
+# Public manager-state responses and manager-specific decisions
+data/manager/
+
 # Immutable model-evaluation outputs
 data/evaluations/
 

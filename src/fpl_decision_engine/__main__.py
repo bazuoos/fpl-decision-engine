@@ -47,6 +47,18 @@ from .historical_opponent_strength_experiment import (
     HistoricalOpponentStrengthExperimentError,
     run_historical_opponent_strength_experiment,
 )
+from .manager_decision import (
+    ManagerDecisionError,
+    evaluate_current_squad,
+    manager_decision_payload,
+    write_manager_decision,
+)
+from .manager_state import (
+    FRESHNESS_WARNING,
+    POST_DEADLINE_WARNING,
+    ManagerStateError,
+    PublicFPLManagerStateProvider,
+)
 from .official_data import (
     DEFAULT_HISTORY_DELAY_SECONDS,
     OfficialDataError,
@@ -80,6 +92,7 @@ COMMANDS = {
     "rank-players",
     "optimize-xi",
     "optimize-squad",
+    "evaluate-entry",
 }
 
 
@@ -509,6 +522,49 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=Path("data/decisions/fpl"),
     )
+
+    entry_parser = subparsers.add_parser(
+        "evaluate-entry",
+        help="Evaluate a public locked manager squad with matching projections.",
+    )
+    entry_parser.add_argument("--entry-id", type=int, required=True)
+    entry_parser.add_argument("--season", default="2026-27")
+    entry_parser.add_argument(
+        "--event",
+        type=int,
+        help="Exact locked public event; defaults to the latest available deadline.",
+    )
+    entry_parser.add_argument(
+        "--target-gameweek",
+        type=int,
+        help="Projection target; defaults to the represented locked event.",
+    )
+    entry_parser.add_argument("--provider", choices=("xfp-v01",), default="xfp-v01")
+    entry_parser.add_argument("--projection-artifact", type=Path)
+    entry_parser.add_argument("--players-artifact", type=Path)
+    entry_parser.add_argument(
+        "--prediction-data-root", type=Path, default=Path("data/predictions/fpl")
+    )
+    entry_parser.add_argument(
+        "--clean-data-root", type=Path, default=Path("data/clean/fpl")
+    )
+    entry_parser.add_argument(
+        "--manager-raw-root", type=Path, default=Path("data/manager/raw/fpl")
+    )
+    entry_parser.add_argument(
+        "--manager-decision-root",
+        type=Path,
+        default=Path("data/manager/decisions/fpl"),
+    )
+    entry_parser.add_argument(
+        "--budget", default="100.0", help="Unconstrained benchmark budget in £m."
+    )
+    entry_parser.add_argument(
+        "--skip-unconstrained-benchmark",
+        action="store_true",
+        help="Skip the informational full-pool benchmark.",
+    )
+    entry_parser.add_argument("--json", action="store_true")
     return parser
 
 
@@ -757,6 +813,91 @@ def main(argv: Sequence[str] | None = None) -> int:
                     print(f"Excluded: {rankings.excluded_counts}")
         except (ProjectionProviderError, DecisionError) as exc:
             logging.error("Decision operation failed: %s", exc)
+            return 1
+    elif args.command == "evaluate-entry":
+        try:
+            state = PublicFPLManagerStateProvider(
+                raw_data_root=args.manager_raw_root
+            ).fetch(
+                entry_id=args.entry_id,
+                season=args.season,
+                represented_event=args.event,
+            )
+            logging.info(
+                "Retrieved public manager state: event %s, deadline %s, semantics %s",
+                state.represented_event,
+                state.deadline_time,
+                state.state_semantics,
+            )
+            target_gameweek = args.target_gameweek or state.represented_event
+            projections = XfpV01ParquetProvider(
+                projection_artifact=args.projection_artifact,
+                players_artifact=args.players_artifact,
+                prediction_data_root=args.prediction_data_root,
+                clean_data_root=args.clean_data_root,
+            ).load(season=args.season, target_gameweek=target_gameweek)
+            benchmark = None
+            if not args.skip_unconstrained_benchmark:
+                benchmark = optimize_squad(
+                    projections, budget_units=budget_m_to_units(args.budget)
+                )
+            result = evaluate_current_squad(
+                state, projections, unconstrained_benchmark=benchmark
+            )
+            artifacts = write_manager_decision(
+                result, decision_data_root=args.manager_decision_root
+            )
+            payload = manager_decision_payload(result)
+            payload["decision_artifact_path"] = str(artifacts.manifest_path)
+            payload["decision_artifact_sha256"] = artifacts.manifest_sha256
+            if args.json:
+                print(json.dumps(payload, indent=2, sort_keys=True))
+            else:
+                print(FRESHNESS_WARNING)
+                print(POST_DEADLINE_WARNING)
+                print(
+                    f"Represented event: GW{state.represented_event} "
+                    f"(deadline {state.deadline_time})"
+                )
+                print(f"Public squad IDs: {[row.element_id for row in state.picks]}")
+                print(f"Manager locked XI: {list(state.manager_xi)}")
+                print(
+                    f"Manager captain/vice: {state.manager_captain}/"
+                    f"{state.manager_vice_captain}"
+                )
+                print(f"Projection reconciliation: {result.reconciliation_status}")
+                if result.optimized_result is not None:
+                    optimized = result.optimized_result
+                    print(
+                        f"Optimized owned-squad XI: "
+                        f"{[row.player.fpl_player_id for row in optimized.selections if row.is_starter]}"
+                    )
+                    print(
+                        f"Captain/vice: {optimized.captain.player_name}/"
+                        f"{optimized.vice_captain.player_name}"
+                    )
+                    print(
+                        f"Objective: {optimized.base_xi_projection:.3f} + "
+                        f"{optimized.captain_bonus:.3f} = {optimized.total_objective:.3f}"
+                    )
+                    print(
+                        "Modeled component projection difference: "
+                        f"{result.modeled_component_projection_difference}"
+                    )
+                    for change in result.change_list:
+                        print(change)
+                else:
+                    print(
+                        "Owned-squad optimization unavailable: "
+                        f"incomplete={list(result.incomplete_owned_player_ids)}, "
+                        f"missing={list(result.missing_owned_player_ids)}, "
+                        f"unresolved={list(result.unresolved_projection_player_ids)}"
+                    )
+                print("Unconstrained benchmark is informational and not a transfer plan.")
+                print("Transfer optimization not performed.")
+                print(f"Decision artifact: {artifacts.manifest_path}")
+        except (ManagerStateError, ManagerDecisionError, ProjectionProviderError, DecisionError) as exc:
+            logging.error("Public manager evaluation failed: %s", exc)
             return 1
     elif args.command == "build-historical":
         try:
