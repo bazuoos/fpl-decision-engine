@@ -10,6 +10,9 @@ from fpl_decision_engine.historical_backtest import HistoricalBacktestResult
 from fpl_decision_engine.historical_attacking_rate_experiment import (
     HistoricalAttackingRateExperimentResult,
 )
+from fpl_decision_engine.historical_calibration_experiment import (
+    HistoricalCalibrationExperimentResult,
+)
 from fpl_decision_engine.historical_minutes_experiment import (
     HistoricalMinutesExperimentResult,
 )
@@ -282,6 +285,30 @@ class CLITests(unittest.TestCase):
         self.assertEqual(
             main([
                 "experiment-attacking-rates-v02",
+                "--historical-clean-root", "custom/clean",
+                "--baseline-root", "custom/backtests",
+                "--experiment-root", "custom/experiments",
+            ]),
+            0,
+        )
+        run.assert_called_once_with(
+            historical_clean_root=Path("custom/clean"),
+            baseline_root=Path("custom/backtests"),
+            experiment_root=Path("custom/experiments"),
+        )
+
+    @patch("fpl_decision_engine.__main__.run_historical_calibration_experiment")
+    def test_calibration_experiment_dispatches_frozen_inputs(self, run) -> None:
+        run.return_value = HistoricalCalibrationExperimentResult(
+            directory=Path("custom/experiments/calibration-v02-experiment-v1"),
+            manifest_path=Path("custom/experiments/calibration-v02-experiment-v1/manifest.json"),
+            development_winner=None,
+            holdout_passed=None,
+            final_decision="DO NOT PROMOTE — KEEP RAW xFP v0.1",
+        )
+        self.assertEqual(
+            main([
+                "experiment-calibration-v02",
                 "--historical-clean-root", "custom/clean",
                 "--baseline-root", "custom/backtests",
                 "--experiment-root", "custom/experiments",

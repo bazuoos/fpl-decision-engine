@@ -23,6 +23,10 @@ from .historical_attacking_rate_experiment import (
     HistoricalAttackingRateExperimentError,
     run_historical_attacking_rate_experiment,
 )
+from .historical_calibration_experiment import (
+    HistoricalCalibrationExperimentError,
+    run_historical_calibration_experiment,
+)
 from .historical_minutes_experiment import (
     HistoricalMinutesExperimentError,
     run_historical_minutes_experiment,
@@ -54,6 +58,7 @@ COMMANDS = {
     "backtest-xfp-v01",
     "experiment-minutes-v02",
     "experiment-attacking-rates-v02",
+    "experiment-calibration-v02",
 }
 
 
@@ -345,6 +350,25 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("data/historical/experiments"),
         help="Root for immutable experiment artifacts (default: %(default)s).",
     )
+    calibration_parser = subparsers.add_parser(
+        "experiment-calibration-v02",
+        help="Run the preregistered historical xFP calibration experiment.",
+    )
+    calibration_parser.add_argument(
+        "--historical-clean-root", type=Path,
+        default=Path("data/historical/clean"),
+        help="Root containing immutable historical-v2 inputs (default: %(default)s).",
+    )
+    calibration_parser.add_argument(
+        "--baseline-root", type=Path,
+        default=Path("data/historical/backtests"),
+        help="Root containing the frozen v0.1 baseline (default: %(default)s).",
+    )
+    calibration_parser.add_argument(
+        "--experiment-root", type=Path,
+        default=Path("data/historical/experiments"),
+        help="Root for immutable experiment artifacts (default: %(default)s).",
+    )
     return parser
 
 
@@ -542,7 +566,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         except HistoricalMinutesExperimentError as exc:
             logging.error("Expected-minutes experiment failed: %s", exc)
             return 1
-    else:
+    elif args.command == "experiment-attacking-rates-v02":
         try:
             result = run_historical_attacking_rate_experiment(
                 historical_clean_root=args.historical_clean_root,
@@ -554,6 +578,19 @@ def main(argv: Sequence[str] | None = None) -> int:
             logging.info("Decision: %s", result.final_decision)
         except HistoricalAttackingRateExperimentError as exc:
             logging.error("Attacking-rate experiment failed: %s", exc)
+            return 1
+    else:
+        try:
+            result = run_historical_calibration_experiment(
+                historical_clean_root=args.historical_clean_root,
+                baseline_root=args.baseline_root,
+                experiment_root=args.experiment_root,
+            )
+            logging.info("Calibration experiment saved to %s", result.directory)
+            logging.info("Development winner: %s", result.development_winner or "none")
+            logging.info("Decision: %s", result.final_decision)
+        except HistoricalCalibrationExperimentError as exc:
+            logging.error("Calibration experiment failed: %s", exc)
             return 1
     return 0
 

@@ -651,6 +651,48 @@ ranking diagnostics, fixed population breakdowns, rate-change-by-sample
 diagnostics, the selection decision, conditional holdout results, and a
 hash-pinned manifest. A completed experiment directory is never overwritten.
 
+## xFP v0.1 calibration experiment
+
+Task 011 tests post-hoc magnitude calibration without changing xFP v0.1 or any
+input feature. The control (`C0`) is the immutable baseline. `C1` is an
+unconstrained ordinary-least-squares mapping with an intercept, and `C2` is a
+deterministic non-decreasing Pool Adjacent Violators isotonic step mapping.
+Both mappings are fitted only on complete 2023/24 modeled-component pairs.
+Missing raw predictions remain missing, and verified blanks remain explicit
+zero predictions.
+
+Run the immutable experiment once with:
+
+```bash
+python -m fpl_decision_engine experiment-calibration-v02
+```
+
+Development selection uses exact C0/candidate common pairs. A candidate must
+reduce RMSE by at least 3% and MAE by at least 2%; materially improve absolute
+bias (or finish within 0.03 points); limit pooled Spearman decline to 0.005;
+limit strict top-10/25/50 mean-overlap decline to one percentage point each;
+and lose at most one percentage point of natural coverage. If both candidates
+qualify, RMSE reduction, then MAE reduction, then the simplicity order `C1`,
+`C2` selects one winner.
+
+The 2024/25 confirmation holdout is not evaluated unless one development
+winner exists. The frozen winner is applied once without refitting and must
+pass every preregistered holdout criterion. Calibration changes prediction
+magnitude only; lower error would not establish improved goal/assist signal or
+fundamentally better player ranking.
+
+Outputs are written under:
+
+```text
+data/historical/experiments/calibration-v02-experiment-v1/
+```
+
+They include the exact C1 coefficients, the complete C2 block mapping,
+representative transformations, natural and common-pair metrics, strict
+ranking diagnostics, fixed raw-xFP calibration bands, diagnostic populations,
+the gated selection decision, conditional holdout results, and a hash-pinned
+manifest. Existing completed output is never overwritten.
+
 ## Run tests
 
 ```bash
