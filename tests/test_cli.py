@@ -7,6 +7,9 @@ from unittest.mock import patch
 from fpl_decision_engine.__main__ import main
 from fpl_decision_engine.historical import HistoricalBuildResult
 from fpl_decision_engine.historical_backtest import HistoricalBacktestResult
+from fpl_decision_engine.historical_attacking_rate_experiment import (
+    HistoricalAttackingRateExperimentResult,
+)
 from fpl_decision_engine.historical_minutes_experiment import (
     HistoricalMinutesExperimentResult,
 )
@@ -259,6 +262,30 @@ class CLITests(unittest.TestCase):
                     "--experiment-root", "custom/experiments",
                 ]
             ),
+            0,
+        )
+        run.assert_called_once_with(
+            historical_clean_root=Path("custom/clean"),
+            baseline_root=Path("custom/backtests"),
+            experiment_root=Path("custom/experiments"),
+        )
+
+    @patch("fpl_decision_engine.__main__.run_historical_attacking_rate_experiment")
+    def test_attacking_rate_experiment_dispatches_frozen_inputs(self, run) -> None:
+        run.return_value = HistoricalAttackingRateExperimentResult(
+            directory=Path("custom/experiments/attacking-rate-v02-experiment-v1"),
+            manifest_path=Path("custom/experiments/attacking-rate-v02-experiment-v1/manifest.json"),
+            development_winner=None,
+            holdout_passed=None,
+            final_decision="DO NOT PROMOTE — KEEP v0.1 ATTACKING RATES",
+        )
+        self.assertEqual(
+            main([
+                "experiment-attacking-rates-v02",
+                "--historical-clean-root", "custom/clean",
+                "--baseline-root", "custom/backtests",
+                "--experiment-root", "custom/experiments",
+            ]),
             0,
         )
         run.assert_called_once_with(

@@ -19,6 +19,10 @@ from .historical_backtest import (
     HistoricalBacktestError,
     build_historical_xfp_v01_backtest,
 )
+from .historical_attacking_rate_experiment import (
+    HistoricalAttackingRateExperimentError,
+    run_historical_attacking_rate_experiment,
+)
 from .historical_minutes_experiment import (
     HistoricalMinutesExperimentError,
     run_historical_minutes_experiment,
@@ -49,6 +53,7 @@ COMMANDS = {
     "build-historical",
     "backtest-xfp-v01",
     "experiment-minutes-v02",
+    "experiment-attacking-rates-v02",
 }
 
 
@@ -321,6 +326,25 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("data/historical/experiments"),
         help="Root for immutable experiment artifacts (default: %(default)s).",
     )
+    attacking_parser = subparsers.add_parser(
+        "experiment-attacking-rates-v02",
+        help="Run the preregistered historical attacking-rate experiment.",
+    )
+    attacking_parser.add_argument(
+        "--historical-clean-root", type=Path,
+        default=Path("data/historical/clean"),
+        help="Root containing immutable historical-v2 inputs (default: %(default)s).",
+    )
+    attacking_parser.add_argument(
+        "--baseline-root", type=Path,
+        default=Path("data/historical/backtests"),
+        help="Root containing the frozen v0.1 baseline (default: %(default)s).",
+    )
+    attacking_parser.add_argument(
+        "--experiment-root", type=Path,
+        default=Path("data/historical/experiments"),
+        help="Root for immutable experiment artifacts (default: %(default)s).",
+    )
     return parser
 
 
@@ -505,7 +529,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         except HistoricalBacktestError as exc:
             logging.error("Historical xFP v0.1 backtest failed: %s", exc)
             return 1
-    else:
+    elif args.command == "experiment-minutes-v02":
         try:
             result = run_historical_minutes_experiment(
                 historical_clean_root=args.historical_clean_root,
@@ -517,6 +541,19 @@ def main(argv: Sequence[str] | None = None) -> int:
             logging.info("Decision: %s", result.final_decision)
         except HistoricalMinutesExperimentError as exc:
             logging.error("Expected-minutes experiment failed: %s", exc)
+            return 1
+    else:
+        try:
+            result = run_historical_attacking_rate_experiment(
+                historical_clean_root=args.historical_clean_root,
+                baseline_root=args.baseline_root,
+                experiment_root=args.experiment_root,
+            )
+            logging.info("Attacking-rate experiment saved to %s", result.directory)
+            logging.info("Development winner: %s", result.development_winner or "none")
+            logging.info("Decision: %s", result.final_decision)
+        except HistoricalAttackingRateExperimentError as exc:
+            logging.error("Attacking-rate experiment failed: %s", exc)
             return 1
     return 0
 

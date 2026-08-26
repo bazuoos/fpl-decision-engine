@@ -603,6 +603,54 @@ also reports how much of the fixed realized-minutes oracle's 34.53% modeled-MAE
 improvement the selected candidate captures; the oracle remains an
 evaluation-only ceiling, not model performance.
 
+## Attacking-rate v0.2 experiment
+
+Task 010 is a second isolated, preregistered experiment. It keeps frozen v0.1
+expected minutes, availability, blanks, doubles, appearance scoring, position
+goal points, aggregation, populations, and evaluation definitions unchanged.
+Only the cumulative prior xG/90 and xA/90 inputs vary.
+
+Run it once with:
+
+```bash
+python -m fpl_decision_engine experiment-attacking-rates-v02
+```
+
+The candidates are the raw-rate control (`S0`), position-aware shrinkage with
+fixed `K=450` (`S1`) or `K=900` (`S2`), and a fixed positional-prior replacement
+below 180 prior minutes (`S3`). xG and xA priors are calculated separately as
+`90 * sum(prior event value) / sum(usable prior minutes)`. Each prior is rebuilt
+for the target's frozen historical position using only lower-GW fixtures whose
+kickoff precedes that target's frozen deadline. It is not a retrospective
+season-wide prior, and no league fallback is invented when a positional prior
+is unavailable.
+
+Development selection uses only 2023/24 common pairs among players with actual
+target minutes above zero. Actual minutes define that diagnostic population
+only after candidate predictions exist; they are never predictors. A candidate
+must improve both goal and assist Spearman by at least 0.01, keep modeled MAE
+and RMSE worsening within 1%, keep absolute-bias worsening within 0.02 points,
+and lose no more than one percentage point of coverage. The fixed selection
+order then uses mean goal/assist Spearman gain, modeled MAE, modeled RMSE, and
+the simplicity order `S1`, `S2`, `S3`.
+
+Only one development winner may reach the 2024/25 confirmation holdout. If no
+candidate clears development, holdout processing stops. Passing an eventual
+holdout means only that the candidate may proceed to xFP v0.2 design; this
+command never modifies or promotes the live model.
+
+Immutable, Git-ignored artifacts are written to:
+
+```text
+data/historical/experiments/attacking-rate-v02-experiment-v1/
+```
+
+Outputs contain causal positional-prior provenance, fixture and player-GW
+candidate predictions, natural and common-pair metrics, strict top-10/25/50
+ranking diagnostics, fixed population breakdowns, rate-change-by-sample
+diagnostics, the selection decision, conditional holdout results, and a
+hash-pinned manifest. A completed experiment directory is never overwritten.
+
 ## Run tests
 
 ```bash
