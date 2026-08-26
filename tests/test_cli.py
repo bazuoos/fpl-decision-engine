@@ -7,6 +7,9 @@ from unittest.mock import patch
 from fpl_decision_engine.__main__ import main
 from fpl_decision_engine.historical import HistoricalBuildResult
 from fpl_decision_engine.historical_backtest import HistoricalBacktestResult
+from fpl_decision_engine.historical_minutes_experiment import (
+    HistoricalMinutesExperimentResult,
+)
 from fpl_decision_engine.predictions import PredictionOutputs
 from fpl_decision_engine.refresh import RefreshResult, RefreshUnlockResult
 
@@ -236,6 +239,32 @@ class CLITests(unittest.TestCase):
         build.assert_called_once_with(
             historical_clean_root=Path("custom/clean"),
             backtest_root=Path("custom/backtests"),
+        )
+
+    @patch("fpl_decision_engine.__main__.run_historical_minutes_experiment")
+    def test_minutes_experiment_dispatches_immutable_inputs_and_output(self, run) -> None:
+        run.return_value = HistoricalMinutesExperimentResult(
+            directory=Path("custom/experiments/minutes-v02-experiment-v1"),
+            manifest_path=Path("custom/experiments/minutes-v02-experiment-v1/manifest.json"),
+            development_winner=None,
+            holdout_passed=None,
+            final_decision="DO NOT PROMOTE — KEEP v0.1 MINUTES",
+        )
+        self.assertEqual(
+            main(
+                [
+                    "experiment-minutes-v02",
+                    "--historical-clean-root", "custom/clean",
+                    "--baseline-root", "custom/backtests",
+                    "--experiment-root", "custom/experiments",
+                ]
+            ),
+            0,
+        )
+        run.assert_called_once_with(
+            historical_clean_root=Path("custom/clean"),
+            baseline_root=Path("custom/backtests"),
+            experiment_root=Path("custom/experiments"),
         )
 
 

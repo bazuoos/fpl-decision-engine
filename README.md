@@ -549,6 +549,60 @@ deterministic tie-breaker. The manifest records every historical-v2 input hash,
 the ingestion-manifest hash, cutoff and coverage policies, output hashes, and
 generation time. A completed backtest version is never overwritten.
 
+## Expected-minutes v0.2 experiment
+
+Task 009 is an isolated, preregistered experiment; it does not change xFP v0.1
+or any live prediction. It compares previous-GW persistence (`M0`) with only
+three declared alternatives: a rolling three-GW mean (`M1`), a rolling five-GW
+mean (`M2`), and fixed 60%/30%/10% recency weights (`M3`). All xG/xA rates,
+position scoring, appearance/goal/assist mechanics, availability hard gates,
+blank/DGW handling, and incomplete-rate behavior remain frozen from v0.1.
+
+Run the experiment once with:
+
+```bash
+python -m fpl_decision_engine experiment-minutes-v02
+```
+
+It uses 2023/24 as development data. A candidate reaches the untouched 2024/25
+holdout only when it clears all preregistered development thresholds: at least
+5% minutes-MAE improvement, 3% minutes-RMSE improvement, and 2% modeled-xFP-MAE
+improvement, with no more than one percentage point less coverage. Comparisons
+use common complete M0/candidate/actual pairs, while each candidate's coverage
+is reported separately. If more than one qualifies, selection uses modeled-xFP
+MAE reduction, modeled-xFP RMSE, minutes MAE, then the fixed simplicity order
+`M1`, `M2`, `M3`. If none qualifies, holdout evaluation stops.
+
+A selected candidate passes holdout only if the same improvement thresholds
+hold, appearance MAE does not worsen, modeled-xFP Spearman falls by no more than
+0.01, and coverage falls by no more than one percentage point. Ranking overlap
+is diagnostic and is not a pass criterion. Passing means only “promote this
+candidate to an xFP v0.2 design”; it does not update the live model.
+
+Windows use only calendar FPL GWs strictly before the target whose eligible
+fixture kickoffs are before the frozen target deadline. A genuine fixture with
+zero player minutes is an observed zero. A team blank and a player not yet in
+the historical universe are missing observations, not zero. Eligible DGW
+fixture minutes are summed to player-GW before entering a window; one observed
+GW is the minimum needed to form a candidate estimate. `M3` renormalizes its
+fixed weights over observed GWs. Each per-fixture estimate is capped to 0–90,
+then the frozen availability hard gate is applied.
+
+Immutable, Git-ignored outputs are written to:
+
+```text
+data/historical/experiments/minutes-v02-experiment-v1/
+```
+
+They contain fixture and player-GW candidate predictions, development metrics,
+common-pair comparisons, strict top-10/25/50 diagnostics, fixed diagnostic
+populations, the selection decision, holdout outputs only if a development
+winner exists, and a manifest containing input/output hashes and all decision
+rules. The completed experiment directory is never overwritten. The manifest
+also reports how much of the fixed realized-minutes oracle's 34.53% modeled-MAE
+improvement the selected candidate captures; the oracle remains an
+evaluation-only ceiling, not model performance.
+
 ## Run tests
 
 ```bash
