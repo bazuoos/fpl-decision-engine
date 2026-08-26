@@ -475,6 +475,77 @@ editable squad, current manager-specific selling prices, or free-transfer count.
 A future manual-input transfer design must require current squad confirmation,
 explicit sell values, bank, and free transfers before evaluating transfers.
 
+### Manually verified editable squad
+
+Public picks describe a locked deadline, not necessarily the squad currently
+shown on the official Transfers screen. `evaluate-editable-squad` therefore
+records manual official-screen confirmation as a separate immutable provenance
+object and requires its season and target gameweek to match an existing frozen
+projection exactly.
+
+```bash
+python -m fpl_decision_engine evaluate-editable-squad \
+  --entry-id <entry_id> \
+  --season 2026-27 \
+  --target-gameweek 2 \
+  --player <element_id>:GK:<name> \
+  --bank 0.0 \
+  --free-transfers 1 \
+  --current-transfer-cost-points 0 \
+  --post-deadline-transfers-known \
+  --benchmark-manifest <task014-decision_manifest.json>
+```
+
+Supply `--player <element_id>:<position>:<name>` exactly 15 times using the
+verified 2 GK / 5 DEF / 5 MID / 3 FWD composition.
+
+The manual state records the verification source, optional verification
+timestamp, bank, free transfers, transfer-cost state, squad, and whether exact
+manager selling prices were verified. It is never silently merged with the
+public locked-deadline artifact. Current XI/captain/vice are not inferred when
+they were not manually verified.
+
+The command reconciles all 15 element IDs to the frozen projection and calls
+Task 014's fixed-squad `optimize_xi` path only. Its default decision policy is
+`strict_complete_only`: incomplete or missing projections remain unusable and
+block the full fixed-squad result; their numeric storage values are not
+substituted as zero.
+
+For an explicitly experimental appearance-only review, select the versioned,
+non-default policy:
+
+```bash
+python -m fpl_decision_engine evaluate-editable-squad \
+  <the same manually verified squad arguments> \
+  --decision-policy appearance_only_allowed
+```
+
+This policy admits a numeric projection even when `prediction_complete=false`,
+while preserving that incomplete status in reconciliation and decision
+diagnostics. It never admits a null, missing, or non-finite projection. The
+artifact identifies incomplete players admitted to the squad, used in the XI,
+or used as captain/vice, and reports their objective contribution. Because the
+stored appearance-only xFP has no available goal/assist contribution, those
+components are implicitly treated as zero. This experimental result is not a
+production-ready transfer recommendation. The strict policy remains the
+default and must not be weakened implicitly.
+
+The bench list uses Task 014's deterministic position-then-player-ID reporting
+order. It is not an optimized autosub priority.
+
+The existing Task 014 full-pool result is independently hash-checked and
+reconstructed before being shown as
+`informational_unconstrained_projection_benchmark`. It is not a transfer plan.
+Without verified manager-specific sell values, one-transfer affordability is
+reported as `blocked_missing_verified_manager_selling_prices`; current market
+prices cannot substitute for selling prices. Third-party price-change metadata,
+if retained, has no effect on projections, selection, affordability, or transfer
+analysis.
+
+All editable-squad outputs retain the caveat that xFP v0.1 models appearance,
+goals, and assists only. It is not expected total FPL points and omits material
+goalkeeper/defender scoring such as clean sheets, saves, and goals conceded.
+
 ## Leakage-safe evaluation
 
 The evaluation methodology is defined before results are available so GW2

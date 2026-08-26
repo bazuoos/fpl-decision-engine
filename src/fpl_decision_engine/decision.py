@@ -33,6 +33,14 @@ DEFAULT_BUDGET_UNITS = 1000
 SQUAD_POSITION_COUNTS = {"GK": 2, "DEF": 5, "MID": 5, "FWD": 3}
 POSITION_ORDER = {"GK": 1, "DEF": 2, "MID": 3, "FWD": 4}
 OBJECTIVE_TOLERANCE = 1e-8
+DECISION_POLICY_VERSION = "decision-eligibility-policy-v1"
+STRICT_COMPLETE_ONLY_POLICY = "strict_complete_only"
+APPEARANCE_ONLY_ALLOWED_POLICY = "appearance_only_allowed"
+DEFAULT_DECISION_POLICY = STRICT_COMPLETE_ONLY_POLICY
+DECISION_POLICIES = {
+    STRICT_COMPLETE_ONLY_POLICY,
+    APPEARANCE_ONLY_ALLOWED_POLICY,
+}
 
 
 class DecisionError(Exception):
@@ -155,19 +163,64 @@ def _projection(player: ProjectionPlayer) -> float:
     return player.projection
 
 
+def projection_eligible_for_policy(
+    player: ProjectionPlayer, decision_policy: str = DEFAULT_DECISION_POLICY
+) -> bool:
+    """Return eligibility without changing the projection's original state."""
+    if decision_policy not in DECISION_POLICIES:
+        raise DecisionError(f"unsupported decision policy: {decision_policy!r}")
+    if decision_policy == STRICT_COMPLETE_ONLY_POLICY:
+        return player.eligible
+    return (
+        player.projection_state
+        in {
+            ProjectionState.VALID,
+            ProjectionState.VERIFIED_BLANK,
+            ProjectionState.INCOMPLETE,
+        }
+        and player.projection is not None
+        and math.isfinite(player.projection)
+    )
+
+
+def _policy_projection(player: ProjectionPlayer, decision_policy: str) -> float:
+    if (
+        not projection_eligible_for_policy(player, decision_policy)
+        or player.projection is None
+    ):
+        raise DecisionError(
+            f"player {player.fpl_player_id} has no numeric projection eligible under "
+            f"decision policy {decision_policy}"
+        )
+    if not math.isfinite(player.projection):
+        raise DecisionError(
+            f"player {player.fpl_player_id} has a non-finite eligible projection"
+        )
+    return player.projection
+
+
 def _validate_squad_players(
-    squad: Iterable[ProjectionPlayer], *, budget_units: int | None = None
+    squad: Iterable[ProjectionPlayer],
+    *,
+    budget_units: int | None = None,
+    decision_policy: str = DEFAULT_DECISION_POLICY,
 ) -> tuple[ProjectionPlayer, ...]:
+    if decision_policy not in DECISION_POLICIES:
+        raise DecisionError(f"unsupported decision policy: {decision_policy!r}")
     players = tuple(squad)
     if len(players) != 15:
         raise DecisionError(f"a squad must contain exactly 15 players, found {len(players)}")
     ids = [player.fpl_player_id for player in players]
     if len(set(ids)) != len(ids):
         raise DecisionError("a squad cannot contain duplicate player IDs")
-    ineligible = [player.fpl_player_id for player in players if not player.eligible]
+    ineligible = [
+        player.fpl_player_id
+        for player in players
+        if not projection_eligible_for_policy(player, decision_policy)
+    ]
     if ineligible:
         raise DecisionError(
-            "squad contains ineligible projection states for player IDs: "
+            f"squad contains projections ineligible under {decision_policy} for player IDs: "
             + ", ".join(map(str, sorted(ineligible)))
         )
     position_counts = Counter(player.position for player in players)
@@ -199,6 +252,7 @@ def resolve_existing_squad(
     player_ids: Iterable[int],
     *,
     budget_units: int | None = None,
+    decision_policy: str = DEFAULT_DECISION_POLICY,
 ) -> tuple[ProjectionPlayer, ...]:
     requested = tuple(int(player_id) for player_id in player_ids)
     if len(set(requested)) != len(requested):
@@ -211,7 +265,9 @@ def resolve_existing_squad(
             + ", ".join(map(str, missing))
         )
     return _validate_squad_players(
-        (by_id[player_id] for player_id in requested), budget_units=budget_units
+        (by_id[player_id] for player_id in requested),
+        budget_units=budget_units,
+        decision_policy=decision_policy,
     )
 
 
@@ -230,9 +286,14 @@ def optimize_xi(
     *,
     budget_units: int | None = None,
     excluded_counts: dict[str, int] | None = None,
+    decision_policy: str = DEFAULT_DECISION_POLICY,
 ) -> DecisionResult:
     """Enumerate the small legal-XI space for one validated 15-player squad."""
-    players = _validate_squad_players(squad, budget_units=budget_units)
+    players = _validate_squad_players(
+        squad,
+        budget_units=budget_units,
+        decision_policy=decision_policy,
+    )
     by_position = {
         position: tuple(player for player in players if player.position == position)
         for position in POSITION_ORDER
@@ -252,9 +313,15 @@ def optimize_xi(
                         starters = (
                             (goalkeeper,) + defender_group + midfielder_group + forward_group
                         )
-                        captain_projection = max(_projection(player) for player in starters)
+                        captain_projection = max(
+                            _policy_projection(player, decision_policy)
+                            for player in starters
+                        )
                         objective = (
-                            sum(_projection(player) for player in starters)
+                            sum(
+                                _policy_projection(player, decision_policy)
+                                for player in starters
+                            )
                             + captain_projection
                         )
                         starter_ids = tuple(
@@ -285,7 +352,10 @@ def optimize_xi(
     starter_ids = {player.fpl_player_id for player in best_starters}
     captain_order = sorted(
         best_starters,
-        key=lambda player: (-_projection(player), player.fpl_player_id),
+        key=lambda player: (
+            -_policy_projection(player, decision_policy),
+            player.fpl_player_id,
+        ),
     )
     captain, vice_captain = captain_order[:2]
     formation_counts = Counter(player.position for player in best_starters)
@@ -307,10 +377,12 @@ def optimize_xi(
             is_captain=player.fpl_player_id == captain.fpl_player_id,
             is_vice_captain=player.fpl_player_id == vice_captain.fpl_player_id,
             base_contribution=(
-                _projection(player) if player.fpl_player_id in starter_ids else 0.0
+                _policy_projection(player, decision_policy)
+                if player.fpl_player_id in starter_ids
+                else 0.0
             ),
             captain_bonus=(
-                _projection(player)
+                _policy_projection(player, decision_policy)
                 if player.fpl_player_id == captain.fpl_player_id
                 else 0.0
             ),
@@ -318,7 +390,7 @@ def optimize_xi(
         for player in ordered_players
     )
     base_projection = sum(row.base_contribution for row in selections)
-    captain_bonus = _projection(captain)
+    captain_bonus = _policy_projection(captain, decision_policy)
     cost = sum(player.price_units for player in players)
     return DecisionResult(
         squad=tuple(sorted(players, key=lambda player: player.fpl_player_id)),

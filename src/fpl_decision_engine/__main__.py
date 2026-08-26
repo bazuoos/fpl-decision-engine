@@ -11,7 +11,9 @@ from pathlib import Path
 
 from .features import build_player_gameweek_features
 from .decision import (
+    DECISION_POLICIES,
     DECISION_OUTPUT_CLASSIFICATION,
+    DEFAULT_DECISION_POLICY,
     DecisionError,
     budget_m_to_units,
     decision_result_dict,
@@ -22,6 +24,15 @@ from .decision import (
     write_decision_artifacts,
 )
 from .evaluation import evaluate_xfp
+from .editable_manager import (
+    EditableManagerError,
+    create_manual_editable_state,
+    editable_decision_payload,
+    evaluate_editable_squad,
+    load_task014_benchmark,
+    parse_manual_pick,
+    write_editable_decision,
+)
 from .gameweek_transform import (
     transform_fixtures_for_snapshot,
     transform_player_history_for_snapshot,
@@ -93,6 +104,7 @@ COMMANDS = {
     "optimize-xi",
     "optimize-squad",
     "evaluate-entry",
+    "evaluate-editable-squad",
 }
 
 
@@ -565,6 +577,65 @@ def build_parser() -> argparse.ArgumentParser:
         help="Skip the informational full-pool benchmark.",
     )
     entry_parser.add_argument("--json", action="store_true")
+
+    editable_parser = subparsers.add_parser(
+        "evaluate-editable-squad",
+        help="Evaluate a manually verified editable squad against frozen projections.",
+    )
+    editable_parser.add_argument("--entry-id", type=int, required=True)
+    editable_parser.add_argument("--season", default="2026-27")
+    editable_parser.add_argument("--target-gameweek", type=int, required=True)
+    editable_parser.add_argument(
+        "--player",
+        action="append",
+        required=True,
+        help="Repeat 15 times as element_id:position:display_name.",
+    )
+    editable_parser.add_argument("--bank", required=True, help="Verified bank in £m.")
+    editable_parser.add_argument("--free-transfers", type=int, required=True)
+    editable_parser.add_argument(
+        "--current-transfer-cost-points", type=int, default=0
+    )
+    editable_parser.add_argument(
+        "--post-deadline-transfers-known",
+        action="store_true",
+        help="Assert that post-deadline transfer state was manually checked.",
+    )
+    editable_parser.add_argument("--verification-timestamp")
+    editable_parser.add_argument("--projection-artifact", type=Path)
+    editable_parser.add_argument("--players-artifact", type=Path)
+    editable_parser.add_argument(
+        "--prediction-data-root", type=Path, default=Path("data/predictions/fpl")
+    )
+    editable_parser.add_argument(
+        "--clean-data-root", type=Path, default=Path("data/clean/fpl")
+    )
+    editable_parser.add_argument(
+        "--benchmark-manifest",
+        type=Path,
+        required=True,
+        help="Immutable Task 014 decision-engine-v2 manifest.",
+    )
+    editable_parser.add_argument(
+        "--decision-policy",
+        choices=sorted(DECISION_POLICIES),
+        default=DEFAULT_DECISION_POLICY,
+        help=(
+            "Fixed-squad projection eligibility policy. The strict complete-only "
+            "policy remains the default."
+        ),
+    )
+    editable_parser.add_argument(
+        "--manual-data-root",
+        type=Path,
+        default=Path("data/manager/manual/fpl"),
+    )
+    editable_parser.add_argument(
+        "--manager-decision-root",
+        type=Path,
+        default=Path("data/manager/decisions/fpl"),
+    )
+    editable_parser.add_argument("--json", action="store_true")
     return parser
 
 
@@ -898,6 +969,112 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print(f"Decision artifact: {artifacts.manifest_path}")
         except (ManagerStateError, ManagerDecisionError, ProjectionProviderError, DecisionError) as exc:
             logging.error("Public manager evaluation failed: %s", exc)
+            return 1
+    elif args.command == "evaluate-editable-squad":
+        try:
+            picks = tuple(parse_manual_pick(value) for value in args.player)
+            state = create_manual_editable_state(
+                entry_id=args.entry_id,
+                season=args.season,
+                target_gameweek=args.target_gameweek,
+                picks=picks,
+                bank_m=args.bank,
+                free_transfers=args.free_transfers,
+                current_transfer_cost_points=args.current_transfer_cost_points,
+                post_deadline_transfers_known=args.post_deadline_transfers_known,
+                verification_timestamp=args.verification_timestamp,
+                manual_data_root=args.manual_data_root,
+            )
+            projections = XfpV01ParquetProvider(
+                projection_artifact=args.projection_artifact,
+                players_artifact=args.players_artifact,
+                prediction_data_root=args.prediction_data_root,
+                clean_data_root=args.clean_data_root,
+            ).load(season=args.season, target_gameweek=args.target_gameweek)
+            benchmark = load_task014_benchmark(args.benchmark_manifest, projections)
+            result = evaluate_editable_squad(
+                state,
+                projections,
+                benchmark,
+                decision_policy=args.decision_policy,
+            )
+            artifacts = write_editable_decision(
+                result, decision_data_root=args.manager_decision_root
+            )
+            payload = editable_decision_payload(result)
+            payload["decision_artifact_path"] = str(artifacts.decision_path)
+            payload["decision_artifact_sha256"] = artifacts.decision_sha256
+            if args.json:
+                print(json.dumps(payload, indent=2, sort_keys=True))
+            else:
+                print(payload["model_caveat"])
+                print(
+                    f"Decision policy: {result.decision_policy} "
+                    f"(policy coverage {result.decision_policy_coverage_pct:.1f}%)"
+                )
+                if payload["appearance_only_policy_caveat"] is not None:
+                    print(payload["appearance_only_policy_caveat"])
+                print(
+                    f"Manual editable state: {args.season} GW{args.target_gameweek}; "
+                    f"coverage {result.projection_coverage_pct:.1f}%"
+                )
+                print(f"Reconciliation: {result.reconciliation_counts}")
+                if result.optimized_result is None:
+                    print(
+                        "Fixed-squad optimization is blocked by projection reconciliation: "
+                        f"{payload['blocking_projection_player_ids']}"
+                    )
+                else:
+                    optimized = result.optimized_result
+                    print(
+                        "Starting XI: "
+                        + ", ".join(
+                            row.player.player_name
+                            for row in optimized.selections
+                            if row.is_starter
+                        )
+                    )
+                    print(f"Formation: {optimized.formation}")
+                    print(
+                        "Bench deterministic reporting order: "
+                        + ", ".join(
+                            row.player.player_name
+                            for row in optimized.selections
+                            if not row.is_starter
+                        )
+                    )
+                    print(
+                        f"Captain/vice: {optimized.captain.player_name}/"
+                        f"{optimized.vice_captain.player_name}"
+                    )
+                    print(
+                        f"Objective: {optimized.base_xi_projection:.3f} + "
+                        f"{optimized.captain_bonus:.3f} = {optimized.total_objective:.3f}"
+                    )
+                    incomplete = payload["incomplete_projection_policy_diagnostics"]
+                    print(
+                        "Incomplete projections admitted/used in XI/objective: "
+                        f"{incomplete['incomplete_projections_admitted_to_squad']}/"
+                        f"{len(incomplete['selected_in_starting_xi'])}/"
+                        f"{incomplete['total_objective_contribution']:.3f}"
+                    )
+                difference = payload["unconstrained_benchmark"][
+                    "difference_from_current_squad_optimum"
+                ]
+                print(
+                    "Task 014 benchmark: informational only; not a transfer plan; "
+                    f"objective difference {difference['total_objective']:.3f}"
+                    if difference is not None
+                    else "Task 014 benchmark: informational only; not a transfer plan."
+                )
+                print(
+                    f"Transfer analysis: {result.transfer_feasibility_status} — "
+                    f"{result.transfer_feasibility_reason}"
+                )
+                print(f"Manual state artifact: {state.artifact_path}")
+                print(f"Decision artifact: {artifacts.decision_path}")
+        except (EditableManagerError, ProjectionProviderError, DecisionError) as exc:
+            logging.error("Editable-squad evaluation failed: %s", exc)
             return 1
     elif args.command == "build-historical":
         try:
