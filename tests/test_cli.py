@@ -16,6 +16,9 @@ from fpl_decision_engine.historical_calibration_experiment import (
 from fpl_decision_engine.historical_minutes_experiment import (
     HistoricalMinutesExperimentResult,
 )
+from fpl_decision_engine.historical_opponent_strength_experiment import (
+    HistoricalOpponentStrengthExperimentResult,
+)
 from fpl_decision_engine.predictions import PredictionOutputs
 from fpl_decision_engine.refresh import RefreshResult, RefreshUnlockResult
 
@@ -309,6 +312,38 @@ class CLITests(unittest.TestCase):
         self.assertEqual(
             main([
                 "experiment-calibration-v02",
+                "--historical-clean-root", "custom/clean",
+                "--baseline-root", "custom/backtests",
+                "--experiment-root", "custom/experiments",
+            ]),
+            0,
+        )
+        run.assert_called_once_with(
+            historical_clean_root=Path("custom/clean"),
+            baseline_root=Path("custom/backtests"),
+            experiment_root=Path("custom/experiments"),
+        )
+
+    @patch(
+        "fpl_decision_engine.__main__.run_historical_opponent_strength_experiment"
+    )
+    def test_opponent_strength_experiment_dispatches_frozen_inputs(self, run) -> None:
+        run.return_value = HistoricalOpponentStrengthExperimentResult(
+            directory=Path(
+                "custom/experiments/opponent-strength-v02-experiment-v1"
+            ),
+            manifest_path=Path(
+                "custom/experiments/opponent-strength-v02-experiment-v1/manifest.json"
+            ),
+            development_winner=None,
+            holdout_passed=None,
+            final_decision=(
+                "DO NOT PROMOTE — KEEP xFP v0.1 WITHOUT OPPONENT ADJUSTMENT"
+            ),
+        )
+        self.assertEqual(
+            main([
+                "experiment-opponent-strength-v02",
                 "--historical-clean-root", "custom/clean",
                 "--baseline-root", "custom/backtests",
                 "--experiment-root", "custom/experiments",

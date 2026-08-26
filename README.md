@@ -693,6 +693,50 @@ ranking diagnostics, fixed raw-xFP calibration bands, diagnostic populations,
 the gated selection decision, conditional holdout results, and a hash-pinned
 manifest. Existing completed output is never overwritten.
 
+## Opponent-strength v0.2 experiment
+
+Task 012 tests one new input while leaving frozen xFP v0.1 unchanged. The
+control (`F0`) uses raw xG/90 and xA/90. `F1` multiplies both rates independently
+by the opponent's causal recent actual-goals-conceded factor; `F2` uses the
+analogous xGC factor. Team goals conceded come directly from fixture scores.
+Team-fixture xGC is the sum of the opponent's player-fixture xG, never a sum of
+player xGC.
+
+Each factor uses at most the opponent's six most recent matches whose kickoff
+is strictly before the frozen target deadline, ordered by kickoff and then
+fixture ID. The causal league baseline uses all eligible team-matches before
+that same deadline. Fewer than three prior matches gives exactly `1.0`; all
+other factors are clipped to `[0.7, 1.3]`. No home/away, attacking-strength,
+minutes, availability, calibration, or scoring component is changed.
+
+Run the immutable experiment once with:
+
+```bash
+python -m fpl_decision_engine experiment-opponent-strength-v02
+```
+
+Development selection uses only 2023/24 normal single-fixture player-GWs with
+actual minutes above zero and strict `F0`/candidate/actual common pairs. Blanks
+and doubles remain diagnostic. The experiment retains the
+`restricted_pseudo_backtest` label because finalized opponent assignment is
+internally consistent but is not independently proven to have been frozen at
+every deadline. The 2024/25 holdout remains unopened unless exactly one
+development candidate passes every preregistered gate; only that candidate and
+`F0` may then be evaluated once.
+
+Artifacts are written to:
+
+```text
+data/historical/experiments/opponent-strength-v02-experiment-v1/
+```
+
+They contain causal team-match defence, selected rolling contexts and source
+fixtures, fixture and player-GW predictions, natural/common-pair metrics, fixed
+diagnostic populations, factor/clipping and confound diagnostics, the gated
+selection decision, conditional holdout outputs, and a hash-pinned manifest.
+Existing completed output is never overwritten, and running the experiment
+does not promote or modify the live model.
+
 ## Run tests
 
 ```bash
