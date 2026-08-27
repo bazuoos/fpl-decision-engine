@@ -1057,6 +1057,37 @@ selection decision, conditional holdout outputs, and a hash-pinned manifest.
 Existing completed output is never overwritten, and running the experiment
 does not promote or modify the live model.
 
+## Previous-season attacking-prior development experiment
+
+Task 018D tests one preregistered cold-start candidate without changing xFP
+v0.1. `C0` reproduces frozen v0.1. `C1` changes only the current cumulative
+xG/90 and xA/90 rates by blending an eligible, code-matched 2023/24 player
+prior with exactly 450 pseudo-minutes. Eligibility requires at least 450
+previous-season minutes, finite official-FPL xG and xA, a unique audited FPL
+`code`, and the same historical position. Team changes remain eligible and
+previous-season performance is aggregated across clubs. Missing or anomalous
+priors fall back exactly to C0; a prior never completes an already-incomplete
+current-season attacking projection.
+
+Run the immutable **2024/25 development-only** evaluation once with:
+
+```bash
+python -m fpl_decision_engine experiment-previous-season-prior-development
+```
+
+Outputs are stored under:
+
+```text
+data/historical/experiments/previous-season-attacking-prior-development-v1/
+```
+
+The command reads historical-v3.1 2023/24 prior data and 2024/25 development
+data only. The 2025/26 holdout is sealed: it is neither opened nor evaluated,
+even when every development gate passes. The manifest records
+`holdout_evaluated=false`, the complete eligibility/fallback audit, common-pair
+metrics, every preregistered gate, and immutable input/output hashes. The
+classification remains `restricted_pseudo_backtest`.
+
 ## Run tests
 
 ```bash

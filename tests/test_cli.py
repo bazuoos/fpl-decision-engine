@@ -19,6 +19,9 @@ from fpl_decision_engine.historical_minutes_experiment import (
 from fpl_decision_engine.historical_opponent_strength_experiment import (
     HistoricalOpponentStrengthExperimentResult,
 )
+from fpl_decision_engine.historical_previous_season_prior_experiment import (
+    HistoricalPreviousSeasonPriorExperimentResult,
+)
 from fpl_decision_engine.predictions import PredictionOutputs
 from fpl_decision_engine.refresh import RefreshResult, RefreshUnlockResult
 
@@ -344,6 +347,36 @@ class CLITests(unittest.TestCase):
         self.assertEqual(
             main([
                 "experiment-opponent-strength-v02",
+                "--historical-clean-root", "custom/clean",
+                "--baseline-root", "custom/backtests",
+                "--experiment-root", "custom/experiments",
+            ]),
+            0,
+        )
+        run.assert_called_once_with(
+            historical_clean_root=Path("custom/clean"),
+            baseline_root=Path("custom/backtests"),
+            experiment_root=Path("custom/experiments"),
+        )
+
+    @patch(
+        "fpl_decision_engine.__main__.run_previous_season_prior_development_experiment"
+    )
+    def test_previous_season_prior_experiment_is_development_only(self, run) -> None:
+        run.return_value = HistoricalPreviousSeasonPriorExperimentResult(
+            directory=Path(
+                "custom/experiments/previous-season-attacking-prior-development-v1"
+            ),
+            manifest_path=Path(
+                "custom/experiments/previous-season-attacking-prior-development-v1/"
+                "experiment_manifest.json"
+            ),
+            development_passed=False,
+            holdout_evaluated=False,
+        )
+        self.assertEqual(
+            main([
+                "experiment-previous-season-prior-development",
                 "--historical-clean-root", "custom/clean",
                 "--baseline-root", "custom/backtests",
                 "--experiment-root", "custom/experiments",

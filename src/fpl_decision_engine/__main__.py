@@ -64,6 +64,10 @@ from .historical_opponent_strength_experiment import (
     HistoricalOpponentStrengthExperimentError,
     run_historical_opponent_strength_experiment,
 )
+from .historical_previous_season_prior_experiment import (
+    HistoricalPreviousSeasonPriorExperimentError,
+    run_previous_season_prior_development_experiment,
+)
 from .manager_decision import (
     ManagerDecisionError,
     evaluate_current_squad,
@@ -115,6 +119,7 @@ COMMANDS = {
     "experiment-attacking-rates-v02",
     "experiment-calibration-v02",
     "experiment-opponent-strength-v02",
+    "experiment-previous-season-prior-development",
     "rank-players",
     "optimize-xi",
     "optimize-squad",
@@ -519,6 +524,28 @@ def build_parser() -> argparse.ArgumentParser:
         "--experiment-root", type=Path,
         default=Path("data/historical/experiments"),
         help="Root for immutable experiment artifacts (default: %(default)s).",
+    )
+    prior_parser = subparsers.add_parser(
+        "experiment-previous-season-prior-development",
+        help=(
+            "Run the preregistered previous-season attacking-prior experiment "
+            "on 2024/25 development data only."
+        ),
+    )
+    prior_parser.add_argument(
+        "--historical-clean-root", type=Path,
+        default=Path("data/historical/clean"),
+        help="Root containing immutable historical-v3.1 inputs (default: %(default)s).",
+    )
+    prior_parser.add_argument(
+        "--baseline-root", type=Path,
+        default=Path("data/historical/backtests"),
+        help="Root containing the frozen v0.1 baseline (default: %(default)s).",
+    )
+    prior_parser.add_argument(
+        "--experiment-root", type=Path,
+        default=Path("data/historical/experiments"),
+        help="Root for immutable development artifacts (default: %(default)s).",
     )
 
     rank_parser = subparsers.add_parser(
@@ -1313,7 +1340,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         except HistoricalCalibrationExperimentError as exc:
             logging.error("Calibration experiment failed: %s", exc)
             return 1
-    else:
+    elif args.command == "experiment-opponent-strength-v02":
         try:
             result = run_historical_opponent_strength_experiment(
                 historical_clean_root=args.historical_clean_root,
@@ -1325,6 +1352,22 @@ def main(argv: Sequence[str] | None = None) -> int:
             logging.info("Decision: %s", result.final_decision)
         except HistoricalOpponentStrengthExperimentError as exc:
             logging.error("Opponent-strength experiment failed: %s", exc)
+            return 1
+    else:
+        try:
+            result = run_previous_season_prior_development_experiment(
+                historical_clean_root=args.historical_clean_root,
+                baseline_root=args.baseline_root,
+                experiment_root=args.experiment_root,
+            )
+            logging.info(
+                "Previous-season prior development experiment saved to %s",
+                result.directory,
+            )
+            logging.info("Development passed: %s", result.development_passed)
+            logging.info("Holdout evaluated: %s", result.holdout_evaluated)
+        except HistoricalPreviousSeasonPriorExperimentError as exc:
+            logging.error("Previous-season prior development experiment failed: %s", exc)
             return 1
     return 0
 
