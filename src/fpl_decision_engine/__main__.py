@@ -23,6 +23,11 @@ from .decision import (
     resolve_existing_squad,
     write_decision_artifacts,
 )
+from .decision_reliability import (
+    DecisionReliabilityError,
+    load_reliability_context,
+    write_decision_reliability,
+)
 from .evaluation import evaluate_xfp
 from .editable_manager import (
     EditableManagerError,
@@ -116,6 +121,7 @@ COMMANDS = {
     "evaluate-entry",
     "evaluate-editable-squad",
     "evaluate-one-transfer",
+    "analyze-decision-reliability",
 }
 
 
@@ -690,6 +696,24 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("data/manager/decisions/fpl"),
     )
     transfer_parser.add_argument("--json", action="store_true")
+
+    reliability_parser = subparsers.add_parser(
+        "analyze-decision-reliability",
+        help="Add diagnostic reliability evidence to an immutable Task 016 decision.",
+    )
+    reliability_parser.add_argument(
+        "--decision-artifact",
+        type=Path,
+        required=True,
+        help="Immutable Task 016 one_transfer_decision.json.",
+    )
+    reliability_parser.add_argument(
+        "--feature-artifact",
+        type=Path,
+        required=True,
+        help="Frozen player_gameweek_features.parquet linked by the prediction.",
+    )
+    reliability_parser.add_argument("--json", action="store_true")
     return parser
 
 
@@ -1196,6 +1220,33 @@ def main(argv: Sequence[str] | None = None) -> int:
             TransferDecisionError,
         ) as exc:
             logging.error("One-transfer evaluation failed: %s", exc)
+            return 1
+    elif args.command == "analyze-decision-reliability":
+        try:
+            context = load_reliability_context(
+                args.decision_artifact,
+                args.feature_artifact,
+            )
+            artifacts = write_decision_reliability(context)
+            payload = json.loads(artifacts.reliability_path.read_bytes())
+            if args.json:
+                print(json.dumps(payload, indent=2, sort_keys=True))
+            else:
+                summary = payload["human_summary"]
+                print("Model result:", summary["model_result"])
+                print("Reliability evidence:", summary["reliability_evidence"])
+                print("Interpretation:", summary["interpretation"])
+                print("Warnings:")
+                for warning in payload["warnings"]:
+                    print(f"- {warning['code']}: {warning['message']}")
+                print(
+                    "Diagnostic actions:",
+                    ", ".join(payload["stability_summary"]["distinct_diagnostic_actions"]),
+                )
+                print(f"Reliability artifact: {artifacts.reliability_path}")
+                print(f"SHA-256: {artifacts.reliability_sha256}")
+        except DecisionReliabilityError as exc:
+            logging.error("Decision reliability analysis failed: %s", exc)
             return 1
     elif args.command == "build-historical":
         try:

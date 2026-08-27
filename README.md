@@ -590,6 +590,65 @@ conceded deductions, bonus, and defensive-contribution scoring are omitted.
 The selected action is therefore not claimed to be the definitively best FPL
 transfer.
 
+### Decision reliability diagnostics
+
+`analyze-decision-reliability` adds a separate, read-only human interpretation
+layer to an existing immutable Task 016 decision. It does not change xFP,
+projection eligibility, legal candidates, the Task 014 optimizer, or the
+official recommendation.
+
+```bash
+python -m fpl_decision_engine analyze-decision-reliability \
+  --decision-artifact <one_transfer_decision.json> \
+  --feature-artifact <player_gameweek_features.parquet>
+```
+
+The command verifies the hashes linking the Task 016 decision, all-candidate
+artifact, frozen xFP player-GW artifact, clean player input, feature input, and
+manual manager state. Missing required provenance is an error. It then exposes
+prior minutes, appearances, starts, cumulative xG/xA, xG/90, xA/90,
+`low_sample`, completeness, expected minutes, and frozen availability for every
+player materially involved in the current XI, official transfer, resulting XI,
+captaincy, and top-10 alternatives.
+
+Rate ranks and P90/P95/P99 values use metric-specific populations from the same
+frozen player-GW artifact, grouped by frozen FPL position. Each xG/90 or xA/90
+population independently contains only `prediction_complete=true` rows with a
+genuinely defined finite value for that metric. Undefined rates are excluded,
+never treated as zero; xG/90 and xA/90 population sizes may therefore differ.
+The extreme-rate warning is strictly descriptive: xG/90 or xA/90 above
+position P95. It never changes xFP or transfer eligibility.
+
+The artifact also contains exactly 11 explicitly `diagnostic_only` views for
+incoming minimum prior minutes, position-specific rate-tail exclusion,
+position-specific rate caps, and an XI-only objective without captain
+amplification. Minimum-minute and rate-exclusion views are declared incoming
+acquisition screens: existing owned players are grandfathered, no projection is
+transformed, and the original ROLL objective remains the comparison baseline.
+Rate-cap views are symmetric projection transforms: they recalculate temporary
+appearance+goal+assist values in memory for the owned ROLL squad and every
+incoming-player squad before re-optimizing each objective. Stored projections
+remain untouched. These views have no veto power and do not replace the official
+objective. Their candidate universe is the exact already-legality-checked Task
+016 candidate artifact; Task 017 does not rebuild transfer legality.
+
+The report also separates a universal season-state flag from player-specific
+evidence. For the frozen GW2 universe, `low_sample` is universal (610/610) and
+therefore cannot distinguish one player from another. De Cuyper's distinctive
+reliability concern is instead that his extreme attacking rates come from one
+appearance and 77 minutes. This distinction is persisted in the artifact, not
+only printed by the command.
+
+Outputs are immutable children of the source Task 016 directory:
+
+```text
+<task016_timestamp>/decision-reliability-v1/<timestamp>/decision_reliability.json
+```
+
+The report provides factual stability counts and gain ranges, not a probability,
+confidence score, or unsupported safe/unsafe grade. Its human-facing summary
+separates the unchanged model result, reliability evidence, and interpretation.
+
 ## Leakage-safe evaluation
 
 The evaluation methodology is defined before results are available so GW2
