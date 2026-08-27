@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import io
 import json
 import lzma
@@ -12,6 +13,7 @@ from pathlib import Path
 import duckdb
 
 from fpl_decision_engine.historical import (
+    DUPLICATE_VALIDATION_MODE,
     FEATURE_SCHEMA,
     HISTORY_CUTOFF_RULE,
     HistoricalDataQualityError,
@@ -20,12 +22,19 @@ from fpl_decision_engine.historical import (
     _cache_source,
     _audit_chronological_exclusions,
     _build_features_and_actuals,
+    _deduplicate_player_fixture_rows,
     _previous_context,
+    _write_parquet,
     _validate_feature_rows,
     build_historical_datasets,
     validate_predeadline_snapshot,
 )
-from fpl_decision_engine.historical_sources import HistoricalSource
+from fpl_decision_engine.historical_sources import (
+    RANDDALLF_2025_26_COMMIT,
+    VAASTAV_2025_26_COMMIT,
+    HistoricalSource,
+    sources_by_season,
+)
 
 
 def _csv_bytes(rows: list[dict[str, object]]) -> bytes:
@@ -426,6 +435,84 @@ class HistoricalIngestionTests(unittest.TestCase):
 
 
 class HistoricalSourceValidationTests(unittest.TestCase):
+    def test_duckdb_writer_round_trips_feature_nulls_without_sentinels(self) -> None:
+        schema = (
+            ("season", "VARCHAR"),
+            ("element_id", "BIGINT"),
+            ("previous_gameweek_minutes_uncapped", "INTEGER"),
+            ("prior_xg_per_90", "DOUBLE"),
+            ("previous_gw_context_status", "VARCHAR"),
+            ("neighboring_numeric_value", "DOUBLE"),
+        )
+        row = (
+            "2025-26",
+            841,
+            None,
+            None,
+            "player_not_in_previous_predeadline_universe",
+            5.5,
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "nullable_feature.parquet"
+            connection = duckdb.connect(":memory:")
+            try:
+                _write_parquet(connection, "nullable_feature", schema, [row], path)
+                actual = connection.execute(
+                    "SELECT *, typeof(element_id), "
+                    "typeof(previous_gameweek_minutes_uncapped), "
+                    "typeof(prior_xg_per_90), typeof(neighboring_numeric_value) "
+                    "FROM read_parquet(?)",
+                    [str(path)],
+                ).fetchone()
+            finally:
+                connection.close()
+
+        self.assertEqual(actual[:2], ("2025-26", 841))
+        self.assertIsNone(actual[2])
+        self.assertIsNone(actual[3])
+        for value in actual[2:4]:
+            self.assertNotIn(value, (0, 0.0, ""))
+            self.assertFalse(isinstance(value, float) and value != value)
+        self.assertEqual(
+            actual[4:6],
+            ("player_not_in_previous_predeadline_universe", 5.5),
+        )
+        self.assertEqual(actual[6:], ("BIGINT", "INTEGER", "DOUBLE", "DOUBLE"))
+
+    def test_2025_source_catalogue_is_exactly_pinned(self) -> None:
+        sources = sources_by_season("2025-26")
+        self.assertEqual(len(sources), 42)
+        self.assertEqual(
+            {source.commit for source in sources if source.kind != "predeadline_bootstrap"},
+            {VAASTAV_2025_26_COMMIT},
+        )
+        snapshots = [source for source in sources if source.kind == "predeadline_bootstrap"]
+        self.assertEqual(len(snapshots), 38)
+        self.assertEqual({source.commit for source in snapshots}, {RANDDALLF_2025_26_COMMIT})
+        self.assertEqual(sorted(source.gameweek for source in snapshots), list(range(1, 39)))
+
+    def test_identical_duplicate_player_fixture_is_explicitly_rejected(self) -> None:
+        row = {"element": "100", "fixture": "7", "minutes": "77", "expected_goals": "1.47"}
+        accepted, rejected = _deduplicate_player_fixture_rows(
+            [dict(row), dict(row)], season="2025-26",
+            raw_record_bytes=[b"100,7,77,1.47", b"100,7,77,1.47"],
+        )
+        self.assertEqual(accepted, [(2, row)])
+        self.assertEqual(
+            rejected,
+            [{"element_id": 100, "fixture_id": 7,
+              "accepted_source_row_number": 2, "rejected_source_row_number": 3}],
+        )
+
+    def test_nonidentical_duplicate_player_fixture_fails_closed(self) -> None:
+        first = {"element": "100", "fixture": "7", "minutes": "77"}
+        second = dict(first)
+        with self.assertRaisesRegex(HistoricalDataQualityError, "non-identical duplicate"):
+            _deduplicate_player_fixture_rows(
+                [first, second], season="2025-26",
+                raw_record_bytes=[b"100,7,77", b'100,7,"77"'],
+            )
+
     def test_source_hash_mismatch_refuses_before_parsing(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             source = HistoricalSource(
@@ -597,6 +684,166 @@ class HistoricalSourceValidationTests(unittest.TestCase):
             HistoricalDataQualityError, "chronological target leakage"
         ):
             _validate_feature_rows([tuple(malformed)], actuals)
+
+
+@unittest.skipUnless(
+    Path("data/historical/clean/historical-v3.1/historical_ingestion_manifest.json").is_file(),
+    "immutable historical-v3.1 artifact is not present",
+)
+class HistoricalV3ArtifactTests(unittest.TestCase):
+    def test_manifest_and_2025_edge_cases_match_audit(self) -> None:
+        root = Path("data/historical/clean/historical-v3.1")
+        manifest = json.loads((root / "historical_ingestion_manifest.json").read_bytes())
+        self.assertEqual(manifest["parser_schema_version"], "historical-v3.1")
+        reconciliation = manifest["reconciliation_audit"]
+        self.assertEqual(
+            reconciliation["duplicate_validation_mode"], DUPLICATE_VALIDATION_MODE
+        )
+        self.assertTrue(reconciliation["duplicate_validation_fix_applied_before_build"])
+        self.assertFalse(
+            reconciliation["intermediate_output_from_parsed_field_validation_reused"]
+        )
+        prior_counts = manifest["row_counts"]["2024-25"]
+        self.assertEqual(prior_counts["assistant_manager_rows_excluded"], 322)
+        self.assertEqual(prior_counts["assistant_manager_elements_excluded"], 20)
+        counts = manifest["row_counts"]["2025-26"]
+        self.assertEqual(counts["raw_player_fixture_rows"], 29_757)
+        self.assertEqual(counts["player_fixture_rows"], 29_747)
+        self.assertEqual(counts["byte_identical_duplicate_rows_excluded"], 10)
+        self.assertEqual(counts["player_rows_with_minutes"], 11_492)
+        self.assertEqual(counts["identity_rows"], 841)
+        self.assertEqual(counts["fixture_rows"], 380)
+        self.assertEqual(counts["predeadline_snapshots"], 38)
+        self.assertFalse(manifest["fixture_assignment_verified_predeadline"])
+        transition = next(
+            row for row in manifest["identity"]["adjacent_season_audits"]
+            if row["from_season"] == "2024-25" and row["to_season"] == "2025-26"
+        )
+        self.assertEqual(transition["position_changes"], 12)
+        self.assertEqual(transition["shared_codes"], 534)
+        self.assertEqual(transition["element_id_changes"], 533)
+        self.assertEqual(transition["element_id_unchanged"], 1)
+        self.assertEqual(transition["team_changes"], 74)
+        self.assertEqual(
+            manifest["player_universe_edges"][0]["classification"],
+            "added_after_final_predeadline_snapshot_no_state_fabricated",
+        )
+        self.assertEqual(
+            [row["gameweek"] for row in manifest["fixture_structure"]["2025-26"]["special_gameweeks"]],
+            [26, 31, 33, 34, 36],
+        )
+
+    def test_2025_parquet_grain_nulls_and_sillah_state(self) -> None:
+        root = Path("data/historical/clean/historical-v3.1/2025-26")
+        connection = duckdb.connect(":memory:")
+        try:
+            fixture_path = str(root / "historical_player_fixture.parquet")
+            self.assertEqual(
+                connection.execute(
+                    "SELECT count(*), count(DISTINCT (element_id, fixture_id)), "
+                    "count(*) FILTER (WHERE xg IS NULL OR xa IS NULL), "
+                    "count(*) FILTER (WHERE minutes > 0) FROM read_parquet(?)",
+                    [fixture_path],
+                ).fetchone(),
+                (29_747, 29_747, 0, 11_492),
+            )
+            columns = {
+                row[0] for row in connection.execute(
+                    "DESCRIBE SELECT * FROM read_parquet(?)", [fixture_path]
+                ).fetchall()
+            }
+            self.assertNotIn("xP", columns)
+            identity_path = str(root / "historical_player_identity.parquet")
+            state_path = str(root / "historical_predeadline_player_state.parquet")
+            feature_path = str(root / "historical_prediction_features.parquet")
+            actual_path = str(root / "historical_prediction_actuals.parquet")
+            self.assertEqual(
+                connection.execute(
+                    "SELECT count(*) FROM read_parquet(?) WHERE element_id=841",
+                    [identity_path],
+                ).fetchone()[0],
+                1,
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT count(*) FROM read_parquet(?) WHERE element_id=841",
+                    [state_path],
+                ).fetchone()[0],
+                0,
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT count(*) FROM read_parquet(?) WHERE element_id=841",
+                    [feature_path],
+                ).fetchone()[0],
+                0,
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT count(*) FROM read_parquet(?) WHERE element_id=841",
+                    [actual_path],
+                ).fetchone()[0],
+                0,
+            )
+            self.assertEqual(
+                connection.execute(
+                    "SELECT count(DISTINCT target_gameweek) FROM read_parquet(?)",
+                    [state_path],
+                ).fetchone()[0],
+                38,
+            )
+            fixture_context = connection.execute(
+                "WITH teams AS ("
+                "SELECT gameweek, home_team_name team FROM read_parquet(?) UNION ALL "
+                "SELECT gameweek, away_team_name team FROM read_parquet(?)"
+                "), all_teams AS (SELECT DISTINCT team FROM teams), "
+                "gws AS (SELECT * FROM range(1,39) t(gw)), counts AS ("
+                "SELECT gw gameweek, all_teams.team, count(teams.team) n "
+                "FROM gws CROSS JOIN all_teams LEFT JOIN teams "
+                "ON teams.gameweek=gw AND teams.team=all_teams.team "
+                "GROUP BY gw, all_teams.team) "
+                "SELECT gameweek, team, n FROM counts WHERE n<>1 "
+                "ORDER BY gameweek, team",
+                [str(root / "historical_fixtures.parquet")] * 2,
+            ).fetchall()
+            self.assertEqual(
+                fixture_context,
+                [
+                    (26, "Arsenal", 2), (26, "Wolves", 2),
+                    (31, "Arsenal", 0), (31, "Crystal Palace", 0),
+                    (31, "Man City", 0), (31, "Wolves", 0),
+                    (33, "Bournemouth", 2), (33, "Brighton", 2),
+                    (33, "Burnley", 2), (33, "Chelsea", 2),
+                    (33, "Leeds", 2), (33, "Man City", 2),
+                    (34, "Bournemouth", 0), (34, "Brighton", 0),
+                    (34, "Burnley", 0), (34, "Chelsea", 0),
+                    (34, "Leeds", 0), (34, "Man City", 0),
+                    (36, "Crystal Palace", 2), (36, "Man City", 2),
+                ],
+            )
+        finally:
+            connection.close()
+
+    def test_manifest_output_hashes_and_historical_v2_are_unchanged(self) -> None:
+        root = Path("data/historical/clean/historical-v3.1")
+        manifest = json.loads((root / "historical_ingestion_manifest.json").read_bytes())
+        for output in manifest["outputs"]:
+            body = (root / output["path"]).read_bytes()
+            self.assertEqual(hashlib.sha256(body).hexdigest(), output["sha256"])
+        v2_manifest = Path(
+            "data/historical/clean/historical-v2/historical_ingestion_manifest.json"
+        )
+        self.assertEqual(
+            hashlib.sha256(v2_manifest.read_bytes()).hexdigest(),
+            "954555cdb1376e71902d359d06adcda78212822e01e02cc00ea91973f21c2c85",
+        )
+        v3_manifest = Path(
+            "data/historical/clean/historical-v3/historical_ingestion_manifest.json"
+        )
+        self.assertEqual(
+            hashlib.sha256(v3_manifest.read_bytes()).hexdigest(),
+            "09be3584aba234d690d6b85a63c0445b08f5f0a6dcaeb9c2b5bb8bb376e6490f",
+        )
 
 
 if __name__ == "__main__":

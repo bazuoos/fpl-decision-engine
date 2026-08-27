@@ -1,4 +1,4 @@
-"""Pinned source catalogue approved by the Task 006B historical audit."""
+"""Pinned source catalogue approved by the Task 006B/018A audits."""
 
 from __future__ import annotations
 
@@ -6,10 +6,18 @@ from dataclasses import dataclass
 
 VAASTAV_REPOSITORY = "vaastav/Fantasy-Premier-League"
 VAASTAV_COMMIT = "c2add969e11ec19002a091f8aa60164c9a255854"
+VAASTAV_2025_26_COMMIT = "f9ed3e8839b0f970e0d5d4a83c5628f6eaee755a"
 RANDDALLF_REPOSITORY = "Randdalf/fplcache"
 RANDDALLF_COMMIT = "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867"
+RANDDALLF_2025_26_COMMIT = "dea291add4556c24587f54023c177562d8d60e7d"
 HISTORICAL_CLASSIFICATION = "restricted_pseudo_backtest"
-PARSER_SCHEMA_VERSION = "historical-v2"
+PARSER_SCHEMA_VERSION = "historical-v3.1"
+
+PRESEASON_PRIOR_COMMITS = {
+    "2023-24": "204c134d8e90e2b6e69ec252aa3ef6f10f21e73c",
+    "2024-25": "59c767596750f554ba464de94cf4fce8664a6cbe",
+    "2025-26": VAASTAV_2025_26_COMMIT,
+}
 
 
 @dataclass(frozen=True)
@@ -43,6 +51,12 @@ _VAASTAV_FILES = {
         "data/2024-25/players_raw.csv": "75686051b265cbe7755ac71213ecaad21b26ee1cc46a8bafbba19c39ce894b05",
         "data/2024-25/teams.csv": "d10a6db8feca6db9e44a3ba50b15168396667ea387fee9235d6b211c7f598c3b",
     },
+    "2025-26": {
+        "data/2025-26/gws/merged_gw.csv": "0d09f1f1cb1b5520ec8e2f25238aa652efe2a263d8ca7cb2b6538b27bf86727d",
+        "data/2025-26/fixtures.csv": "2d7e3950d346df14ca486cb09e9b9ba406d37d943775244eed06cdc021ffb3a9",
+        "data/2025-26/players_raw.csv": "412ce0172016f8f98f25177dc6de9f3cd2a8ec7a6135f9aa638d7fdee784d67b",
+        "data/2025-26/teams.csv": "b29df099cb0ad25413e284e53116099b0e0496874f99743dbc0870d8241b46c5",
+    },
 }
 
 
@@ -60,7 +74,7 @@ VAASTAV_SOURCES = tuple(
     HistoricalSource(
         season=season,
         repository=VAASTAV_REPOSITORY,
-        commit=VAASTAV_COMMIT,
+        commit=(VAASTAV_2025_26_COMMIT if season == "2025-26" else VAASTAV_COMMIT),
         path=path,
         sha256=digest,
         kind=_vaastav_kind(path),
@@ -152,6 +166,48 @@ _RANDDALLF_AUDIT_ROWS = """
 """.strip()
 
 
+_RANDDALLF_2025_26_AUDIT_ROWS = """
+2025-26,1,2025/8/15/1252.json.xz,eee31c9ece4864963bff4d88543ac5d440ca4d574ec89512e680d6e697f9a086
+2025-26,2,2025/8/22/1251.json.xz,4fc61f6f89d925af550887c05eeb84648d9860cf974ddee113306a89a1d36f51
+2025-26,3,2025/8/30/0632.json.xz,02366ddb44914b5a8f846af64886a657d5dd6fa9115b77b990112d647d4d37c0
+2025-26,4,2025/9/13/0631.json.xz,0bbfb0d3a5f580ca7ada903c3d9ad25b1036ecc258160eb2b415715c5c03697a
+2025-26,5,2025/9/20/0632.json.xz,7d7a0bcb8206f816b772d9d354d0f4690cdfa52c271f5f938b07ddfbc5e04084
+2025-26,6,2025/9/27/0631.json.xz,d24eb9d137739682a71090d4abf7b9c49245624f5ffab316c127781ebe514838
+2025-26,7,2025/10/3/1249.json.xz,45371fe22f35ede4f644052a0918b1e5fb58d52bb671557be1aa3904a5fdb467
+2025-26,8,2025/10/18/0633.json.xz,e81984e8ed02ab4e214d8276580d851c97f130d87cc6e13dc265e1b456bac48e
+2025-26,9,2025/10/24/1254.json.xz,4faee9cbcd6ba4c065acba30fc0a79abc8ca67e522493611f9ab001bf20b28b6
+2025-26,10,2025/11/1/1247.json.xz,438308293493bd5bfe702c4c33371b0d7f88ecde5ea28b19cdebd2efc6a2991f
+2025-26,11,2025/11/8/0634.json.xz,b9b40ee84b55e24b2ce8a3adae8116626ece5091dfd453e05eff640a6b4143fe
+2025-26,12,2025/11/22/0634.json.xz,3c3a52d10e696f93f49f75d803ceb2753aa45ba09495523ee777b23377cc400d
+2025-26,13,2025/11/29/1250.json.xz,88a3689a796c51387ac427ce215f0f8a56b4d95999f422d671dc46cede87e091
+2025-26,14,2025/12/2/1258.json.xz,38c5c4ae749a0e10a6a9730247e9348a3753a2d129f3e50cee58624c602634b8
+2025-26,15,2025/12/6/0636.json.xz,d8b06805b784077a35ebe3428e87ab80379e594ede823e80030e030e27e1fde5
+2025-26,16,2025/12/13/1251.json.xz,24854bd83cfddd66ecaa2eeecb7d857c1ee46058c27627c9f1a337593454b250
+2025-26,17,2025/12/20/0638.json.xz,125e16fb0120ad65e2fbe2998c9613b70f4310b7dfa219b6110ce4a9968bcc81
+2025-26,18,2025/12/26/1255.json.xz,beb448b597ee95631bd893f12d617406da064189db78ff4ac0eab80efa32513f
+2025-26,19,2025/12/30/1258.json.xz,e89b8875aa9734299b25130c69156abab75dc4de879422e05c347f1469dca750
+2025-26,20,2026/1/3/0640.json.xz,c7db78778c4d0ce11478f78a0e5b993b45c615fb84827cc3862cd348542e6423
+2025-26,21,2026/1/6/1258.json.xz,637c423d6108b26dcd674d275e21a4f3ef423efc40122905ec2c4521c6dd7414
+2025-26,22,2026/1/17/0639.json.xz,2e14d23acf03415ee763d7e72864bf41d46b45666c0cadf46815560903ef2a12
+2025-26,23,2026/1/24/0640.json.xz,b37dd4fbbdbd7be11c0343ba4683f305404b822dc07560bc7368ec1fa54def45
+2025-26,24,2026/1/31/1303.json.xz,ed930ca5b29d29de3bbfa31b505988fff8ffeb4aae35a15667613384b929925e
+2025-26,25,2026/2/6/1315.json.xz,baa605b8109f3525a3f8d042c61f7ca7512a3e6d42278f9300eb1f21132a6d41
+2025-26,26,2026/2/10/1341.json.xz,c70b651cfdcf2166734fe1ac14a3a687e96bd540377fbedd6693eccca7ecbefa
+2025-26,27,2026/2/21/1303.json.xz,ca5e759c6fd7e1118b649e8cfee3bd0b485a686f0b2a9db6306bd329e49952fe
+2025-26,28,2026/2/27/1314.json.xz,8edc1cc4e1d0a05e61abb6067530217968dec324f0e0460a220c4a568d83a61d
+2025-26,29,2026/3/3/1314.json.xz,109d57adb64e150a21725a68f1c61f0d9874daf16426d327cbc4c49e4de86b18
+2025-26,30,2026/3/14/1308.json.xz,80f6e7464eac91189732cc79715d4b76c891a42a5990423d780ebe43b886e870
+2025-26,31,2026/3/20/1316.json.xz,60180c532341d293ec9c457a27be1b077994eab1f0f4cb9fc7e23436455d5930
+2025-26,32,2026/4/10/1326.json.xz,d3ed02efc62d181101ece997ba7d12988065852286efd747d35710f4116247df
+2025-26,33,2026/4/18/0719.json.xz,a6d6cce56422bc2a29334c58e3d106705b8510dd1c7d2253f2aec0e484d0e92f
+2025-26,34,2026/4/24/1355.json.xz,057f28b2a0d8e326ef9a6a67efd63b91d7cf31b0d1dbfac5e7240267d70b3195
+2025-26,35,2026/5/1/1343.json.xz,f3a8ad4c99a8bec46bd6cfdc475cb475e4003c0c66e01a47a83dd723c0442d18
+2025-26,36,2026/5/9/0804.json.xz,b3db8dab3968df2ab7be35e73ed095ac0fa95394d6b82c0a99a59779975a2914
+2025-26,37,2026/5/15/1423.json.xz,a91d944878bcb8581fb897c32536cb99040af53df5d57dcbcb293b4b08a708eb
+2025-26,38,2026/5/24/0839.json.xz,8127526148dbe0ab0a3fb15e9f59c01f4444b8e3aed00ffa10806f42ca9f41a6
+""".strip()
+
+
 RANDDALLF_SOURCES = tuple(
     HistoricalSource(
         season=season,
@@ -166,7 +222,23 @@ RANDDALLF_SOURCES = tuple(
     for season, gameweek, path, digest in [row.split(",")]
 )
 
-APPROVED_HISTORICAL_SOURCES = VAASTAV_SOURCES + RANDDALLF_SOURCES
+RANDDALLF_2025_26_SOURCES = tuple(
+    HistoricalSource(
+        season=season,
+        repository=RANDDALLF_REPOSITORY,
+        commit=RANDDALLF_2025_26_COMMIT,
+        path=f"cache/{path}",
+        sha256=digest,
+        kind="predeadline_bootstrap",
+        gameweek=int(gameweek),
+    )
+    for row in _RANDDALLF_2025_26_AUDIT_ROWS.splitlines()
+    for season, gameweek, path, digest in [row.split(",")]
+)
+
+APPROVED_HISTORICAL_SOURCES = (
+    VAASTAV_SOURCES + RANDDALLF_SOURCES + RANDDALLF_2025_26_SOURCES
+)
 
 
 def sources_by_season(season: str) -> tuple[HistoricalSource, ...]:

@@ -25,6 +25,7 @@ from .historical_sources import (
     APPROVED_HISTORICAL_SOURCES,
     HISTORICAL_CLASSIFICATION,
     PARSER_SCHEMA_VERSION,
+    PRESEASON_PRIOR_COMMITS,
     HistoricalSource,
 )
 from .tls import network_error_reason, verified_urlopen
@@ -38,11 +39,13 @@ HISTORY_CUTOFF_RULE = (
     "performance_gameweek < target_gameweek AND fixture_kickoff < target_deadline"
 )
 MATERIAL_RECONCILIATION_THRESHOLD = 0.05
+DUPLICATE_VALIDATION_MODE = "exact_original_csv_record_bytes"
 POSITIONS = {1: "GK", 2: "DEF", 3: "MID", 4: "FWD"}
 GOAL_POINTS = {"GK": 10, "DEF": 6, "MID": 5, "FWD": 4}
 APPROVED_COUNTS = {
-    "2023-24": {"player_rows": 29_725, "minutes_rows": 11_384, "am_rows": 0, "am_elements": 0},
-    "2024-25": {"player_rows": 27_283, "minutes_rows": 11_566, "am_rows": 322, "am_elements": 20},
+    "2023-24": {"raw_player_rows": 29_725, "player_rows": 29_725, "duplicate_rows": 0, "minutes_rows": 11_384, "am_rows": 0, "am_elements": 0, "identity_rows": 865},
+    "2024-25": {"raw_player_rows": 27_605, "player_rows": 27_283, "duplicate_rows": 0, "minutes_rows": 11_566, "am_rows": 322, "am_elements": 20, "identity_rows": 784},
+    "2025-26": {"raw_player_rows": 29_757, "player_rows": 29_747, "duplicate_rows": 10, "minutes_rows": 11_492, "am_rows": 0, "am_elements": 0, "identity_rows": 841},
 }
 
 
@@ -104,6 +107,7 @@ FIXTURE_SCHEMA = (
     ("kickoff_time", "TIMESTAMPTZ"), ("home_score", "INTEGER"),
     ("away_score", "INTEGER"), ("finished", "BOOLEAN"),
     ("finished_provisional", "BOOLEAN"), ("fixture_assignment_context", "VARCHAR"),
+    ("fixture_assignment_verified_predeadline", "BOOLEAN"),
     ("source_repository", "VARCHAR"), ("source_commit", "VARCHAR"),
     ("source_path", "VARCHAR"), ("source_sha256", "VARCHAR"),
 )
@@ -145,6 +149,7 @@ FEATURE_SCHEMA = (
     ("target_fixture_count", "INTEGER"), ("target_opponent_team_id", "INTEGER"),
     ("target_home_away", "VARCHAR"), ("target_kickoff_time", "TIMESTAMPTZ"),
     ("fixture_assignment_context", "VARCHAR"), ("target_deadline", "TIMESTAMPTZ"),
+    ("fixture_assignment_verified_predeadline", "BOOLEAN"),
     ("snapshot_timestamp", "TIMESTAMPTZ"), ("availability_status", "VARCHAR"),
     ("chance_of_playing_next_round", "SMALLINT"), ("availability_news", "VARCHAR"),
     ("availability_known_pre_deadline", "BOOLEAN"),
@@ -357,6 +362,51 @@ def _read_csv(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(source_file))
 
 
+def _deduplicate_player_fixture_rows(
+    rows: list[dict[str, str]], *, season: str,
+    raw_record_bytes: list[bytes] | None = None,
+) -> tuple[list[tuple[int, dict[str, str]]], list[dict[str, int]]]:
+    """Accept one byte-equivalent CSV record per key; reject conflicting duplicates."""
+    accepted: list[tuple[int, dict[str, str]]] = []
+    first_by_key: dict[tuple[int, int], tuple[int, dict[str, str], bytes | None]] = {}
+    rejected: list[dict[str, int]] = []
+    for source_row_number, row in enumerate(rows, start=2):
+        element_id = _int(row.get("element"), field="gameweek.element")
+        fixture_id = _int(row.get("fixture"), field="gameweek.fixture")
+        key = (element_id, fixture_id)
+        raw_bytes = (
+            raw_record_bytes[source_row_number - 2]
+            if raw_record_bytes is not None
+            else None
+        )
+        prior = first_by_key.get(key)
+        if prior is None:
+            first_by_key[key] = (source_row_number, row, raw_bytes)
+            accepted.append((source_row_number, row))
+            continue
+        accepted_row_number, accepted_row, accepted_bytes = prior
+        identical = (
+            raw_bytes == accepted_bytes
+            if raw_record_bytes is not None
+            else row == accepted_row
+        )
+        if not identical:
+            raise HistoricalDataQualityError(
+                "non-identical duplicate player-fixture rows: "
+                f"{season}/{element_id}/{fixture_id} at source rows "
+                f"{accepted_row_number} and {source_row_number}"
+            )
+        rejected.append(
+            {
+                "element_id": element_id,
+                "fixture_id": fixture_id,
+                "accepted_source_row_number": accepted_row_number,
+                "rejected_source_row_number": source_row_number,
+            }
+        )
+    return accepted, rejected
+
+
 def _source_for(
     sources: Iterable[HistoricalSource], season: str, kind: str
 ) -> HistoricalSource:
@@ -445,18 +495,22 @@ def _write_parquet(
     columns = ", ".join(f'"{name}" {data_type}' for name, data_type in schema)
     connection.execute(f'CREATE OR REPLACE TABLE "{table}" ({columns})')
     if rows:
-        row_placeholders = f"({', '.join('?' for _ in schema)})"
-        # DuckDB executemany performs one statement per row. Moderate batches keep
-        # the dependency footprint small while avoiding tens of thousands of
-        # individual insert statements for the historical feature datasets.
-        batch_size = 250
-        for start in range(0, len(rows), batch_size):
-            batch = rows[start : start + batch_size]
-            values = ", ".join(row_placeholders for _ in batch)
-            parameters = [value for row in batch for value in row]
-            connection.execute(
-                f'INSERT INTO "{table}" VALUES {values}', parameters
-            )
+        expressions: list[str] = []
+        parameters: list[list[Any]] = []
+        for index, (_, data_type) in enumerate(schema):
+            values = [row[index] for row in rows]
+            if data_type == "TIMESTAMPTZ":
+                values = [
+                    _iso_utc(value) if isinstance(value, datetime) else value
+                    for value in values
+                ]
+                expressions.append("unnest(?::VARCHAR[])::TIMESTAMPTZ")
+            else:
+                expressions.append(f"unnest(?::{data_type}[])")
+            parameters.append(values)
+        connection.execute(
+            f'INSERT INTO "{table}" SELECT {", ".join(expressions)}', parameters
+        )
     connection.execute(
         f'COPY "{table}" TO ? (FORMAT PARQUET, COMPRESSION ZSTD)', [str(path)]
     )
@@ -583,6 +637,7 @@ def _parse_season_sources(
                 _bool(row.get("finished"), field="fixture.finished"),
                 _bool(row.get("finished_provisional"), field="fixture.finished_provisional"),
                 FIXTURE_ASSIGNMENT_CONTEXT,
+                False,
                 fixture_source.repository,
                 fixture_source.commit,
                 fixture_source.path,
@@ -591,12 +646,20 @@ def _parse_season_sources(
         )
 
     raw_gameweeks = _read_csv(cached[merged_source])
+    raw_record_bytes = cached[merged_source].read_bytes().splitlines()[1:]
+    if len(raw_record_bytes) != len(raw_gameweeks):
+        raise HistoricalDataQualityError(
+            f"multi-line or malformed CSV records prevent byte audit for {season}"
+        )
+    accepted_gameweeks, duplicate_rows = _deduplicate_player_fixture_rows(
+        raw_gameweeks, season=season, raw_record_bytes=raw_record_bytes
+    )
     player_fixtures: list[tuple[Any, ...]] = []
     player_fixture_records: list[dict[str, Any]] = []
     am_rows = 0
     am_elements: set[int] = set()
     keys: set[tuple[int, int]] = set()
-    for source_row_number, row in enumerate(raw_gameweeks, start=2):
+    for source_row_number, row in accepted_gameweeks:
         position = row.get("position")
         element_id = _int(row.get("element"), field="gameweek.element")
         if position not in GOAL_POINTS:
@@ -618,9 +681,7 @@ def _parse_season_sources(
         fixture_id = _int(row.get("fixture"), field="gameweek.fixture")
         key = (element_id, fixture_id)
         if key in keys:
-            raise HistoricalDataQualityError(
-                f"duplicate player-fixture key {season}/{element_id}/{fixture_id}"
-            )
+            raise HistoricalDataQualityError(f"internal duplicate key {season}/{element_id}/{fixture_id}")
         keys.add(key)
         fixture = fixture_records.get(fixture_id)
         if fixture is None:
@@ -740,10 +801,13 @@ def _parse_season_sources(
     if strict_approved:
         expected = APPROVED_COUNTS[season]
         observed = {
+            "raw_player_rows": len(raw_gameweeks),
             "player_rows": len(player_fixtures),
+            "duplicate_rows": len(duplicate_rows),
             "minutes_rows": minutes_rows,
             "am_rows": am_rows,
             "am_elements": len(am_elements),
+            "identity_rows": len(identities),
         }
         if observed != expected:
             raise HistoricalDataQualityError(
@@ -755,6 +819,7 @@ def _parse_season_sources(
             )
 
     return {
+        "season": season,
         "teams": teams,
         "raw_players": raw_players,
         "player_master": player_master,
@@ -764,6 +829,8 @@ def _parse_season_sources(
         "fixtures_by_gameweek_team": fixtures_by_gameweek_team,
         "player_fixtures": player_fixtures,
         "player_fixture_records": player_fixture_records,
+        "raw_player_fixture_rows": len(raw_gameweeks),
+        "duplicate_rows": duplicate_rows,
         "am_rows": am_rows,
         "am_elements": len(am_elements),
         "minutes_rows": minutes_rows,
@@ -1211,6 +1278,7 @@ def _build_features_and_actuals(
                     fixture["kickoff_time"] if fixture else None,
                     FIXTURE_ASSIGNMENT_CONTEXT,
                     state["deadline"],
+                    False,
                     state["snapshot_timestamp"],
                     state["status"],
                     state["chance"],
@@ -1385,6 +1453,136 @@ def _reconciliation_exceptions(
     return exceptions
 
 
+def _duplicate_reconciliation_rows(
+    season: str, season_data: dict[str, Any]
+) -> list[tuple[Any, ...]]:
+    rows: list[tuple[Any, ...]] = []
+    for duplicate in season_data["duplicate_rows"]:
+        element_id = duplicate["element_id"]
+        player = season_data["player_master"].get(element_id, {})
+        rows.append(
+            (
+                season,
+                element_id,
+                _int(player.get("code"), field="player.code", nullable=True),
+                player.get("web_name"),
+                "duplicate_player_fixture_row",
+                None,
+                None,
+                None,
+                False,
+                "byte_identical_duplicate_source_row",
+                json.dumps(duplicate, sort_keys=True),
+                "first_row_accepted_identical_duplicate_rejected",
+            )
+        )
+    return rows
+
+
+def _validate_2025_reconciliation(season_data: dict[str, Any]) -> dict[str, Any]:
+    fields = {
+        "expected_goals": "xg",
+        "expected_assists": "xa",
+        "expected_goal_involvements": "xgi",
+        "expected_goals_conceded": "xgc",
+    }
+    exact_fields = {
+        "minutes": "minutes",
+        "goals_scored": "goals",
+        "assists": "assists",
+        "total_points": "total_points",
+    }
+    by_player: dict[int, list[dict[str, Any]]] = defaultdict(list)
+    for record in season_data["player_fixture_records"]:
+        by_player[record["element_id"]].append(record)
+    expected_mismatches: list[dict[str, Any]] = []
+    exact_mismatches: list[dict[str, Any]] = []
+    null_expected_rows = 0
+    for element_id, player in season_data["player_master"].items():
+        records = by_player.get(element_id, [])
+        for raw_field, clean_field in fields.items():
+            values = [record[clean_field] for record in records]
+            null_expected_rows += sum(value is None for value in values)
+            fixture_sum = _sum_nullable(values)
+            season_total = _number(player.get(raw_field), field=f"player.{raw_field}")
+            if fixture_sum is None or season_total is None or not math.isclose(
+                fixture_sum, season_total, rel_tol=0.0, abs_tol=1e-9
+            ):
+                expected_mismatches.append(
+                    {"element_id": element_id, "field": raw_field,
+                     "fixture_sum": fixture_sum, "season_total": season_total}
+                )
+        for raw_field, clean_field in exact_fields.items():
+            fixture_sum = sum(record[clean_field] for record in records)
+            season_total = _int(player.get(raw_field), field=f"player.{raw_field}")
+            if fixture_sum != season_total:
+                exact_mismatches.append(
+                    {"element_id": element_id, "field": raw_field,
+                     "fixture_sum": fixture_sum, "season_total": season_total}
+                )
+    if expected_mismatches or exact_mismatches or null_expected_rows:
+        raise HistoricalDataQualityError(
+            "2025/26 season reconciliation changed: "
+            f"expected-stat mismatches={len(expected_mismatches)}, "
+            f"actual mismatches={len(exact_mismatches)}, null expected rows={null_expected_rows}"
+        )
+    return {
+        "players_checked": len(season_data["player_master"]),
+        "expected_stat_mismatches": 0,
+        "actual_stat_mismatches": 0,
+        "null_expected_stat_values": 0,
+    }
+
+
+def _identity_transition_audit(
+    left: dict[str, Any], right: dict[str, Any]
+) -> dict[str, Any]:
+    def by_code(data: dict[str, Any]) -> dict[int, tuple[int, str, str, int]]:
+        return {
+            _int(row[2], field="identity.code"): (
+                _int(row[1], field="identity.element_id"),
+                str(row[7]),
+                str(row[9]),
+                _int(row[2], field="identity.code"),
+            )
+            for row in data["identities"]
+        }
+
+    left_map = by_code(left)
+    right_map = by_code(right)
+    shared = sorted(set(left_map) & set(right_map))
+    element_changes = sum(left_map[code][0] != right_map[code][0] for code in shared)
+    return {
+        "from_season": left["season"],
+        "to_season": right["season"],
+        "shared_codes": len(shared),
+        "element_id_changes": element_changes,
+        "element_id_unchanged": len(shared) - element_changes,
+        "position_changes": sum(left_map[code][1] != right_map[code][1] for code in shared),
+        "team_changes": sum(left_map[code][2] != right_map[code][2] for code in shared),
+        "join_key": "code",
+        "element_id_join_prohibited": True,
+    }
+
+
+def _fixture_structure_audit(season_data: dict[str, Any]) -> dict[str, Any]:
+    team_ids = sorted(season_data["teams"])
+    special: list[dict[str, Any]] = []
+    for gameweek in range(1, 39):
+        counts = {
+            team_id: len(season_data["fixtures_by_gameweek_team"].get((gameweek, team_id), []))
+            for team_id in team_ids
+        }
+        blanks = [team for team, count in counts.items() if count == 0]
+        doubles = [team for team, count in counts.items() if count > 1]
+        if blanks or doubles:
+            special.append(
+                {"gameweek": gameweek, "fixture_count": sum(counts.values()) // 2,
+                 "blank_team_ids": blanks, "double_team_ids": doubles}
+            )
+    return {"fixture_rows": len(season_data["fixtures"]), "special_gameweeks": special}
+
+
 def _validate_feature_rows(
     features: list[tuple[Any, ...]], actuals: list[tuple[Any, ...]]
 ) -> None:
@@ -1433,6 +1631,10 @@ def _validate_feature_rows(
             )
         if row[indexes["fixture_assignment_context"]] != FIXTURE_ASSIGNMENT_CONTEXT:
             raise HistoricalDataQualityError("fixture context is not explicitly finalized")
+        if row[indexes["fixture_assignment_verified_predeadline"]] is not False:
+            raise HistoricalDataQualityError(
+                "finalized fixture assignment was incorrectly labelled pre-deadline verified"
+            )
     actual_names = {name for name, _ in ACTUAL_SCHEMA}
     if not actual_names or not actuals:
         raise HistoricalDataQualityError("historical actual section is empty")
@@ -1481,7 +1683,7 @@ def build_historical_datasets(
             raise HistoricalDataQualityError(
                 "historical source catalogue differs from the exact audited source set"
             )
-        if seasons != ["2023-24", "2024-25"]:
+        if seasons != ["2023-24", "2024-25", "2025-26"]:
             raise HistoricalDataQualityError(f"unexpected approved seasons: {seasons}")
     final_directory = clean_data_root / PARSER_SCHEMA_VERSION
     if final_directory.exists():
@@ -1509,6 +1711,10 @@ def build_historical_datasets(
     chronology_audit_by_season: dict[str, list[dict[str, Any]]] = {}
     identity_variants: dict[int, list[dict[str, Any]]] = defaultdict(list)
     output_details: list[dict[str, Any]] = []
+    season_data_by_season: dict[str, dict[str, Any]] = {}
+    reconciliation_audit_by_season: dict[str, dict[str, Any]] = {}
+    fixture_structure_by_season: dict[str, dict[str, Any]] = {}
+    player_universe_edges: list[dict[str, Any]] = []
     try:
         for season in seasons:
             season_sources = tuple(source for source in sources if source.season == season)
@@ -1518,6 +1724,7 @@ def build_historical_datasets(
                 cached=cached,
                 strict_approved=strict_approved,
             )
+            season_data_by_season[season] = season_data
             predeadline_rows, state_records, snapshot_stats = _parse_predeadline_states(
                 season,
                 sources=season_sources,
@@ -1533,6 +1740,35 @@ def build_historical_datasets(
             )
             _validate_feature_rows(feature_rows, actual_rows)
             reconciliation_rows = _reconciliation_exceptions(season_data)
+            reconciliation_rows.extend(_duplicate_reconciliation_rows(season, season_data))
+            fixture_structure_by_season[season] = _fixture_structure_audit(season_data)
+            if season == "2025-26":
+                reconciliation_audit_by_season[season] = _validate_2025_reconciliation(
+                    season_data
+                )
+                sillah = season_data["player_master"].get(841)
+                if (
+                    not sillah
+                    or sillah.get("web_name") != "Sillah"
+                    or _int(sillah.get("minutes"), field="Sillah.minutes") != 0
+                    or _int(sillah.get("total_points"), field="Sillah.total_points") != 0
+                    or any(record["element_id"] == 841 for record in state_records)
+                ):
+                    raise HistoricalDataQualityError(
+                        "audited post-GW38 Sillah player-universe edge changed"
+                    )
+                player_universe_edges.append(
+                    {
+                        "season": season,
+                        "element_id": 841,
+                        "code": _int(sillah.get("code"), field="Sillah.code"),
+                        "display_name": "Sillah",
+                        "end_of_season_minutes": 0,
+                        "end_of_season_total_points": 0,
+                        "predeadline_snapshot_rows": 0,
+                        "classification": "added_after_final_predeadline_snapshot_no_state_fabricated",
+                    }
+                )
 
             for identity in season_data["identities"]:
                 identity_variants[identity[2]].append(
@@ -1575,7 +1811,9 @@ def build_historical_datasets(
                 connection.close()
 
             overall_counts[season] = {
+                "raw_player_fixture_rows": season_data["raw_player_fixture_rows"],
                 "player_fixture_rows": len(season_data["player_fixtures"]),
+                "byte_identical_duplicate_rows_excluded": len(season_data["duplicate_rows"]),
                 "player_rows_with_minutes": season_data["minutes_rows"],
                 "fixture_rows": len(season_data["fixtures"]),
                 "identity_rows": len(season_data["identities"]),
@@ -1600,7 +1838,7 @@ def build_historical_datasets(
                 rejected = None
                 if source.kind == "player_fixture":
                     accepted = len(season_data["player_fixtures"])
-                    rejected = season_data["am_rows"]
+                    rejected = season_data["am_rows"] + len(season_data["duplicate_rows"])
                 elif source.kind == "fixtures":
                     accepted = len(season_data["fixtures"])
                     rejected = 0
@@ -1634,6 +1872,33 @@ def build_historical_datasets(
             for code, mappings in sorted(identity_variants.items())
             if len({mapping["display_name"] for mapping in mappings}) > 1
         ]
+        identity_transitions = [
+            _identity_transition_audit(
+                season_data_by_season[left], season_data_by_season[right]
+            )
+            for left, right in zip(seasons, seasons[1:])
+        ]
+        if strict_approved:
+            audited_transition = next(
+                audit for audit in identity_transitions
+                if audit["from_season"] == "2024-25"
+                and audit["to_season"] == "2025-26"
+            )
+            expected_transition = {
+                "shared_codes": 534,
+                "element_id_changes": 533,
+                "element_id_unchanged": 1,
+                "position_changes": 12,
+                "team_changes": 74,
+            }
+            observed_transition = {
+                key: audited_transition[key] for key in expected_transition
+            }
+            if observed_transition != expected_transition:
+                raise HistoricalDataQualityError(
+                    "audited 2024/25 to 2025/26 identity transition changed: "
+                    f"expected {expected_transition}, observed {observed_transition}"
+                )
         manifest = {
             "status": "complete",
             "historical_classification": HISTORICAL_CLASSIFICATION,
@@ -1650,7 +1915,18 @@ def build_historical_datasets(
                 "element_id_cross_season_join_prohibited": True,
                 "cross_season_code_name_variants": code_name_variants,
                 "code_collisions_within_season": [],
+                "adjacent_season_audits": identity_transitions,
             },
+            "preseason_prior_source_boundaries": {
+                season: {
+                    "repository": "vaastav/Fantasy-Premier-League",
+                    "commit": commit,
+                    "classification": "later_finalized_archive_possible_retroactive_corrections",
+                }
+                for season, commit in PRESEASON_PRIOR_COMMITS.items()
+            },
+            "fixture_structure": fixture_structure_by_season,
+            "player_universe_edges": player_universe_edges,
             "temporal_policy": {
                 "prediction_history_cutoff": HISTORY_CUTOFF_RULE,
                 "source_performance_must_be_known_before_target_deadline": True,
@@ -1665,6 +1941,7 @@ def build_historical_datasets(
                 "guard": "fixture_kickoff < target_deadline",
             },
             "fixture_assignment_context": FIXTURE_ASSIGNMENT_CONTEXT,
+            "fixture_assignment_verified_predeadline": False,
             "expected_stat_semantics": EXPECTED_STAT_SEMANTICS,
             "reconciliation_audit": {
                 "material_absolute_difference_threshold": (
@@ -1672,6 +1949,14 @@ def build_historical_datasets(
                 ),
                 "threshold_is_reporting_only": True,
                 "source_values_mutated": False,
+                "by_season": reconciliation_audit_by_season,
+                "identical_duplicate_policy": (
+                    "accept_first_and_reject_only-byte-for-byte-identical-CSV-records; "
+                    "fail_on_non-identical_duplicate_key"
+                ),
+                "duplicate_validation_mode": DUPLICATE_VALIDATION_MODE,
+                "duplicate_validation_fix_applied_before_build": True,
+                "intermediate_output_from_parsed_field_validation_reused": False,
             },
             "leakage_exclusions": [
                 "vaastav_same_gameweek_xP",

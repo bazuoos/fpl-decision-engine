@@ -410,7 +410,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     historical_parser = subparsers.add_parser(
         "build-historical",
-        help="Build pinned restricted/pseudo-backtest historical datasets.",
+        help="Build pinned immutable historical-v3.1 datasets for 2023/24–2025/26.",
     )
     historical_parser.add_argument(
         "--raw-data-root",

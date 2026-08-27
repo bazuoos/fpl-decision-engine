@@ -726,17 +726,21 @@ retain blank-gameweek players with zero actual points.
 
 ## Restricted historical datasets
 
-The historical builder supports restricted/pseudo-backtesting for 2023/24 and
-2024/25. It retrieves community-preserved official FPL files only from these
+The historical builder supports restricted/pseudo-backtesting for 2023/24,
+2024/25, and 2025/26. It retrieves community-preserved official FPL files only from these
 audited, commit-pinned sources:
 
 - Vaastav `Fantasy-Premier-League` at
   `c2add969e11ec19002a091f8aa60164c9a255854`
 - Randdalf `fplcache` at
   `36bdcddc5764628ec8ef9429dcdc1aafe4f6a867`
+- Vaastav `Fantasy-Premier-League` 2025/26 at
+  `f9ed3e8839b0f970e0d5d4a83c5628f6eaee755a`
+- Randdalf `fplcache` 2025/26 at
+  `dea291add4556c24587f54023c177562d8d60e7d`
 
 Every source has an approved SHA-256 in the source catalogue and is rejected
-before parsing if its observed hash differs. The 76 selected Randdalf snapshots
+before parsing if its observed hash differs. The 114 selected Randdalf snapshots
 (38 per season) are verified as strictly pre-deadline, with the target event
 marked `is_next` and the exact stored deadline. They provide genuinely
 pre-deadline player state such as status, news, price, ownership, cumulative
@@ -759,13 +763,32 @@ Pinned raw files are cached under `data/historical/raw/`. Typed outputs and an
 ingestion/provenance manifest are written under:
 
 ```text
-data/historical/clean/historical-v2/<season>/
+data/historical/clean/historical-v3.1/<season>/
 ```
 
 The player-fixture, fixture, identity, pre-deadline state, prediction-feature,
 separately labelled actual, and reconciliation-exception datasets are all
-Parquet. Existing `historical-v2` output is never overwritten. Both generated
+Parquet. Existing `historical-v2` is preserved byte-for-byte and remains the
+input to the frozen backtests. The originally published `historical-v3` is also
+preserved unchanged; `historical-v3.1` is the corrected immutable build whose
+manifest explicitly records byte-level duplicate validation. Neither version
+is overwritten. Both generated
 historical roots are Git-ignored.
+
+The 2025/26 player-fixture archive contains 29,757 source rows. Ten repeated
+CSV records are byte-for-byte identical; v3 accepts the first copy, records each
+rejected duplicate as a reconciliation record, and fails closed if duplicate
+keys disagree. The resulting grain has 29,747 unique player-fixture rows. FPL
+code is the cross-season candidate bridge; the v3 manifest records element-ID,
+position, and team transitions without substituting later-season position.
+Element 841 (Sillah) first appears after the final accepted deadline snapshot,
+so v3 retains him in end-of-season identity only and does not fabricate
+pre-deadline player state.
+
+The manifest also records season-boundary Vaastav commits used for prospective
+previous-season priors. These are later finalized archives that may contain
+retroactive corrections, so any future prior experiment remains
+`restricted_pseudo_backtest`; v3 does not claim exact as-of-preseason replay.
 
 Within a season, player identity is `(season, element_id)`. FPL `code` is only
 the audited candidate bridge across seasons; `element_id` alone must never join
