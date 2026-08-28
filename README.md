@@ -1091,6 +1091,34 @@ even when every development gate passes. The manifest records
 metrics, every preregistered gate, and immutable input/output hashes. The
 classification remains `restricted_pseudo_backtest`.
 
+## GameweekDecision v1 presentation contract
+
+`GameweekDecision` v1 is a deterministic, versioned JSON boundary between the
+trusted decision engine and future untrusted presentation consumers such as a
+web UI, LINE integration, or LLM explanation layer. The builder reads and
+hash-validates already-materialized decision, manager-state, projection,
+candidate, feature, player, and reliability artifacts. It then reuses
+`validate_decision_selection(...)` for persisted squad/XI/bench/captain/vice
+structure and proves a recommended transfer against the existing trusted
+candidate artifact.
+
+The contract is read-only presentation data. It must not calculate xFP, rerun
+optimization, generate candidates, change the recommendation, or turn
+diagnostic reliability into a confidence score or veto. Consumers should
+version against `schema_name=GameweekDecision` and `schema_version=1.0.0`; an
+incompatible shape requires a new schema version rather than silently changing
+v1. The sole authoritative schema is installed as package data at
+`src/fpl_decision_engine/presentation/schemas/gameweek_decision_v1.schema.json`;
+schema loading is package-relative and does not depend on the working directory.
+
+Contract versions follow SemVer. A PATCH may fix documentation or implementation
+without changing the JSON instances accepted by the schema. A MINOR may add
+backward-compatible contract evolution for consumers validating against the new
+schema. A MAJOR denotes an incompatible contract change. Because v1 uses
+`additionalProperties: false`, adding a field changes the instances accepted by
+the exact `1.0.0` schema and therefore requires an explicit contract-version
+change rather than silently modifying a published schema.
+
 ## Run tests
 
 ```bash

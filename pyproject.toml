@@ -12,6 +12,7 @@ license = { file = "LICENSE" }
 dependencies = [
     "duckdb>=1.0",
     "highspy>=1.7,<2",
+    "jsonschema>=4.23,<5",
 ]
 
 [project.scripts]
@@ -19,3 +20,6 @@ fpl-fetch = "fpl_decision_engine.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"fpl_decision_engine.presentation" = ["schemas/*.json"]
