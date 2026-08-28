@@ -61,9 +61,9 @@ class PlayerReliability:
     position: str
     projection: float | None
     projection_state: str
-    prior_total_minutes: float
+    prior_total_minutes: float | None
     prior_appearances: int
-    prior_starts: int
+    prior_starts: int | None
     cumulative_prior_xg: float | None
     cumulative_prior_xa: float | None
     prior_xg_per_90: float | None
@@ -157,6 +157,79 @@ def _integer(value: Any, label: str) -> int:
     if result != value:
         raise DecisionReliabilityError(f"{label} must be an integer")
     return result
+
+
+def _nullable_integer(value: Any, label: str) -> int | None:
+    if value is None:
+        return None
+    return _integer(value, label)
+
+
+def _reconciled_prior_minutes(
+    feature_value: Any, prediction_value: Any, player_id: int
+) -> float | None:
+    """Preserve a legitimate no-prior-universe null while verifying provenance."""
+    feature_minutes = _float(
+        feature_value,
+        f"player {player_id} prior total minutes",
+        nullable=True,
+    )
+    prediction_minutes = _float(
+        prediction_value,
+        f"player {player_id} prediction prior minutes",
+        nullable=True,
+    )
+    if feature_minutes is None or prediction_minutes is None:
+        if feature_minutes is prediction_minutes:
+            return None
+        raise DecisionReliabilityError(
+            f"player {player_id} prior minutes do not reconcile between feature and prediction"
+        )
+    if not math.isclose(
+        feature_minutes,
+        prediction_minutes,
+        rel_tol=0.0,
+        abs_tol=1e-9,
+    ):
+        raise DecisionReliabilityError(
+            f"player {player_id} prior minutes do not reconcile between feature and prediction"
+        )
+    return feature_minutes
+
+
+def _validated_prior_history_provenance(
+    *,
+    feature_minutes: Any,
+    prediction_minutes: Any,
+    appearances: Any,
+    starts: Any,
+    projection: float | None,
+    prediction_complete: bool,
+    player_id: int,
+) -> tuple[float | None, int, int | None]:
+    """Accept null history only for an incomplete player absent from the prior universe."""
+    numeric_minutes = _reconciled_prior_minutes(
+        feature_minutes, prediction_minutes, player_id
+    )
+    numeric_appearances = _integer(
+        appearances, f"player {player_id} prior appearances"
+    )
+    numeric_starts = _nullable_integer(starts, f"player {player_id} prior starts")
+    if numeric_minutes is None:
+        if (
+            numeric_appearances != 0
+            or numeric_starts is not None
+            or projection is not None
+            or prediction_complete
+        ):
+            raise DecisionReliabilityError(
+                f"player {player_id} has unexpected null prior-history provenance"
+            )
+    elif numeric_starts is None:
+        raise DecisionReliabilityError(
+            f"player {player_id} has unexpected null prior-history provenance"
+        )
+    return numeric_minutes, numeric_appearances, numeric_starts
 
 
 def _quantile(values: Iterable[float], quantile: float) -> float:
@@ -498,19 +571,20 @@ def load_reliability_context(
             chance,
             news,
         ) = feature_rows[player_id]
-        numeric_minutes = _float(feature_minutes, f"player {player_id} prior total minutes")
-        if prior_minutes is None or not math.isclose(
-            numeric_minutes,
-            float(prior_minutes),
-            rel_tol=0.0,
-            abs_tol=1e-9,
-        ):
-            raise DecisionReliabilityError(
-                f"player {player_id} prior minutes do not reconcile between feature and prediction"
-            )
         numeric_projection = _float(projection, f"player {player_id} projection", nullable=True)
         if numeric_projection != projected.projection:
             raise DecisionReliabilityError(f"player {player_id} projection does not reconcile")
+        numeric_minutes, numeric_appearances, numeric_starts = (
+            _validated_prior_history_provenance(
+                feature_minutes=feature_minutes,
+                prediction_minutes=prior_minutes,
+                appearances=appearances,
+                starts=starts,
+                projection=numeric_projection,
+                prediction_complete=bool(prediction_complete),
+                player_id=player_id,
+            )
+        )
         reliability[player_id] = PlayerReliability(
             fpl_player_id=player_id,
             player_name=projected.player_name,
@@ -519,8 +593,8 @@ def load_reliability_context(
             projection=numeric_projection,
             projection_state=projected.projection_state.value,
             prior_total_minutes=numeric_minutes,
-            prior_appearances=_integer(appearances, f"player {player_id} prior appearances"),
-            prior_starts=_integer(starts, f"player {player_id} prior starts"),
+            prior_appearances=numeric_appearances,
+            prior_starts=numeric_starts,
             cumulative_prior_xg=_float(
                 cumulative_xg, f"player {player_id} cumulative xG", nullable=True
             ),
@@ -862,8 +936,16 @@ def build_sensitivity_views(
         filtered = [
             candidate
             for candidate in context.candidates
-            if context.players[int(candidate["in"]["element_id"])].prior_total_minutes
-            >= threshold
+            if (
+                context.players[
+                    int(candidate["in"]["element_id"])
+                ].prior_total_minutes
+                is not None
+                and context.players[
+                    int(candidate["in"]["element_id"])
+                ].prior_total_minutes
+                >= threshold
+            )
         ]
         action, top = _rank_persisted_candidates(filtered, roll_objective)
         views.append(_diagnostic_view(

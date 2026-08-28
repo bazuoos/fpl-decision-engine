@@ -13,6 +13,8 @@ from fpl_decision_engine.decision_reliability import (
     DecisionReliabilityOutputExistsError,
     PlayerReliability,
     _fixed_squad_diagnostic,
+    _reconciled_prior_minutes,
+    _validated_prior_history_provenance,
     analyze_decision_reliability,
     build_rate_reference,
     build_sensitivity_views,
@@ -54,6 +56,89 @@ def reliability_player(
 
 
 class ReliabilityPrimitiveTests(unittest.TestCase):
+    def test_absent_prior_universe_null_history_is_accepted_and_excluded(self) -> None:
+        minutes, appearances, starts = _validated_prior_history_provenance(
+            feature_minutes=None,
+            prediction_minutes=None,
+            appearances=0,
+            starts=None,
+            projection=None,
+            prediction_complete=False,
+            player_id=611,
+        )
+        self.assertIsNone(minutes)
+        self.assertEqual(appearances, 0)
+        self.assertIsNone(starts)
+        with self.assertRaisesRegex(
+            DecisionReliabilityError, "prior minutes do not reconcile"
+        ):
+            _reconciled_prior_minutes(None, 0.0, 611)
+        with self.assertRaisesRegex(
+            DecisionReliabilityError, "prior minutes do not reconcile"
+        ):
+            _reconciled_prior_minutes(0.0, None, 611)
+        players = {
+            index: reliability_player(index, position, 0.2)
+            for index, position in enumerate(("GK", "DEF", "MID", "FWD"), 1)
+        }
+        absent = replace(
+            reliability_player(611, "DEF", 0.0),
+            projection=None,
+            projection_state="missing_projection",
+            prior_total_minutes=None,
+            prior_starts=None,
+            prior_xg_per_90=None,
+            prior_xa_per_90=None,
+            prediction_complete=False,
+            expected_minutes=None,
+            appearance_xfp=None,
+        )
+        players[absent.fpl_player_id] = absent
+        reference = build_rate_reference(players)
+        defender_xg = reference["DEF"]["prior_xg_per_90"]
+        self.assertEqual(defender_xg["position_rows_n"], 2)
+        self.assertEqual(defender_xg["population_n"], 1)
+        self.assertEqual(defender_xg["excluded_null_rate_n"], 1)
+        payload = player_reliability_payload(
+            absent,
+            roles=("diagnostic",),
+            players=players,
+            reference=reference,
+        )
+        self.assertIsNone(payload["prior_total_minutes"])
+        self.assertIsNone(payload["prior_starts"])
+        self.assertFalse(
+            payload["rate_diagnostics"]["xg_per_90"][
+                "eligible_for_reference_population"
+            ]
+        )
+
+    def test_unexpected_null_prior_history_fails_closed(self) -> None:
+        with self.assertRaisesRegex(
+            DecisionReliabilityError, "unexpected null prior-history provenance"
+        ):
+            _validated_prior_history_provenance(
+                feature_minutes=90.0,
+                prediction_minutes=90.0,
+                appearances=1,
+                starts=None,
+                projection=2.0,
+                prediction_complete=True,
+                player_id=42,
+            )
+        with self.assertRaisesRegex(
+            DecisionReliabilityError, "unexpected null prior-history provenance"
+        ):
+            _validated_prior_history_provenance(
+                feature_minutes=None,
+                prediction_minutes=None,
+                appearances=0,
+                starts=None,
+                projection=0.0,
+                prediction_complete=False,
+                player_id=43,
+            )
+
     def test_position_percentile_rank_and_extreme_flag(self) -> None:
         players: dict[int, PlayerReliability] = {}
         player_id = 1

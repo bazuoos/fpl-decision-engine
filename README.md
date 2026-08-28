@@ -616,6 +616,9 @@ frozen player-GW artifact, grouped by frozen FPL position. Each xG/90 or xA/90
 population independently contains only `prediction_complete=true` rows with a
 genuinely defined finite value for that metric. Undefined rates are excluded,
 never treated as zero; xG/90 and xA/90 population sizes may therefore differ.
+Players who were not in the prior frozen player universe retain null prior
+minutes/starts in reliability provenance; those nulls are not converted to zero
+or admitted to a numeric reference population.
 The extreme-rate warning is strictly descriptive: xG/90 or xA/90 above
 position P95. It never changes xFP or transfer eligibility.
 
