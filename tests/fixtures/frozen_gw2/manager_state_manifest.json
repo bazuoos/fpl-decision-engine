@@ -1,0 +1,228 @@
+{
+  "active_chip": null,
+  "chip_history": [],
+  "deadline_time": "2026-08-21T17:30:00Z",
+  "entry_id": 6644775,
+  "event_bank_units": 0,
+  "event_team_value_units": 1000,
+  "field_classification": {
+    "captain_and_vice": "as_of_last_deadline_public",
+    "chip_history": "historical_public",
+    "entry_summary": "current_live_public",
+    "event_bank_and_team_value": "as_of_last_deadline_public",
+    "locked_xi_and_bench": "as_of_last_deadline_public",
+    "manager_picks": "as_of_last_deadline_public",
+    "transfer_history": "historical_public"
+  },
+  "freshness_warning": "PUBLIC MANAGER STATE IS LOCKED AS OF THE REPRESENTED DEADLINE",
+  "manager_bench": [
+    111,
+    272,
+    499,
+    321
+  ],
+  "manager_captain": 411,
+  "manager_vice_captain": 1,
+  "manager_xi": [
+    1,
+    8,
+    201,
+    391,
+    175,
+    426,
+    557,
+    481,
+    40,
+    368,
+    411
+  ],
+  "picks": [
+    {
+      "element_id": 1,
+      "is_captain": false,
+      "is_vice_captain": true,
+      "multiplier": 1,
+      "pick_position": 1,
+      "position": "GK",
+      "team_id": 1
+    },
+    {
+      "element_id": 8,
+      "is_captain": false,
+      "is_vice_captain": false,
+      "multiplier": 1,
+      "pick_position": 2,
+      "position": "DEF",
+      "team_id": 1
+    },
+    {
+      "element_id": 201,
+      "is_captain": false,
+      "is_vice_captain": false,
+      "multiplier": 1,
+      "pick_position": 3,
+      "position": "DEF",
+      "team_id": 8
+    },
+    {
+      "element_id": 391,
+      "is_captain": false,
+      "is_vice_captain": false,
+      "multiplier": 1,
+      "pick_position": 4,
+      "position": "DEF",
+      "team_id": 15
+    },
+    {
+      "element_id": 175,
+      "is_captain": false,
+      "is_vice_captain": false,
+      "multiplier": 1,
+      "pick_position": 5,
+      "position": "DEF",
+      "team_id": 7
+    },
+    {
+      "element_id": 426,
+      "is_captain": false,
+      "is_vice_captain": false,
+      "multiplier": 1,
+      "pick_position": 6,
+      "position": "MID",
+      "team_id": 16
+    },
+    {
+      "element_id": 557,
+      "is_captain": false,
+      "is_vice_captain": false,
+      "multiplier": 1,
+      "pick_position": 7,
+      "position": "MID",
+      "team_id": 1
+    },
+    {
+      "element_id": 481,
+      "is_captain": false,
+      "is_vice_captain": false,
+      "multiplier": 1,
+      "pick_position": 8,
+      "position": "MID",
+      "team_id": 15
+    },
+    {
+      "element_id": 40,
+      "is_captain": false,
+      "is_vice_captain": false,
+      "multiplier": 1,
+      "pick_position": 9,
+      "position": "MID",
+      "team_id": 6
+    },
+    {
+      "element_id": 368,
+      "is_captain": false,
+      "is_vice_captain": false,
+      "multiplier": 1,
+      "pick_position": 10,
+      "position": "MID",
+      "team_id": 14
+    },
+    {
+      "element_id": 411,
+      "is_captain": true,
+      "is_vice_captain": false,
+      "multiplier": 2,
+      "pick_position": 11,
+      "position": "FWD",
+      "team_id": 15
+    },
+    {
+      "element_id": 111,
+      "is_captain": false,
+      "is_vice_captain": false,
+      "multiplier": 0,
+      "pick_position": 12,
+      "position": "GK",
+      "team_id": 5
+    },
+    {
+      "element_id": 272,
+      "is_captain": false,
+      "is_vice_captain": false,
+      "multiplier": 0,
+      "pick_position": 13,
+      "position": "FWD",
+      "team_id": 10
+    },
+    {
+      "element_id": 499,
+      "is_captain": false,
+      "is_vice_captain": false,
+      "multiplier": 0,
+      "pick_position": 14,
+      "position": "DEF",
+      "team_id": 19
+    },
+    {
+      "element_id": 321,
+      "is_captain": false,
+      "is_vice_captain": false,
+      "multiplier": 0,
+      "pick_position": 15,
+      "position": "FWD",
+      "team_id": 12
+    }
+  ],
+  "post_deadline_warning": "Transfers made after that deadline may not be represented.",
+  "represented_event": 1,
+  "retrieval_timestamp": "2026-08-26T12:18:28.264443Z",
+  "season": "2026-27",
+  "sources": [
+    {
+      "endpoint": "https://fantasy.premierleague.com/api/bootstrap-static/",
+      "method": "GET",
+      "name": "bootstrap-static",
+      "raw_path": "bootstrap-static.json",
+      "sha256": "eac85d6870b559709b307266a3838577012ba54b49d42b1ce6fb858c6438b46e"
+    },
+    {
+      "endpoint": "https://fantasy.premierleague.com/api/entry/6644775/",
+      "method": "GET",
+      "name": "entry",
+      "raw_path": "entry.json",
+      "sha256": "0e8c42f166432da0a5f368b3fac9729cafa8756581083de3448ff72de4ed03ae"
+    },
+    {
+      "endpoint": "https://fantasy.premierleague.com/api/entry/6644775/history/",
+      "method": "GET",
+      "name": "entry-history",
+      "raw_path": "entry-history.json",
+      "sha256": "0b734c1b14b4eb77cfc5fe34edd6aaf284c449769b2a556eb4803c53da30402b"
+    },
+    {
+      "endpoint": "https://fantasy.premierleague.com/api/entry/6644775/transfers/",
+      "method": "GET",
+      "name": "entry-transfers",
+      "raw_path": "entry-transfers.json",
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    {
+      "endpoint": "https://fantasy.premierleague.com/api/entry/6644775/event/1/picks/",
+      "method": "GET",
+      "name": "event-1-picks",
+      "raw_path": "event-1-picks.json",
+      "sha256": "a528d375c1b60966b547ceeefde1afafef3763235aa054c2c1e9fa9495d91218"
+    }
+  ],
+  "state_semantics": "manager_state_as_of_event_deadline",
+  "transfer_history": [],
+  "transfer_recommendation_status": "not_available_in_public_manager_state_v1",
+  "unavailable_public_fields": [
+    "current_editable_squad",
+    "current_player_purchase_prices",
+    "current_player_selling_prices",
+    "free_transfer_count",
+    "live_post_deadline_squad_changes"
+  ],
+  "version": "public-manager-state-v1"
+}

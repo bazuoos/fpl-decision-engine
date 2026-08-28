@@ -35,6 +35,7 @@ from fpl_decision_engine.historical_sources import (
     HistoricalSource,
     sources_by_season,
 )
+from tests.fixture_support import materialized_historical_fixture
 
 
 def _csv_bytes(rows: list[dict[str, object]]) -> bytes:
@@ -686,14 +687,21 @@ class HistoricalSourceValidationTests(unittest.TestCase):
             _validate_feature_rows([tuple(malformed)], actuals)
 
 
-@unittest.skipUnless(
-    Path("data/historical/clean/historical-v3.1/historical_ingestion_manifest.json").is_file(),
-    "immutable historical-v3.1 artifact is not present",
-)
 class HistoricalV3ArtifactTests(unittest.TestCase):
-    def test_manifest_and_2025_edge_cases_match_audit(self) -> None:
-        root = Path("data/historical/clean/historical-v3.1")
-        manifest = json.loads((root / "historical_ingestion_manifest.json").read_bytes())
+    """Pair reviewed metadata with synthetic tables for fresh-checkout contracts."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.fixture_manager = materialized_historical_fixture()
+        cls.fixture = cls.fixture_manager.__enter__()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.fixture_manager.__exit__(None, None, None)
+
+    def test_reviewed_manifest_metadata_preserves_2025_audit(self) -> None:
+        """Validate the committed reviewed manifest copy, not ignored outputs."""
+        manifest = json.loads(self.fixture.metadata_manifest.read_bytes())
         self.assertEqual(manifest["parser_schema_version"], "historical-v3.1")
         reconciliation = manifest["reconciliation_audit"]
         self.assertEqual(
@@ -733,8 +741,9 @@ class HistoricalV3ArtifactTests(unittest.TestCase):
             [26, 31, 33, 34, 36],
         )
 
-    def test_2025_parquet_grain_nulls_and_sillah_state(self) -> None:
-        root = Path("data/historical/clean/historical-v3.1/2025-26")
+    def test_synthetic_2025_contract_grain_nulls_and_sillah_state(self) -> None:
+        """Validate representative contracts on synthetic, non-production Parquets."""
+        root = self.fixture.root / "2025-26"
         connection = duckdb.connect(":memory:")
         try:
             fixture_path = str(root / "historical_player_fixture.parquet")
@@ -824,25 +833,24 @@ class HistoricalV3ArtifactTests(unittest.TestCase):
         finally:
             connection.close()
 
-    def test_manifest_output_hashes_and_historical_v2_are_unchanged(self) -> None:
-        root = Path("data/historical/clean/historical-v3.1")
-        manifest = json.loads((root / "historical_ingestion_manifest.json").read_bytes())
+    def test_synthetic_output_hashes_and_reviewed_manifest_copy_hashes(self) -> None:
+        """Separate temporary-output integrity from reviewed metadata identity."""
+        root = self.fixture.root
+        manifest = json.loads(self.fixture.synthetic_manifest.read_bytes())
         for output in manifest["outputs"]:
             body = (root / output["path"]).read_bytes()
             self.assertEqual(hashlib.sha256(body).hexdigest(), output["sha256"])
-        v2_manifest = Path(
-            "data/historical/clean/historical-v2/historical_ingestion_manifest.json"
-        )
         self.assertEqual(
-            hashlib.sha256(v2_manifest.read_bytes()).hexdigest(),
+            hashlib.sha256(self.fixture.v2_manifest.read_bytes()).hexdigest(),
             "954555cdb1376e71902d359d06adcda78212822e01e02cc00ea91973f21c2c85",
         )
-        v3_manifest = Path(
-            "data/historical/clean/historical-v3/historical_ingestion_manifest.json"
+        self.assertEqual(
+            hashlib.sha256(self.fixture.v3_manifest.read_bytes()).hexdigest(),
+            "09be3584aba234d690d6b85a63c0445b08f5f0a6dcaeb9c2b5bb8bb376e6490f",
         )
         self.assertEqual(
-            hashlib.sha256(v3_manifest.read_bytes()).hexdigest(),
-            "09be3584aba234d690d6b85a63c0445b08f5f0a6dcaeb9c2b5bb8bb376e6490f",
+            hashlib.sha256(self.fixture.v31_manifest.read_bytes()).hexdigest(),
+            "59e66482df041c3bd3a8d04ed8d2ca6cbdd5e0cbf020ba4a18d5bca463988d66",
         )
 
 

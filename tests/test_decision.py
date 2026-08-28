@@ -36,6 +36,7 @@ from fpl_decision_engine.projection_provider import (
     XfpV01ParquetProvider,
     sha256_file,
 )
+from tests.fixture_support import materialized_frozen_gw2
 
 
 def player(
@@ -673,64 +674,57 @@ class XfpV01ProviderTests(unittest.TestCase):
                     projection_artifact=bad, players_artifact=players
                 ).load(season="2026-27", target_gameweek=2)
 
-    def test_read_only_decision_use_does_not_modify_frozen_gw2_artifacts(self) -> None:
-        projection = Path(
-            "data/predictions/fpl/2026-27/20260825T073532.450889Z/"
-            "gameweek=2/xfp_v01_gameweek.parquet"
-        )
-        fixture_prediction = Path(
-            "data/predictions/fpl/2026-27/20260825T073532.450889Z/"
-            "gameweek=2/xfp_v01_fixtures.parquet"
-        )
-        features = Path(
-            "data/features/fpl/2026-27/20260825T073532.450889Z/"
-            "gameweek=2/player_gameweek_features.parquet"
-        )
-        players = Path(
-            "data/clean/fpl/2026-27/20260825T073532.450889Z/players.parquet"
-        )
-        protected = (projection, fixture_prediction, features, players)
-        if not all(path.is_file() for path in protected):
-            self.skipTest("local frozen GW2 artifacts are not present")
-        before = {path: sha256_file(path) for path in protected}
-        data = XfpV01ParquetProvider(
-            projection_artifact=projection, players_artifact=players
-        ).load(season="2026-27", target_gameweek=2)
-        ranking = rank_players(data)
-        connection = duckdb.connect()
-        try:
-            direct_counts = connection.execute(
-                """SELECT
-                       count(*) FILTER (
-                           WHERE prediction_complete
-                             AND fixture_count > 0
-                             AND gameweek_xfp_v01 IS NOT NULL
-                       ) AS valid,
-                       count(*) FILTER (
-                           WHERE fixture_count = 0
-                             AND gameweek_xfp_v01 = 0
-                       ) AS verified_blank,
-                       count(*) FILTER (
-                           WHERE NOT prediction_complete
-                             AND fixture_count > 0
-                             AND gameweek_xfp_v01 IS NOT NULL
-                       ) AS incomplete,
-                       count(*) FILTER (
-                           WHERE fixture_count > 0
-                             AND gameweek_xfp_v01 IS NULL
-                       ) AS missing
-                     FROM read_parquet(?)""",
-                [str(projection)],
-            ).fetchone()
-        finally:
-            connection.close()
-        self.assertEqual(direct_counts, (310, 0, 300, 0))
-        self.assertEqual(len(ranking.rows), 310)
-        self.assertEqual(
-            ranking.excluded_counts,
-            {"incomplete_projection": 300, "missing_projection": 0},
-        )
-        self.assertEqual(before, {path: sha256_file(path) for path in protected})
+    def test_read_only_decision_use_does_not_modify_reviewed_test_fixtures(self) -> None:
+        """Exercise provider/ranking semantics on committed reviewed-byte copies."""
+        with materialized_frozen_gw2() as fixture:
+            fixture_sources = (
+                fixture.gameweek_predictions,
+                fixture.fixture_predictions,
+                fixture.features,
+                fixture.players,
+            )
+            before = {path: sha256_file(path) for path in fixture_sources}
+            data = XfpV01ParquetProvider(
+                projection_artifact=fixture.gameweek_predictions,
+                players_artifact=fixture.players,
+            ).load(season="2026-27", target_gameweek=2)
+            ranking = rank_players(data)
+            connection = duckdb.connect()
+            try:
+                direct_counts = connection.execute(
+                    """SELECT
+                           count(*) FILTER (
+                               WHERE prediction_complete
+                                 AND fixture_count > 0
+                                 AND gameweek_xfp_v01 IS NOT NULL
+                           ) AS valid,
+                           count(*) FILTER (
+                               WHERE fixture_count = 0
+                                 AND gameweek_xfp_v01 = 0
+                           ) AS verified_blank,
+                           count(*) FILTER (
+                               WHERE NOT prediction_complete
+                                 AND fixture_count > 0
+                                 AND gameweek_xfp_v01 IS NOT NULL
+                           ) AS incomplete,
+                           count(*) FILTER (
+                               WHERE fixture_count > 0
+                                 AND gameweek_xfp_v01 IS NULL
+                           ) AS missing
+                         FROM read_parquet(?)""",
+                    [str(fixture.gameweek_predictions)],
+                ).fetchone()
+            finally:
+                connection.close()
+            self.assertEqual(direct_counts, (310, 0, 300, 0))
+            self.assertEqual(len(ranking.rows), 310)
+            self.assertEqual(
+                ranking.excluded_counts,
+                {"incomplete_projection": 300, "missing_projection": 0},
+            )
+            self.assertEqual(
+                before, {path: sha256_file(path) for path in fixture_sources}
+            )
 
 
 if __name__ == "__main__":

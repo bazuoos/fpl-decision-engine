@@ -1,0 +1,203 @@
+{
+  "candidate_definitions": {
+    "C0": "frozen xFP v0.1 semantics",
+    "C1": "C0 with only eligible player-specific previous-season xG/90 and xA/90 blended using 450 pseudo-minutes"
+  },
+  "cross_season_element_id_join_prohibited": true,
+  "cross_season_join_key": "audited_unique_fpl_code",
+  "development_gameweeks": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38
+  ],
+  "development_gate_count": 21,
+  "development_gates_passed": 19,
+  "development_pass": false,
+  "development_season": "2024-25",
+  "development_thresholds": {
+    "gw11_plus_assist_spearman_minimum_change": -0.01,
+    "gw11_plus_combined_mae_maximum_worsening_pct": 1.0,
+    "gw11_plus_goal_spearman_minimum_change": -0.01,
+    "gw11_plus_modeled_mae_maximum_worsening_pct": 1.0,
+    "gw11_plus_modeled_rmse_maximum_worsening_pct": 1.0,
+    "gw11_plus_modeled_spearman_minimum_change": -0.01,
+    "gw2_5_best_component_spearman_improvement": 0.02,
+    "gw2_5_combined_mae_improvement_pct": 5.0,
+    "gw2_5_combined_rmse_improvement_pct": 3.0,
+    "gw2_5_modeled_mae_improvement_pct": 3.0,
+    "gw2_5_modeled_rmse_maximum_worsening_pct": 0.0,
+    "gw2_5_other_component_spearman_minimum_change": -0.01,
+    "gw6_10_assist_spearman_minimum_change": -0.01,
+    "gw6_10_combined_mae_maximum_worsening_pct": 1.0,
+    "gw6_10_goal_spearman_minimum_change": -0.01,
+    "gw6_10_modeled_mae_maximum_worsening_pct": 1.0,
+    "gw6_10_modeled_rmse_maximum_worsening_pct": 1.0,
+    "gw6_10_modeled_spearman_minimum_change": -0.01,
+    "overall_combined_absolute_bias_maximum_increase": 0.05,
+    "overall_coverage_maximum_drop_pp": 1.0,
+    "overall_modeled_absolute_bias_maximum_increase": 0.05
+  },
+  "expanded_c1_coverage_is_not_a_performance_gate": true,
+  "experiment_scope": "development_only",
+  "experiment_version": "previous-season-attacking-prior-development-v1",
+  "generation_timestamp": "2026-08-27T17:17:14.832534Z",
+  "historical_classification": "restricted_pseudo_backtest",
+  "historical_input_version": "historical-v3.1",
+  "historical_manifest_sha256": "59e66482df041c3bd3a8d04ed8d2ca6cbdd5e0cbf020ba4a18d5bca463988d66",
+  "holdout_evaluated": false,
+  "holdout_input_files_read": [],
+  "holdout_season": "2025-26",
+  "immutable_inputs": [
+    {
+      "path": "data/historical/backtests/xfp-v01-baseline-v1/backtest_manifest.json",
+      "sha256": "bcd0fb2259fc1ee8a08fbb7946280b7c42b786c4b07fa872547474f2877431d7"
+    },
+    {
+      "path": "data/historical/backtests/xfp-v01-baseline-v1/fixture_predictions.parquet",
+      "sha256": "d806b57c44bcaa27515d80d28ed58a10cc8e3904e8df1213c8e6ed488d06e723"
+    },
+    {
+      "path": "data/historical/backtests/xfp-v01-baseline-v1/player_gameweek.parquet",
+      "sha256": "be4f2f4ad1fc70e53d4d6da8916a184b35223a1d23ccb3bbccd6d4df1948ee1e"
+    },
+    {
+      "path": "data/historical/clean/historical-v3.1/2023-24/historical_player_fixture.parquet",
+      "sha256": "ae1a61e58e9aa0aa562a73d27f7b8ef1424ea207b1693ce43acea51625820fb4"
+    },
+    {
+      "path": "data/historical/clean/historical-v3.1/2023-24/historical_player_identity.parquet",
+      "sha256": "e2899e0a54b5dbd1de558d300157af778c1f7ad355af1f31209a7f529cb343d0"
+    },
+    {
+      "path": "data/historical/clean/historical-v3.1/2023-24/historical_reconciliation_exceptions.parquet",
+      "sha256": "2439cfccc2c8214c504246aea5e4e3e9964766f16fcec79152df92daaa6faee6"
+    },
+    {
+      "path": "data/historical/clean/historical-v3.1/2024-25/historical_player_fixture.parquet",
+      "sha256": "c609cc203c7c114fc566e993515f9be80873773e36a3ab91766e17d7e46d03fa"
+    },
+    {
+      "path": "data/historical/clean/historical-v3.1/2024-25/historical_predeadline_player_state.parquet",
+      "sha256": "07c5c743c862428ac598625e4f6eaca6bcbf5a89ac54f4c056302b32ef592b7e"
+    },
+    {
+      "path": "data/historical/clean/historical-v3.1/2024-25/historical_prediction_features.parquet",
+      "sha256": "360bdc456fd7679b50ec3fd740a131a51cb58528528eca3d6ab18089f4bd05e8"
+    },
+    {
+      "path": "data/historical/clean/historical-v3.1/historical_ingestion_manifest.json",
+      "sha256": "59e66482df041c3bd3a8d04ed8d2ca6cbdd5e0cbf020ba4a18d5bca463988d66"
+    }
+  ],
+  "incomplete_current_attacking_projection_completed_by_prior": false,
+  "live_model_modified": false,
+  "minimum_previous_season_minutes": 450,
+  "missing_previous_statistics_imputed": false,
+  "model_formula_frozen": "xfp_v01",
+  "outputs": [
+    {
+      "bytes": 21066,
+      "path": "player_prior_eligibility.parquet",
+      "rows": 781,
+      "sha256": "418a209e81c2c63e026b4a68cf5bc801698df3b5d182d9480de6ebda3602bb6b"
+    },
+    {
+      "bytes": 639,
+      "path": "prior_eligibility_reason_counts.parquet",
+      "rows": 5,
+      "sha256": "2e4e8f629c8f2ae16e0c7bcb109c46a787161be19f739c1b8a84b87f22b4c1cb"
+    },
+    {
+      "bytes": 1281103,
+      "path": "development_candidate_fixture.parquet",
+      "rows": 53822,
+      "sha256": "8d772cde78db9897dfb319bc8572aab40bb6b40949c52e15c89ef99ba6022b1a"
+    },
+    {
+      "bytes": 1668159,
+      "path": "development_candidate_player_gameweek.parquet",
+      "rows": 53098,
+      "sha256": "f96eebe564cda6ac47094d229c7bb1a17d4997564346a5e251a9dbd82c0759a5"
+    },
+    {
+      "bytes": 5660,
+      "path": "development_metrics.parquet",
+      "rows": 80,
+      "sha256": "cf2c8a7705c4771ca0458716fad36da29eec1d261b05ce86de7a4c8ce460a12d"
+    },
+    {
+      "bytes": 6330,
+      "path": "development_common_pair_metrics.parquet",
+      "rows": 40,
+      "sha256": "83eee1cc0a994f775443bacb9c2c9557e1a183f25f5eaa2660137a0bf52c8c03"
+    },
+    {
+      "bytes": 3274,
+      "path": "development_coverage.parquet",
+      "rows": 80,
+      "sha256": "b5be84f54451944c1a29b145bab4cba6d6a4d685f08a75077943567727da35bb"
+    },
+    {
+      "bytes": 2754,
+      "path": "development_gates.parquet",
+      "rows": 21,
+      "sha256": "420cb210517e24ddc6299b8560342a235d5ab2cfe31477647742a0bee5bd83fa"
+    }
+  ],
+  "position_match_required": true,
+  "previous_season_clubs_aggregated": true,
+  "primary_performance_population": "played player-GWs with C0, C1, and corresponding actual all non-null",
+  "prior_eligibility": {
+    "eligible_players": 327,
+    "fallback_players": 454,
+    "reason_counts": {
+      "eligible": 327,
+      "no_previous_season_code_match": 268,
+      "position_mismatch": 9,
+      "previous_season_minutes_below_450": 89,
+      "zero_previous_season_minutes": 88
+    },
+    "target_players": 781
+  },
+  "prior_season": "2023-24",
+  "prospective_2026_27_gw2_evaluated": false,
+  "pseudo_minutes": 450.0,
+  "same_gameweek_xp_prohibited": true,
+  "status": "complete",
+  "team_changes_invalidate_prior": false,
+  "temporal_cutoff_rule": "performance_gameweek < target_gameweek AND fixture_kickoff < target_deadline"
+}

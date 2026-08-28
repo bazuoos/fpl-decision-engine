@@ -1,0 +1,884 @@
+{
+  "admitted_incomplete_roll_squad": [
+    {
+      "element_id": 111,
+      "expected_minutes": 0.0,
+      "name": "Steele",
+      "prediction_complete": false,
+      "projection": 0.0
+    },
+    {
+      "element_id": 272,
+      "expected_minutes": 0.0,
+      "name": "Kusi-Asare",
+      "prediction_complete": false,
+      "projection": 0.0
+    },
+    {
+      "element_id": 499,
+      "expected_minutes": 0.0,
+      "name": "Pedro Porro",
+      "prediction_complete": false,
+      "projection": 0.0
+    }
+  ],
+  "appearance_only_policy_caveat": "For admitted incomplete projections, unavailable goal and assist contribution is implicitly treated as zero in the already-stored numeric xFP.",
+  "best_transfer": {
+    "base_xi_projection": 50.14,
+    "captain_bonus": 11.450000000000001,
+    "captain_id": 115,
+    "formation": "4-5-1",
+    "gain_vs_roll": 13.770000000000003,
+    "in": {
+      "element_id": 115,
+      "expected_minutes": 77.0,
+      "name": "De Cuyper",
+      "projection_state": "valid_projection",
+      "purchase_price_units": 45
+    },
+    "optimized_squad": {
+      "base_xi_projection": 50.14,
+      "bench": [
+        {
+          "element_id": 111,
+          "name": "Steele"
+        },
+        {
+          "element_id": 175,
+          "name": "van Ewijk"
+        },
+        {
+          "element_id": 272,
+          "name": "Kusi-Asare"
+        },
+        {
+          "element_id": 321,
+          "name": "Walle Egeli"
+        }
+      ],
+      "bench_order_semantics": "deterministic_task014_position_then_fpl_player_id_reporting_order; autosub_priority_is_not_optimized",
+      "captain": {
+        "element_id": 115,
+        "name": "De Cuyper"
+      },
+      "captain_bonus": 11.450000000000001,
+      "formation": "4-5-1",
+      "squad": [
+        {
+          "element_id": 1,
+          "expected_minutes": 90.0,
+          "name": "Raya",
+          "position": "GK",
+          "prediction_complete": true,
+          "projection": 2.0,
+          "projection_state": "valid_projection",
+          "purchase_price_units": 60,
+          "team_id": 1
+        },
+        {
+          "element_id": 8,
+          "expected_minutes": 80.0,
+          "name": "Calafiori",
+          "position": "DEF",
+          "prediction_complete": true,
+          "projection": 2.51,
+          "projection_state": "valid_projection",
+          "purchase_price_units": 55,
+          "team_id": 1
+        },
+        {
+          "element_id": 40,
+          "expected_minutes": 81.0,
+          "name": "Rogers",
+          "position": "MID",
+          "prediction_complete": true,
+          "projection": 7.1000000000000005,
+          "projection_state": "valid_projection",
+          "purchase_price_units": 75,
+          "team_id": 6
+        },
+        {
+          "element_id": 111,
+          "expected_minutes": 0.0,
+          "name": "Steele",
+          "position": "GK",
+          "prediction_complete": false,
+          "projection": 0.0,
+          "projection_state": "incomplete_projection",
+          "purchase_price_units": 40,
+          "team_id": 5
+        },
+        {
+          "element_id": 115,
+          "expected_minutes": 77.0,
+          "name": "De Cuyper",
+          "position": "DEF",
+          "prediction_complete": true,
+          "projection": 11.450000000000001,
+          "projection_state": "valid_projection",
+          "purchase_price_units": 45,
+          "team_id": 5
+        },
+        {
+          "element_id": 175,
+          "expected_minutes": 90.0,
+          "name": "van Ewijk",
+          "position": "DEF",
+          "prediction_complete": true,
+          "projection": 2.03,
+          "projection_state": "valid_projection",
+          "purchase_price_units": 40,
+          "team_id": 7
+        },
+        {
+          "element_id": 201,
+          "expected_minutes": 54.0,
+          "name": "Mu\u00f1oz",
+          "position": "DEF",
+          "prediction_complete": true,
+          "projection": 2.4099999999999997,
+          "projection_state": "valid_projection",
+          "purchase_price_units": 55,
+          "team_id": 8
+        },
+        {
+          "element_id": 272,
+          "expected_minutes": 0.0,
+          "name": "Kusi-Asare",
+          "position": "FWD",
+          "prediction_complete": false,
+          "projection": 0.0,
+          "projection_state": "incomplete_projection",
+          "purchase_price_units": 45,
+          "team_id": 10
+        },
+        {
+          "element_id": 321,
+          "expected_minutes": 10.0,
+          "name": "Walle Egeli",
+          "position": "FWD",
+          "prediction_complete": true,
+          "projection": 1.0,
+          "projection_state": "valid_projection",
+          "purchase_price_units": 45,
+          "team_id": 12
+        },
+        {
+          "element_id": 368,
+          "expected_minutes": 90.0,
+          "name": "Szoboszlai",
+          "position": "MID",
+          "prediction_complete": true,
+          "projection": 7.0600000000000005,
+          "projection_state": "valid_projection",
+          "purchase_price_units": 70,
+          "team_id": 14
+        },
+        {
+          "element_id": 391,
+          "expected_minutes": 90.0,
+          "name": "Gvardiol",
+          "position": "DEF",
+          "prediction_complete": true,
+          "projection": 3.29,
+          "projection_state": "valid_projection",
+          "purchase_price_units": 55,
+          "team_id": 15
+        },
+        {
+          "element_id": 411,
+          "expected_minutes": 90.0,
+          "name": "Haaland",
+          "position": "FWD",
+          "prediction_complete": true,
+          "projection": 5.02,
+          "projection_state": "valid_projection",
+          "purchase_price_units": 155,
+          "team_id": 15
+        },
+        {
+          "element_id": 426,
+          "expected_minutes": 90.0,
+          "name": "B.Fernandes",
+          "position": "MID",
+          "prediction_complete": true,
+          "projection": 3.1799999999999997,
+          "projection_state": "valid_projection",
+          "purchase_price_units": 120,
+          "team_id": 16
+        },
+        {
+          "element_id": 481,
+          "expected_minutes": 62.0,
+          "name": "Anderson",
+          "position": "MID",
+          "prediction_complete": true,
+          "projection": 2.75,
+          "projection_state": "valid_projection",
+          "purchase_price_units": 65,
+          "team_id": 15
+        },
+        {
+          "element_id": 557,
+          "expected_minutes": 75.0,
+          "name": "Tzolis",
+          "position": "MID",
+          "prediction_complete": true,
+          "projection": 3.37,
+          "projection_state": "valid_projection",
+          "purchase_price_units": 65,
+          "team_id": 1
+        }
+      ],
+      "starting_xi": [
+        {
+          "element_id": 1,
+          "name": "Raya"
+        },
+        {
+          "element_id": 8,
+          "name": "Calafiori"
+        },
+        {
+          "element_id": 115,
+          "name": "De Cuyper"
+        },
+        {
+          "element_id": 201,
+          "name": "Mu\u00f1oz"
+        },
+        {
+          "element_id": 391,
+          "name": "Gvardiol"
+        },
+        {
+          "element_id": 40,
+          "name": "Rogers"
+        },
+        {
+          "element_id": 368,
+          "name": "Szoboszlai"
+        },
+        {
+          "element_id": 426,
+          "name": "B.Fernandes"
+        },
+        {
+          "element_id": 481,
+          "name": "Anderson"
+        },
+        {
+          "element_id": 557,
+          "name": "Tzolis"
+        },
+        {
+          "element_id": 411,
+          "name": "Haaland"
+        }
+      ],
+      "total_objective": 61.59,
+      "vice_captain": {
+        "element_id": 40,
+        "name": "Rogers"
+      }
+    },
+    "out": {
+      "element_id": 499,
+      "name": "Pedro Porro",
+      "verified_selling_price_units": 55
+    },
+    "resulting_bank_units": 10,
+    "total_objective": 61.59,
+    "vice_captain_id": 40
+  },
+  "candidate_summaries_artifact": {
+    "path": "/Users/nattawatyamchaianan/Projects/fpl-decision-engine/data/manager/decisions/fpl/2026-27/entry=6644775/gameweek=2/20260826T132044.123523Z/one-transfer-decision-v1/20260826T165408.903032Z/legal_transfer_candidates.json",
+    "sha256": "107216cdaa224d86e380c0bd2ab67b6afef5a7a233e105710a0255e0f3510c50"
+  },
+  "classification": "experimental_decision_output_using_xfp_v01_modeled_components_only",
+  "comparison": {
+    "best_transfer_objective": 61.59,
+    "projected_gain_from_best_transfer": 13.770000000000003,
+    "recommended_action": "TRANSFER",
+    "roll_objective": 47.82
+  },
+  "decision_policy": "appearance_only_allowed",
+  "decision_policy_is_default": false,
+  "decision_policy_version": "decision-eligibility-policy-v1",
+  "entry_id": 6644775,
+  "generation_timestamp": "2026-08-26T16:54:08.903032Z",
+  "incomplete_projection_invariant": "every admitted numeric incomplete xFP v0.1 projection has expected_minutes exactly 0",
+  "interpretation": "Best legal action only under frozen xFP v0.1 and the explicitly selected experimental appearance-only policy; not a definitive best FPL transfer.",
+  "legal_transfer_candidate_count": 2107,
+  "manual_state": {
+    "artifact_path": "/Users/nattawatyamchaianan/Projects/fpl-decision-engine/data/manager/manual/fpl/2026-27/entry=6644775/gameweek=2/20260826T132044.123523Z/manual_editable_state.json",
+    "artifact_sha256": "556163234f35d0206076d6d13978d0cebb37a1e8062576371d593ecc9c8e8a68",
+    "bank_units": 0,
+    "free_transfers": 1,
+    "no_chip_modeled": true,
+    "one_transfer_cost_points": 0
+  },
+  "model_caveat": "xFP v0.1 models appearance, goals and assists only; it is not expected total FPL points. Goalkeeper and defender clean-sheet, save and goals-conceded value is omitted.",
+  "optimizer": {
+    "decision_engine_version": "decision-engine-v2",
+    "objective": "starting_xi_xfp_plus_captain_xfp",
+    "objective_tolerance": 1e-08,
+    "reused_task014_optimize_xi": true
+  },
+  "projection_provenance": {
+    "artifact_path": "/Users/nattawatyamchaianan/Projects/fpl-decision-engine/data/predictions/fpl/2026-27/20260825T073532.450889Z/gameweek=2/xfp_v01_gameweek.parquet",
+    "artifact_sha256": "105fc489991b568d1d572213f188543fbe8fd07504f0f7845504fa76a3eaa5fc",
+    "model_id": "xfp_v01",
+    "provider_id": "xfp_v01_parquet_v1"
+  },
+  "purchase_price_provenance": {
+    "players_artifact_path": "/Users/nattawatyamchaianan/Projects/fpl-decision-engine/data/clean/fpl/2026-27/20260825T073532.450889Z/players.parquet",
+    "players_artifact_sha256": "0ddbe5be615b2e5fc7eeb631035d5b65a382d70bf7e1acf3e9a269ec9cd35589",
+    "snapshot_timestamp": "20260825T073532.450889Z",
+    "source": "frozen_official_fpl_clean_player_snapshot",
+    "third_party_price_used": false
+  },
+  "roll": {
+    "base_xi_projection": 40.72,
+    "bench": [
+      {
+        "element_id": 111,
+        "name": "Steele"
+      },
+      {
+        "element_id": 499,
+        "name": "Pedro Porro"
+      },
+      {
+        "element_id": 272,
+        "name": "Kusi-Asare"
+      },
+      {
+        "element_id": 321,
+        "name": "Walle Egeli"
+      }
+    ],
+    "bench_order_semantics": "deterministic_task014_position_then_fpl_player_id_reporting_order; autosub_priority_is_not_optimized",
+    "captain": {
+      "element_id": 40,
+      "name": "Rogers"
+    },
+    "captain_bonus": 7.1000000000000005,
+    "formation": "4-5-1",
+    "squad": [
+      {
+        "element_id": 1,
+        "expected_minutes": 90.0,
+        "name": "Raya",
+        "position": "GK",
+        "prediction_complete": true,
+        "projection": 2.0,
+        "projection_state": "valid_projection",
+        "purchase_price_units": 60,
+        "team_id": 1
+      },
+      {
+        "element_id": 8,
+        "expected_minutes": 80.0,
+        "name": "Calafiori",
+        "position": "DEF",
+        "prediction_complete": true,
+        "projection": 2.51,
+        "projection_state": "valid_projection",
+        "purchase_price_units": 55,
+        "team_id": 1
+      },
+      {
+        "element_id": 40,
+        "expected_minutes": 81.0,
+        "name": "Rogers",
+        "position": "MID",
+        "prediction_complete": true,
+        "projection": 7.1000000000000005,
+        "projection_state": "valid_projection",
+        "purchase_price_units": 75,
+        "team_id": 6
+      },
+      {
+        "element_id": 111,
+        "expected_minutes": 0.0,
+        "name": "Steele",
+        "position": "GK",
+        "prediction_complete": false,
+        "projection": 0.0,
+        "projection_state": "incomplete_projection",
+        "purchase_price_units": 40,
+        "team_id": 5
+      },
+      {
+        "element_id": 175,
+        "expected_minutes": 90.0,
+        "name": "van Ewijk",
+        "position": "DEF",
+        "prediction_complete": true,
+        "projection": 2.03,
+        "projection_state": "valid_projection",
+        "purchase_price_units": 40,
+        "team_id": 7
+      },
+      {
+        "element_id": 201,
+        "expected_minutes": 54.0,
+        "name": "Mu\u00f1oz",
+        "position": "DEF",
+        "prediction_complete": true,
+        "projection": 2.4099999999999997,
+        "projection_state": "valid_projection",
+        "purchase_price_units": 55,
+        "team_id": 8
+      },
+      {
+        "element_id": 272,
+        "expected_minutes": 0.0,
+        "name": "Kusi-Asare",
+        "position": "FWD",
+        "prediction_complete": false,
+        "projection": 0.0,
+        "projection_state": "incomplete_projection",
+        "purchase_price_units": 45,
+        "team_id": 10
+      },
+      {
+        "element_id": 321,
+        "expected_minutes": 10.0,
+        "name": "Walle Egeli",
+        "position": "FWD",
+        "prediction_complete": true,
+        "projection": 1.0,
+        "projection_state": "valid_projection",
+        "purchase_price_units": 45,
+        "team_id": 12
+      },
+      {
+        "element_id": 368,
+        "expected_minutes": 90.0,
+        "name": "Szoboszlai",
+        "position": "MID",
+        "prediction_complete": true,
+        "projection": 7.0600000000000005,
+        "projection_state": "valid_projection",
+        "purchase_price_units": 70,
+        "team_id": 14
+      },
+      {
+        "element_id": 391,
+        "expected_minutes": 90.0,
+        "name": "Gvardiol",
+        "position": "DEF",
+        "prediction_complete": true,
+        "projection": 3.29,
+        "projection_state": "valid_projection",
+        "purchase_price_units": 55,
+        "team_id": 15
+      },
+      {
+        "element_id": 411,
+        "expected_minutes": 90.0,
+        "name": "Haaland",
+        "position": "FWD",
+        "prediction_complete": true,
+        "projection": 5.02,
+        "projection_state": "valid_projection",
+        "purchase_price_units": 155,
+        "team_id": 15
+      },
+      {
+        "element_id": 426,
+        "expected_minutes": 90.0,
+        "name": "B.Fernandes",
+        "position": "MID",
+        "prediction_complete": true,
+        "projection": 3.1799999999999997,
+        "projection_state": "valid_projection",
+        "purchase_price_units": 120,
+        "team_id": 16
+      },
+      {
+        "element_id": 481,
+        "expected_minutes": 62.0,
+        "name": "Anderson",
+        "position": "MID",
+        "prediction_complete": true,
+        "projection": 2.75,
+        "projection_state": "valid_projection",
+        "purchase_price_units": 65,
+        "team_id": 15
+      },
+      {
+        "element_id": 499,
+        "expected_minutes": 0.0,
+        "name": "Pedro Porro",
+        "position": "DEF",
+        "prediction_complete": false,
+        "projection": 0.0,
+        "projection_state": "incomplete_projection",
+        "purchase_price_units": 55,
+        "team_id": 19
+      },
+      {
+        "element_id": 557,
+        "expected_minutes": 75.0,
+        "name": "Tzolis",
+        "position": "MID",
+        "prediction_complete": true,
+        "projection": 3.37,
+        "projection_state": "valid_projection",
+        "purchase_price_units": 65,
+        "team_id": 1
+      }
+    ],
+    "starting_xi": [
+      {
+        "element_id": 1,
+        "name": "Raya"
+      },
+      {
+        "element_id": 8,
+        "name": "Calafiori"
+      },
+      {
+        "element_id": 175,
+        "name": "van Ewijk"
+      },
+      {
+        "element_id": 201,
+        "name": "Mu\u00f1oz"
+      },
+      {
+        "element_id": 391,
+        "name": "Gvardiol"
+      },
+      {
+        "element_id": 40,
+        "name": "Rogers"
+      },
+      {
+        "element_id": 368,
+        "name": "Szoboszlai"
+      },
+      {
+        "element_id": 426,
+        "name": "B.Fernandes"
+      },
+      {
+        "element_id": 481,
+        "name": "Anderson"
+      },
+      {
+        "element_id": 557,
+        "name": "Tzolis"
+      },
+      {
+        "element_id": 411,
+        "name": "Haaland"
+      }
+    ],
+    "total_objective": 47.82,
+    "vice_captain": {
+      "element_id": 368,
+      "name": "Szoboszlai"
+    }
+  },
+  "scope": "single_gameweek_zero_or_one_free_transfer",
+  "season": "2026-27",
+  "selling_price_inputs": {
+    "inferred_from_current_price": false,
+    "manager_specific": true,
+    "prices": [
+      {
+        "element_id": 1,
+        "selling_price_units": 60
+      },
+      {
+        "element_id": 8,
+        "selling_price_units": 55
+      },
+      {
+        "element_id": 40,
+        "selling_price_units": 75
+      },
+      {
+        "element_id": 111,
+        "selling_price_units": 40
+      },
+      {
+        "element_id": 175,
+        "selling_price_units": 40
+      },
+      {
+        "element_id": 201,
+        "selling_price_units": 55
+      },
+      {
+        "element_id": 272,
+        "selling_price_units": 45
+      },
+      {
+        "element_id": 321,
+        "selling_price_units": 45
+      },
+      {
+        "element_id": 368,
+        "selling_price_units": 70
+      },
+      {
+        "element_id": 391,
+        "selling_price_units": 55
+      },
+      {
+        "element_id": 411,
+        "selling_price_units": 155
+      },
+      {
+        "element_id": 426,
+        "selling_price_units": 120
+      },
+      {
+        "element_id": 481,
+        "selling_price_units": 65
+      },
+      {
+        "element_id": 499,
+        "selling_price_units": 55
+      },
+      {
+        "element_id": 557,
+        "selling_price_units": 65
+      }
+    ],
+    "source": "manual_transcription_from_official_fpl_transfers_page_screenshot"
+  },
+  "target_gameweek": 2,
+  "tie_breaking": {
+    "roll_beats_transfer_within_tolerance": true,
+    "tied_transfers": "outgoing_fpl_player_id_then_incoming_fpl_player_id_ascending"
+  },
+  "top_10_legal_transfers": [
+    {
+      "base_xi_projection": 50.14,
+      "captain_bonus": 11.450000000000001,
+      "captain_id": 115,
+      "formation": "4-5-1",
+      "gain_vs_roll": 13.770000000000003,
+      "in": {
+        "element_id": 115,
+        "expected_minutes": 77.0,
+        "name": "De Cuyper",
+        "projection_state": "valid_projection",
+        "purchase_price_units": 45
+      },
+      "out": {
+        "element_id": 499,
+        "name": "Pedro Porro",
+        "verified_selling_price_units": 55
+      },
+      "resulting_bank_units": 10,
+      "total_objective": 61.59,
+      "vice_captain_id": 40
+    },
+    {
+      "base_xi_projection": 49.76,
+      "captain_bonus": 11.450000000000001,
+      "captain_id": 115,
+      "formation": "4-5-1",
+      "gain_vs_roll": 13.39,
+      "in": {
+        "element_id": 115,
+        "expected_minutes": 77.0,
+        "name": "De Cuyper",
+        "projection_state": "valid_projection",
+        "purchase_price_units": 45
+      },
+      "out": {
+        "element_id": 201,
+        "name": "Mu\u00f1oz",
+        "verified_selling_price_units": 55
+      },
+      "resulting_bank_units": 10,
+      "total_objective": 61.21,
+      "vice_captain_id": 40
+    },
+    {
+      "base_xi_projection": 49.660000000000004,
+      "captain_bonus": 11.450000000000001,
+      "captain_id": 115,
+      "formation": "4-5-1",
+      "gain_vs_roll": 13.290000000000006,
+      "in": {
+        "element_id": 115,
+        "expected_minutes": 77.0,
+        "name": "De Cuyper",
+        "projection_state": "valid_projection",
+        "purchase_price_units": 45
+      },
+      "out": {
+        "element_id": 8,
+        "name": "Calafiori",
+        "verified_selling_price_units": 55
+      },
+      "resulting_bank_units": 10,
+      "total_objective": 61.11000000000001,
+      "vice_captain_id": 40
+    },
+    {
+      "base_xi_projection": 48.88,
+      "captain_bonus": 11.450000000000001,
+      "captain_id": 115,
+      "formation": "4-5-1",
+      "gain_vs_roll": 12.510000000000005,
+      "in": {
+        "element_id": 115,
+        "expected_minutes": 77.0,
+        "name": "De Cuyper",
+        "projection_state": "valid_projection",
+        "purchase_price_units": 45
+      },
+      "out": {
+        "element_id": 391,
+        "name": "Gvardiol",
+        "verified_selling_price_units": 55
+      },
+      "resulting_bank_units": 10,
+      "total_objective": 60.330000000000005,
+      "vice_captain_id": 40
+    },
+    {
+      "base_xi_projection": 47.08,
+      "captain_bonus": 9.110000000000001,
+      "captain_id": 123,
+      "formation": "4-5-1",
+      "gain_vs_roll": 8.369999999999997,
+      "in": {
+        "element_id": 123,
+        "expected_minutes": 63.0,
+        "name": "Hinshelwood",
+        "projection_state": "valid_projection",
+        "purchase_price_units": 60
+      },
+      "out": {
+        "element_id": 481,
+        "name": "Anderson",
+        "verified_selling_price_units": 65
+      },
+      "resulting_bank_units": 5,
+      "total_objective": 56.19,
+      "vice_captain_id": 40
+    },
+    {
+      "base_xi_projection": 46.65,
+      "captain_bonus": 9.110000000000001,
+      "captain_id": 123,
+      "formation": "4-5-1",
+      "gain_vs_roll": 7.939999999999998,
+      "in": {
+        "element_id": 123,
+        "expected_minutes": 63.0,
+        "name": "Hinshelwood",
+        "projection_state": "valid_projection",
+        "purchase_price_units": 60
+      },
+      "out": {
+        "element_id": 426,
+        "name": "B.Fernandes",
+        "verified_selling_price_units": 120
+      },
+      "resulting_bank_units": 60,
+      "total_objective": 55.76,
+      "vice_captain_id": 40
+    },
+    {
+      "base_xi_projection": 46.46,
+      "captain_bonus": 9.110000000000001,
+      "captain_id": 123,
+      "formation": "4-5-1",
+      "gain_vs_roll": 7.75,
+      "in": {
+        "element_id": 123,
+        "expected_minutes": 63.0,
+        "name": "Hinshelwood",
+        "projection_state": "valid_projection",
+        "purchase_price_units": 60
+      },
+      "out": {
+        "element_id": 557,
+        "name": "Tzolis",
+        "verified_selling_price_units": 65
+      },
+      "resulting_bank_units": 5,
+      "total_objective": 55.57,
+      "vice_captain_id": 40
+    },
+    {
+      "base_xi_projection": 42.77,
+      "captain_bonus": 9.110000000000001,
+      "captain_id": 123,
+      "formation": "4-5-1",
+      "gain_vs_roll": 4.060000000000002,
+      "in": {
+        "element_id": 123,
+        "expected_minutes": 63.0,
+        "name": "Hinshelwood",
+        "projection_state": "valid_projection",
+        "purchase_price_units": 60
+      },
+      "out": {
+        "element_id": 368,
+        "name": "Szoboszlai",
+        "verified_selling_price_units": 70
+      },
+      "resulting_bank_units": 10,
+      "total_objective": 51.88,
+      "vice_captain_id": 40
+    },
+    {
+      "base_xi_projection": 42.730000000000004,
+      "captain_bonus": 9.110000000000001,
+      "captain_id": 123,
+      "formation": "4-5-1",
+      "gain_vs_roll": 4.020000000000003,
+      "in": {
+        "element_id": 123,
+        "expected_minutes": 63.0,
+        "name": "Hinshelwood",
+        "projection_state": "valid_projection",
+        "purchase_price_units": 60
+      },
+      "out": {
+        "element_id": 40,
+        "name": "Rogers",
+        "verified_selling_price_units": 75
+      },
+      "resulting_bank_units": 15,
+      "total_objective": 51.84,
+      "vice_captain_id": 368
+    },
+    {
+      "base_xi_projection": 44.18,
+      "captain_bonus": 7.1000000000000005,
+      "captain_id": 40,
+      "formation": "4-5-1",
+      "gain_vs_roll": 3.460000000000001,
+      "in": {
+        "element_id": 86,
+        "expected_minutes": 90.0,
+        "name": "Lewis-Potter",
+        "projection_state": "valid_projection",
+        "purchase_price_units": 55
+      },
+      "out": {
+        "element_id": 481,
+        "name": "Anderson",
+        "verified_selling_price_units": 65
+      },
+      "resulting_bank_units": 10,
+      "total_objective": 51.28,
+      "vice_captain_id": 368
+    }
+  ],
+  "version": "one-transfer-decision-v1"
+}

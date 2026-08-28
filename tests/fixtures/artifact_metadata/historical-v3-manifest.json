@@ -1,0 +1,3578 @@
+{
+  "chronological_leakage_audit": {
+    "cases_by_season": {
+      "2023-24": [],
+      "2024-25": [],
+      "2025-26": []
+    },
+    "completion_timestamp_available": false,
+    "guard": "fixture_kickoff < target_deadline"
+  },
+  "created_at": "2026-08-27T12:02:35.253586Z",
+  "expected_stat_semantics": "fixture_level_official_fpl_archive_value",
+  "fixture_assignment_context": "finalized_fixture_assignment",
+  "fixture_assignment_verified_predeadline": false,
+  "fixture_structure": {
+    "2023-24": {
+      "fixture_rows": 380,
+      "special_gameweeks": [
+        {
+          "blank_team_ids": [
+            6,
+            12
+          ],
+          "double_team_ids": [],
+          "fixture_count": 9,
+          "gameweek": 2
+        },
+        {
+          "blank_team_ids": [],
+          "double_team_ids": [
+            6,
+            12
+          ],
+          "fixture_count": 11,
+          "gameweek": 7
+        },
+        {
+          "blank_team_ids": [
+            3,
+            12
+          ],
+          "double_team_ids": [],
+          "fixture_count": 9,
+          "gameweek": 17
+        },
+        {
+          "blank_team_ids": [
+            4,
+            13
+          ],
+          "double_team_ids": [],
+          "fixture_count": 9,
+          "gameweek": 18
+        },
+        {
+          "blank_team_ids": [],
+          "double_team_ids": [
+            4,
+            11,
+            12,
+            13
+          ],
+          "fixture_count": 12,
+          "gameweek": 25
+        },
+        {
+          "blank_team_ids": [
+            7,
+            11,
+            12,
+            18
+          ],
+          "double_team_ids": [],
+          "fixture_count": 8,
+          "gameweek": 26
+        },
+        {
+          "blank_team_ids": [],
+          "double_team_ids": [
+            3,
+            12
+          ],
+          "fixture_count": 11,
+          "gameweek": 28
+        },
+        {
+          "blank_team_ids": [
+            1,
+            3,
+            5,
+            7,
+            8,
+            9,
+            11,
+            13,
+            14,
+            15,
+            17,
+            20
+          ],
+          "double_team_ids": [],
+          "fixture_count": 4,
+          "gameweek": 29
+        },
+        {
+          "blank_team_ids": [
+            18
+          ],
+          "double_team_ids": [
+            1,
+            3,
+            8,
+            9,
+            11,
+            17,
+            20
+          ],
+          "fixture_count": 13,
+          "gameweek": 34
+        },
+        {
+          "blank_team_ids": [],
+          "double_team_ids": [
+            7,
+            18
+          ],
+          "fixture_count": 11,
+          "gameweek": 35
+        },
+        {
+          "blank_team_ids": [],
+          "double_team_ids": [
+            5,
+            7,
+            13,
+            14,
+            15,
+            18
+          ],
+          "fixture_count": 13,
+          "gameweek": 37
+        }
+      ]
+    },
+    "2024-25": {
+      "fixture_rows": 380,
+      "special_gameweeks": [
+        {
+          "blank_team_ids": [
+            8,
+            12
+          ],
+          "double_team_ids": [],
+          "fixture_count": 9,
+          "gameweek": 15
+        },
+        {
+          "blank_team_ids": [],
+          "double_team_ids": [
+            8,
+            12
+          ],
+          "fixture_count": 11,
+          "gameweek": 24
+        },
+        {
+          "blank_team_ids": [],
+          "double_team_ids": [
+            2,
+            12
+          ],
+          "fixture_count": 11,
+          "gameweek": 25
+        },
+        {
+          "blank_team_ids": [
+            2,
+            7,
+            12,
+            15
+          ],
+          "double_team_ids": [],
+          "fixture_count": 8,
+          "gameweek": 29
+        },
+        {
+          "blank_team_ids": [],
+          "double_team_ids": [
+            7,
+            15
+          ],
+          "fixture_count": 11,
+          "gameweek": 32
+        },
+        {
+          "blank_team_ids": [],
+          "double_team_ids": [
+            1,
+            2,
+            7,
+            13
+          ],
+          "fixture_count": 12,
+          "gameweek": 33
+        },
+        {
+          "blank_team_ids": [
+            1,
+            2,
+            7,
+            13
+          ],
+          "double_team_ids": [],
+          "fixture_count": 8,
+          "gameweek": 34
+        }
+      ]
+    },
+    "2025-26": {
+      "fixture_rows": 380,
+      "special_gameweeks": [
+        {
+          "blank_team_ids": [],
+          "double_team_ids": [
+            1,
+            20
+          ],
+          "fixture_count": 11,
+          "gameweek": 26
+        },
+        {
+          "blank_team_ids": [
+            1,
+            8,
+            13,
+            20
+          ],
+          "double_team_ids": [],
+          "fixture_count": 8,
+          "gameweek": 31
+        },
+        {
+          "blank_team_ids": [],
+          "double_team_ids": [
+            3,
+            4,
+            6,
+            7,
+            11,
+            13
+          ],
+          "fixture_count": 13,
+          "gameweek": 33
+        },
+        {
+          "blank_team_ids": [
+            3,
+            4,
+            6,
+            7,
+            11,
+            13
+          ],
+          "double_team_ids": [],
+          "fixture_count": 7,
+          "gameweek": 34
+        },
+        {
+          "blank_team_ids": [],
+          "double_team_ids": [
+            8,
+            13
+          ],
+          "fixture_count": 11,
+          "gameweek": 36
+        }
+      ]
+    }
+  },
+  "historical_classification": "restricted_pseudo_backtest",
+  "identity": {
+    "adjacent_season_audits": [
+      {
+        "element_id_changes": 513,
+        "element_id_join_prohibited": true,
+        "element_id_unchanged": 0,
+        "from_season": "2023-24",
+        "join_key": "code",
+        "position_changes": 9,
+        "shared_codes": 513,
+        "team_changes": 72,
+        "to_season": "2024-25"
+      },
+      {
+        "element_id_changes": 533,
+        "element_id_join_prohibited": true,
+        "element_id_unchanged": 1,
+        "from_season": "2024-25",
+        "join_key": "code",
+        "position_changes": 12,
+        "shared_codes": 534,
+        "team_changes": 74,
+        "to_season": "2025-26"
+      }
+    ],
+    "code_collisions_within_season": [],
+    "cross_season_candidate_bridge": "code",
+    "cross_season_code_name_variants": [
+      {
+        "code": 59859,
+        "mappings": [
+          {
+            "display_name": "G\u00fcndogan",
+            "element_id": 625,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "G\u00fcndo\u011fan",
+            "element_id": 420,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 60307,
+        "mappings": [
+          {
+            "display_name": "Gross",
+            "element_id": 134,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Gross",
+            "element_id": 125,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Gro\u00df",
+            "element_id": 783,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 67089,
+        "mappings": [
+          {
+            "display_name": "Dubravka",
+            "element_id": 409,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "D\u00fabravka",
+            "element_id": 396,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "D\u00fabravka",
+            "element_id": 470,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 110504,
+        "mappings": [
+          {
+            "display_name": "Bertrand Traor\u00e9",
+            "element_id": 59,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Traor\u00e9",
+            "element_id": 735,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 118748,
+        "mappings": [
+          {
+            "display_name": "Salah",
+            "element_id": 308,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "M.Salah",
+            "element_id": 328,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "M.Salah",
+            "element_id": 381,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 121145,
+        "mappings": [
+          {
+            "display_name": "Cancelo",
+            "element_id": 346,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Jo\u00e3o Cancelo",
+            "element_id": 353,
+            "season": "2024-25"
+          }
+        ]
+      },
+      {
+        "code": 155408,
+        "mappings": [
+          {
+            "display_name": "L.Cook",
+            "element_id": 66,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Cook",
+            "element_id": 64,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Cook",
+            "element_id": 88,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 168991,
+        "mappings": [
+          {
+            "display_name": "Billing",
+            "element_id": 63,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Philip",
+            "element_id": 76,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Philip",
+            "element_id": 89,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 184667,
+        "mappings": [
+          {
+            "display_name": "Lindelof",
+            "element_id": 386,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Lindelof",
+            "element_id": 376,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Lindel\u00f6f",
+            "element_id": 719,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 194799,
+        "mappings": [
+          {
+            "display_name": "J.Lewis",
+            "element_id": 420,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Lewis",
+            "element_id": 408,
+            "season": "2024-25"
+          }
+        ]
+      },
+      {
+        "code": 195546,
+        "mappings": [
+          {
+            "display_name": "Buendia",
+            "element_id": 35,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Buendia",
+            "element_id": 31,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Buend\u00eda",
+            "element_id": 50,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 197024,
+        "mappings": [
+          {
+            "display_name": "G.Rodr\u00edguez",
+            "element_id": 588,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "G.Rodriguez",
+            "element_id": 618,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 197464,
+        "mappings": [
+          {
+            "display_name": "Phillips",
+            "element_id": 306,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "N.Phillips",
+            "element_id": 332,
+            "season": "2024-25"
+          }
+        ]
+      },
+      {
+        "code": 199670,
+        "mappings": [
+          {
+            "display_name": "Edouard",
+            "element_id": 225,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Edouard",
+            "element_id": 198,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "\u00c9douard",
+            "element_id": 285,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 206915,
+        "mappings": [
+          {
+            "display_name": "Jones",
+            "element_id": 300,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Jones",
+            "element_id": 324,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "C.Jones",
+            "element_id": 388,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 215059,
+        "mappings": [
+          {
+            "display_name": "Sanchez",
+            "element_id": 145,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "S\u00e1nchez",
+            "element_id": 185,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "S\u00e1nchez",
+            "element_id": 220,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 215136,
+        "mappings": [
+          {
+            "display_name": "Williams",
+            "element_id": 467,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "N.Williams",
+            "element_id": 437,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "N.Williams",
+            "element_id": 508,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 232185,
+        "mappings": [
+          {
+            "display_name": "I.Sarr",
+            "element_id": 585,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Sarr",
+            "element_id": 267,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 232653,
+        "mappings": [
+          {
+            "display_name": "J.Ramsey",
+            "element_id": 55,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Ramsey",
+            "element_id": 53,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "J.Ramsey",
+            "element_id": 52,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 241231,
+        "mappings": [
+          {
+            "display_name": "Beyer",
+            "element_id": 160,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Jordan",
+            "element_id": 194,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 245824,
+        "mappings": [
+          {
+            "display_name": "Vin\u00edcius",
+            "element_id": 287,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Vinicius",
+            "element_id": 258,
+            "season": "2024-25"
+          }
+        ]
+      },
+      {
+        "code": 424044,
+        "mappings": [
+          {
+            "display_name": "Hamed Traor\u00e8",
+            "element_id": 87,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "H.Traor\u00e8",
+            "element_id": 67,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "H.Traor\u00e8",
+            "element_id": 93,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 427623,
+        "mappings": [
+          {
+            "display_name": "C.Richards",
+            "element_id": 238,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "C.Richards",
+            "element_id": 194,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Richards",
+            "element_id": 261,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 437748,
+        "mappings": [
+          {
+            "display_name": "M.Tr\u00e9sor",
+            "element_id": 706,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Tr\u00e9sor",
+            "element_id": 214,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 438464,
+        "mappings": [
+          {
+            "display_name": "C.Doucour\u00e9",
+            "element_id": 223,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "C.Doucour\u00e9",
+            "element_id": 193,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Doucour\u00e9",
+            "element_id": 268,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 444463,
+        "mappings": [
+          {
+            "display_name": "W.Fofana",
+            "element_id": 201,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "W.Fofana",
+            "element_id": 189,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Fofana",
+            "element_id": 230,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 448089,
+        "mappings": [
+          {
+            "display_name": "Jo\u00e3o Gomes",
+            "element_id": 559,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "J.Gomes",
+            "element_id": 553,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "J.Gomes",
+            "element_id": 646,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 450542,
+        "mappings": [
+          {
+            "display_name": "Rak-Sakyi",
+            "element_id": 657,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Rak-Sakyi",
+            "element_id": 213,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "J.Rak-Sakyi",
+            "element_id": 278,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 451302,
+        "mappings": [
+          {
+            "display_name": "Altay",
+            "element_id": 695,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Bayindir",
+            "element_id": 367,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Bayindir",
+            "element_id": 431,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 461537,
+        "mappings": [
+          {
+            "display_name": "Mee",
+            "element_id": 835,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Dermot Mee",
+            "element_id": 788,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Mee",
+            "element_id": 435,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 472769,
+        "mappings": [
+          {
+            "display_name": "O\u2019Reilly",
+            "element_id": 607,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "O'Reilly",
+            "element_id": 411,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 476502,
+        "mappings": [
+          {
+            "display_name": "Boubacar Traore",
+            "element_id": 574,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "B.Traore",
+            "element_id": 534,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "B.Traore",
+            "element_id": 649,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 477064,
+        "mappings": [
+          {
+            "display_name": "R.Lewis",
+            "element_id": 358,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Lewis",
+            "element_id": 355,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Lewis",
+            "element_id": 410,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 481624,
+        "mappings": [
+          {
+            "display_name": "Philogene",
+            "element_id": 54,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Jaden",
+            "element_id": 569,
+            "season": "2024-25"
+          }
+        ]
+      },
+      {
+        "code": 482442,
+        "mappings": [
+          {
+            "display_name": "Sarr",
+            "element_id": 513,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "P.M.Sarr",
+            "element_id": 499,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "P.M.Sarr",
+            "element_id": 593,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 484658,
+        "mappings": [
+          {
+            "display_name": "Koz\u0142owski",
+            "element_id": 137,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Kozlowski",
+            "element_id": 130,
+            "season": "2024-25"
+          }
+        ]
+      },
+      {
+        "code": 491012,
+        "mappings": [
+          {
+            "display_name": "Y. Chermiti",
+            "element_id": 645,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Y. Chermiti",
+            "element_id": 237,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Y.Chermiti",
+            "element_id": 312,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 493125,
+        "mappings": [
+          {
+            "display_name": "Dr\u0103gu\u0219in",
+            "element_id": 777,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Dragusin",
+            "element_id": 486,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Dragusin",
+            "element_id": 572,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 496208,
+        "mappings": [
+          {
+            "display_name": "Doak",
+            "element_id": 628,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Doak",
+            "element_id": 318,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Gannon-Doak",
+            "element_id": 391,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 504296,
+        "mappings": [
+          {
+            "display_name": "Coby Ebere",
+            "element_id": 775,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Ebere",
+            "element_id": 307,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 508479,
+        "mappings": [
+          {
+            "display_name": "J\u00f8rgensen",
+            "element_id": 581,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "J\u00f6rgensen",
+            "element_id": 221,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 510500,
+        "mappings": [
+          {
+            "display_name": "Jota Silva",
+            "element_id": 596,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Jota",
+            "element_id": 518,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 514254,
+        "mappings": [
+          {
+            "display_name": "G\u00f3mez",
+            "element_id": 714,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Gomez",
+            "element_id": 169,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 532605,
+        "mappings": [
+          {
+            "display_name": "Andrey",
+            "element_id": 186,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Andrey Santos",
+            "element_id": 150,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Andrey Santos",
+            "element_id": 246,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 536694,
+        "mappings": [
+          {
+            "display_name": "Matheus Fran\u00e7a",
+            "element_id": 615,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "M.Fran\u00e7a",
+            "element_id": 208,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "M.Fran\u00e7a",
+            "element_id": 279,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 547037,
+        "mappings": [
+          {
+            "display_name": "Fletcher",
+            "element_id": 667,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "J.Fletcher",
+            "element_id": 462,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 547719,
+        "mappings": [
+          {
+            "display_name": "Miley",
+            "element_id": 635,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Miley",
+            "element_id": 411,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "L.Miley",
+            "element_id": 497,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 547720,
+        "mappings": [
+          {
+            "display_name": "Charlie Tasker",
+            "element_id": 791,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Tasker",
+            "element_id": 156,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 548308,
+        "mappings": [
+          {
+            "display_name": "Phillips",
+            "element_id": 702,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "A.Phillips",
+            "element_id": 478,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Phillips",
+            "element_id": 576,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 559962,
+        "mappings": [
+          {
+            "display_name": "Jimoh",
+            "element_id": 710,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Jimoh-Aloba",
+            "element_id": 62,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 570241,
+        "mappings": [
+          {
+            "display_name": "Kim Ji-Soo",
+            "element_id": 725,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Ji-soo",
+            "element_id": 96,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Ji-soo",
+            "element_id": 117,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 574398,
+        "mappings": [
+          {
+            "display_name": "Umeh-Chibueze",
+            "element_id": 821,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Umeh-Chibueze",
+            "element_id": 644,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Umeh",
+            "element_id": 282,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 578614,
+        "mappings": [
+          {
+            "display_name": "Agyei",
+            "element_id": 156,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Boateng",
+            "element_id": 203,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 593001,
+        "mappings": [
+          {
+            "display_name": "Gonz\u00e1lez",
+            "element_id": 698,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Gonzalez",
+            "element_id": 547,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Gonzalez",
+            "element_id": 652,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 597320,
+        "mappings": [
+          {
+            "display_name": "Harry Howell",
+            "element_id": 795,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Howell",
+            "element_id": 795,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 604988,
+        "mappings": [
+          {
+            "display_name": "Freddie Simmonds",
+            "element_id": 794,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Simmonds",
+            "element_id": 761,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 606798,
+        "mappings": [
+          {
+            "display_name": "A. Garcia",
+            "element_id": 731,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "A.Garc\u00eda",
+            "element_id": 42,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 612534,
+        "mappings": [
+          {
+            "display_name": "Fredrick",
+            "element_id": 797,
+            "season": "2023-24"
+          },
+          {
+            "display_name": "Benjamin Fredrick",
+            "element_id": 786,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Fredrick",
+            "element_id": 115,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 618873,
+        "mappings": [
+          {
+            "display_name": "Kon\u00e9",
+            "element_id": 779,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Kone",
+            "element_id": 463,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 623095,
+        "mappings": [
+          {
+            "display_name": "Yang",
+            "element_id": 717,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Min-hyeok",
+            "element_id": 594,
+            "season": "2025-26"
+          }
+        ]
+      },
+      {
+        "code": 626464,
+        "mappings": [
+          {
+            "display_name": "G.Nunes",
+            "element_id": 634,
+            "season": "2024-25"
+          },
+          {
+            "display_name": "Nunes",
+            "element_id": 127,
+            "season": "2025-26"
+          }
+        ]
+      }
+    ],
+    "element_id_cross_season_join_prohibited": true,
+    "within_season_key": [
+      "season",
+      "element_id"
+    ]
+  },
+  "leakage_exclusions": [
+    "vaastav_same_gameweek_xP",
+    "target_gameweek_xg_xa",
+    "post_deadline_bootstrap",
+    "later_bootstrap_gap_fill",
+    "end_of_season_prediction_state",
+    "assistant_manager_elements",
+    "missing_expected_stats_as_zero",
+    "final_fixture_assignment_as_known_pre_deadline",
+    "cross_season_element_id_join"
+  ],
+  "outputs": [
+    {
+      "bytes": 644053,
+      "path": "2023-24/historical_player_fixture.parquet",
+      "rows": 29725,
+      "season": "2023-24",
+      "sha256": "ae1a61e58e9aa0aa562a73d27f7b8ef1424ea207b1693ce43acea51625820fb4"
+    },
+    {
+      "bytes": 8261,
+      "path": "2023-24/historical_fixtures.parquet",
+      "rows": 380,
+      "season": "2023-24",
+      "sha256": "0660e83d04b4364aae06e09d496eb35226be6a615f77db15ceeaa23366eae7bd"
+    },
+    {
+      "bytes": 23839,
+      "path": "2023-24/historical_player_identity.parquet",
+      "rows": 865,
+      "season": "2023-24",
+      "sha256": "e2899e0a54b5dbd1de558d300157af778c1f7ad355af1f31209a7f529cb343d0"
+    },
+    {
+      "bytes": 586688,
+      "path": "2023-24/historical_predeadline_player_state.parquet",
+      "rows": 29510,
+      "season": "2023-24",
+      "sha256": "e5293409b872617b05a9a84e3ae5b7cad147c6e546320bd3a7082de26476d140"
+    },
+    {
+      "bytes": 504837,
+      "path": "2023-24/historical_prediction_features.parquet",
+      "rows": 30483,
+      "season": "2023-24",
+      "sha256": "27909fb81354cc52a66229364d450cd58aa9a294d4e63b28c21c2c66bc777613"
+    },
+    {
+      "bytes": 60989,
+      "path": "2023-24/historical_prediction_actuals.parquet",
+      "rows": 29510,
+      "season": "2023-24",
+      "sha256": "661b4967bb3519eff07c3a2ff5115f59e88f7ae42872e5360f0c0f889006ad8d"
+    },
+    {
+      "bytes": 353,
+      "path": "2023-24/historical_reconciliation_exceptions.parquet",
+      "rows": 0,
+      "season": "2023-24",
+      "sha256": "2439cfccc2c8214c504246aea5e4e3e9964766f16fcec79152df92daaa6faee6"
+    },
+    {
+      "bytes": 610869,
+      "path": "2024-25/historical_player_fixture.parquet",
+      "rows": 27283,
+      "season": "2024-25",
+      "sha256": "c609cc203c7c114fc566e993515f9be80873773e36a3ab91766e17d7e46d03fa"
+    },
+    {
+      "bytes": 8185,
+      "path": "2024-25/historical_fixtures.parquet",
+      "rows": 380,
+      "season": "2024-25",
+      "sha256": "15da4685f393995f086f514b4034676d4ea3d52701361f441ea658a98a8c44f1"
+    },
+    {
+      "bytes": 22270,
+      "path": "2024-25/historical_player_identity.parquet",
+      "rows": 784,
+      "season": "2024-25",
+      "sha256": "37735506c8ce788cc0356da85c59b30baf48070435a5871b08f6a8f00ffb87db"
+    },
+    {
+      "bytes": 573336,
+      "path": "2024-25/historical_predeadline_player_state.parquet",
+      "rows": 27159,
+      "season": "2024-25",
+      "sha256": "07c5c743c862428ac598625e4f6eaca6bcbf5a89ac54f4c056302b32ef592b7e"
+    },
+    {
+      "bytes": 477075,
+      "path": "2024-25/historical_prediction_features.parquet",
+      "rows": 27521,
+      "season": "2024-25",
+      "sha256": "360bdc456fd7679b50ec3fd740a131a51cb58528528eca3d6ab18089f4bd05e8"
+    },
+    {
+      "bytes": 57953,
+      "path": "2024-25/historical_prediction_actuals.parquet",
+      "rows": 27159,
+      "season": "2024-25",
+      "sha256": "12f574fae03ebf3fc2bb834a45a52bcf61bf8f330aed8dfa7972d613a78ba516"
+    },
+    {
+      "bytes": 3643,
+      "path": "2024-25/historical_reconciliation_exceptions.parquet",
+      "rows": 3,
+      "season": "2024-25",
+      "sha256": "9707e04a2c85d674bc919e2bb5dba0a6e434214cf2041e6cbd63b70ea68de387"
+    },
+    {
+      "bytes": 648311,
+      "path": "2025-26/historical_player_fixture.parquet",
+      "rows": 29747,
+      "season": "2025-26",
+      "sha256": "afe5f614d1ba6bb69dae7a6fe07f80cee47e81703f8a5671f34bb99658022ea1"
+    },
+    {
+      "bytes": 8234,
+      "path": "2025-26/historical_fixtures.parquet",
+      "rows": 380,
+      "season": "2025-26",
+      "sha256": "ba3f9a187945eaa207f897fcdd90bba98ae485bff447fe1616adcba27bd858a5"
+    },
+    {
+      "bytes": 23510,
+      "path": "2025-26/historical_player_identity.parquet",
+      "rows": 841,
+      "season": "2025-26",
+      "sha256": "750b3561c5218663927b32d752bc8414a8e795b3335b12ed13dee05ee65d50b4"
+    },
+    {
+      "bytes": 589186,
+      "path": "2025-26/historical_predeadline_player_state.parquet",
+      "rows": 29645,
+      "season": "2025-26",
+      "sha256": "676ec925d504ac7763699d6ce4770865e65c6cc0955da07b90549678520d9e7d"
+    },
+    {
+      "bytes": 483468,
+      "path": "2025-26/historical_prediction_features.parquet",
+      "rows": 30053,
+      "season": "2025-26",
+      "sha256": "f1a75a5688987a826d13c79bfd11cd3d343425e70eb840cf1d418cf44c534d7f"
+    },
+    {
+      "bytes": 62070,
+      "path": "2025-26/historical_prediction_actuals.parquet",
+      "rows": 29645,
+      "season": "2025-26",
+      "sha256": "38ccfd8d3edf0803fbb1ed31d8169e4c08a115b6cad7cea0e26e371c8450abb1"
+    },
+    {
+      "bytes": 3326,
+      "path": "2025-26/historical_reconciliation_exceptions.parquet",
+      "rows": 10,
+      "season": "2025-26",
+      "sha256": "db2b68dbfd8f9fbb48004c28bc73452910775c13bdf04a28ad132794c06bc52d"
+    }
+  ],
+  "parser_schema_version": "historical-v3",
+  "perfect_historical_deadline_replay": false,
+  "player_universe_edges": [
+    {
+      "classification": "added_after_final_predeadline_snapshot_no_state_fabricated",
+      "code": 687076,
+      "display_name": "Sillah",
+      "element_id": 841,
+      "end_of_season_minutes": 0,
+      "end_of_season_total_points": 0,
+      "predeadline_snapshot_rows": 0,
+      "season": "2025-26"
+    }
+  ],
+  "preseason_prior_source_boundaries": {
+    "2023-24": {
+      "classification": "later_finalized_archive_possible_retroactive_corrections",
+      "commit": "204c134d8e90e2b6e69ec252aa3ef6f10f21e73c",
+      "repository": "vaastav/Fantasy-Premier-League"
+    },
+    "2024-25": {
+      "classification": "later_finalized_archive_possible_retroactive_corrections",
+      "commit": "59c767596750f554ba464de94cf4fce8664a6cbe",
+      "repository": "vaastav/Fantasy-Premier-League"
+    },
+    "2025-26": {
+      "classification": "later_finalized_archive_possible_retroactive_corrections",
+      "commit": "f9ed3e8839b0f970e0d5d4a83c5628f6eaee755a",
+      "repository": "vaastav/Fantasy-Premier-League"
+    }
+  },
+  "reconciliation_audit": {
+    "by_season": {
+      "2025-26": {
+        "actual_stat_mismatches": 0,
+        "expected_stat_mismatches": 0,
+        "null_expected_stat_values": 0,
+        "players_checked": 841
+      }
+    },
+    "identical_duplicate_policy": "accept_first_and_reject_only_field-for-field-identical_duplicates; fail_on_non-identical_duplicate_key",
+    "material_absolute_difference_threshold": 0.05,
+    "source_values_mutated": false,
+    "threshold_is_reporting_only": true
+  },
+  "row_counts": {
+    "2023-24": {
+      "assistant_manager_elements_excluded": 0,
+      "assistant_manager_rows_excluded": 0,
+      "byte_identical_duplicate_rows_excluded": 0,
+      "chronological_fixture_target_cases_excluded": 0,
+      "chronological_player_fixture_rows_excluded": 0,
+      "fixture_rows": 380,
+      "identity_rows": 865,
+      "player_fixture_rows": 29725,
+      "player_rows_with_minutes": 11384,
+      "predeadline_player_state_rows": 29510,
+      "predeadline_snapshots": 38,
+      "prediction_actual_rows": 29510,
+      "prediction_feature_rows": 30483,
+      "raw_player_fixture_rows": 29725,
+      "reconciliation_exceptions": 0
+    },
+    "2024-25": {
+      "assistant_manager_elements_excluded": 20,
+      "assistant_manager_rows_excluded": 322,
+      "byte_identical_duplicate_rows_excluded": 0,
+      "chronological_fixture_target_cases_excluded": 0,
+      "chronological_player_fixture_rows_excluded": 0,
+      "fixture_rows": 380,
+      "identity_rows": 784,
+      "player_fixture_rows": 27283,
+      "player_rows_with_minutes": 11566,
+      "predeadline_player_state_rows": 27159,
+      "predeadline_snapshots": 38,
+      "prediction_actual_rows": 27159,
+      "prediction_feature_rows": 27521,
+      "raw_player_fixture_rows": 27605,
+      "reconciliation_exceptions": 3
+    },
+    "2025-26": {
+      "assistant_manager_elements_excluded": 0,
+      "assistant_manager_rows_excluded": 0,
+      "byte_identical_duplicate_rows_excluded": 10,
+      "chronological_fixture_target_cases_excluded": 0,
+      "chronological_player_fixture_rows_excluded": 0,
+      "fixture_rows": 380,
+      "identity_rows": 841,
+      "player_fixture_rows": 29747,
+      "player_rows_with_minutes": 11492,
+      "predeadline_player_state_rows": 29645,
+      "predeadline_snapshots": 38,
+      "prediction_actual_rows": 29645,
+      "prediction_feature_rows": 30053,
+      "raw_player_fixture_rows": 29757,
+      "reconciliation_exceptions": 10
+    }
+  },
+  "scoring_policy": {
+    "modeled_actual_components": [
+      "appearance",
+      "historical_position_goals",
+      "assists"
+    ],
+    "not_retrofitted": [
+      "DEFCON",
+      "2026/27 BPS",
+      "modern assist rules"
+    ],
+    "total_points": "actual_points_under_historical_season_rules"
+  },
+  "seasons": [
+    "2023-24",
+    "2024-25",
+    "2025-26"
+  ],
+  "source_files": [
+    {
+      "accepted_records": 29725,
+      "expected_sha256": "e9c09c8856f1c86b4f920f46ddd5033af83409439dfda53be925df2a3e7c8a9e",
+      "kind": "player_fixture",
+      "observed_sha256": "e9c09c8856f1c86b4f920f46ddd5033af83409439dfda53be925df2a3e7c8a9e",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:35:57.888707Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "c2add969e11ec19002a091f8aa60164c9a255854",
+      "source_file_path": "data/2023-24/gws/merged_gw.csv",
+      "source_repository": "vaastav/Fantasy-Premier-League",
+      "target_gameweek": null
+    },
+    {
+      "accepted_records": 380,
+      "expected_sha256": "d8521bdbb80edb5141bc17df71bf6026275f2e56fd6a6dc6041b3ae23a39ce6a",
+      "kind": "fixtures",
+      "observed_sha256": "d8521bdbb80edb5141bc17df71bf6026275f2e56fd6a6dc6041b3ae23a39ce6a",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:35:58.307930Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "c2add969e11ec19002a091f8aa60164c9a255854",
+      "source_file_path": "data/2023-24/fixtures.csv",
+      "source_repository": "vaastav/Fantasy-Premier-League",
+      "target_gameweek": null
+    },
+    {
+      "accepted_records": 865,
+      "expected_sha256": "43d8cf5efb3d901f2499558c40b392b7f0ee22afe28030f36266ad29024c63d9",
+      "kind": "player_identity",
+      "observed_sha256": "43d8cf5efb3d901f2499558c40b392b7f0ee22afe28030f36266ad29024c63d9",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:35:58.676195Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "c2add969e11ec19002a091f8aa60164c9a255854",
+      "source_file_path": "data/2023-24/players_raw.csv",
+      "source_repository": "vaastav/Fantasy-Premier-League",
+      "target_gameweek": null
+    },
+    {
+      "accepted_records": 20,
+      "expected_sha256": "7795f091ccea17fda0752cb07b935e1515b09a9d3f924147997cbf28139edd49",
+      "kind": "teams",
+      "observed_sha256": "7795f091ccea17fda0752cb07b935e1515b09a9d3f924147997cbf28139edd49",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:35:59.046341Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "c2add969e11ec19002a091f8aa60164c9a255854",
+      "source_file_path": "data/2023-24/teams.csv",
+      "source_repository": "vaastav/Fantasy-Premier-League",
+      "target_gameweek": null
+    },
+    {
+      "accepted_records": 641,
+      "expected_sha256": "3e010b2d0339bde641988eb477c5df7f02d3a2cacdf9a984fdd52a797729c7d3",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "3e010b2d0339bde641988eb477c5df7f02d3a2cacdf9a984fdd52a797729c7d3",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:01.465532Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/8/11/1231.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 1
+    },
+    {
+      "accepted_records": 666,
+      "expected_sha256": "cd94da6586686c77c7516e094f1ba5f165085260612d042477b42a2bf6a8c52a",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "cd94da6586686c77c7516e094f1ba5f165085260612d042477b42a2bf6a8c52a",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:01.968590Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/8/18/1231.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 2
+    },
+    {
+      "accepted_records": 678,
+      "expected_sha256": "f5a13892f9294c6ba8190b058b428a0db2c99e19591a630a0e8635d9dbad2304",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "f5a13892f9294c6ba8190b058b428a0db2c99e19591a630a0e8635d9dbad2304",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:02.393214Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/8/25/1232.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 3
+    },
+    {
+      "accepted_records": 697,
+      "expected_sha256": "6efa3c3be23926e3f94dd31f304224e17f00ba837bc873b8a73a5299939266db",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "6efa3c3be23926e3f94dd31f304224e17f00ba837bc873b8a73a5299939266db",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:02.892822Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/9/1/1232.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 4
+    },
+    {
+      "accepted_records": 714,
+      "expected_sha256": "43b82e90908681fa0269c2184044223932100071b0fe0d1b04a226c496dbd3d9",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "43b82e90908681fa0269c2184044223932100071b0fe0d1b04a226c496dbd3d9",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:03.294831Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/9/16/0620.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 5
+    },
+    {
+      "accepted_records": 717,
+      "expected_sha256": "e0f71b52dc7cc1057195f54087e0306117ee0cc85a21e13899c72fe2de832752",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "e0f71b52dc7cc1057195f54087e0306117ee0cc85a21e13899c72fe2de832752",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:03.677547Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/9/23/0620.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 6
+    },
+    {
+      "accepted_records": 718,
+      "expected_sha256": "38eb4d437476bb70c2c6d689246e13e7c0e17ee4e5fbf4be5d37e5c4b9f16896",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "38eb4d437476bb70c2c6d689246e13e7c0e17ee4e5fbf4be5d37e5c4b9f16896",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:04.071151Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/9/30/0621.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 7
+    },
+    {
+      "accepted_records": 722,
+      "expected_sha256": "9a9a762c3450020c279db8f62760a0da566601fdf13dd7d5445dc7d57bd8bb15",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "9a9a762c3450020c279db8f62760a0da566601fdf13dd7d5445dc7d57bd8bb15",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:04.468415Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/10/7/0621.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 8
+    },
+    {
+      "accepted_records": 726,
+      "expected_sha256": "e454e3f28488b4aad5eb1802307e6d1ffdb8831987f5e10ad5a62ce971ca2841",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "e454e3f28488b4aad5eb1802307e6d1ffdb8831987f5e10ad5a62ce971ca2841",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:04.878246Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/10/21/0621.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 9
+    },
+    {
+      "accepted_records": 730,
+      "expected_sha256": "5e7ebc796e7e1f4c0e759c672dc1a39fe6ceaece40472c25965ebf8eded84abe",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "5e7ebc796e7e1f4c0e759c672dc1a39fe6ceaece40472c25965ebf8eded84abe",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:05.366167Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/10/27/1233.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 10
+    },
+    {
+      "accepted_records": 731,
+      "expected_sha256": "cce06561b1cfd37a0a1c5bbad8815d02f83e25e4cbbbda3061ae5eb9a0bc633d",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "cce06561b1cfd37a0a1c5bbad8815d02f83e25e4cbbbda3061ae5eb9a0bc633d",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:05.794825Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/11/4/0621.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 11
+    },
+    {
+      "accepted_records": 733,
+      "expected_sha256": "f873a29708e7156268db72e8aac46d700a0b6b92366eb82d41871eacaae04724",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "f873a29708e7156268db72e8aac46d700a0b6b92366eb82d41871eacaae04724",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:06.177296Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/11/11/0621.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 12
+    },
+    {
+      "accepted_records": 743,
+      "expected_sha256": "3f21f909cd7f745dfec71608d8dc5546e2055dce7764b8c484e38dfa3031bbf3",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "3f21f909cd7f745dfec71608d8dc5546e2055dce7764b8c484e38dfa3031bbf3",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:06.673547Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/11/25/0621.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 13
+    },
+    {
+      "accepted_records": 747,
+      "expected_sha256": "9d5483e8a54bec0176d0e61e180775c70a1a7f20134af9c3c25d725c7fc41eb3",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "9d5483e8a54bec0176d0e61e180775c70a1a7f20134af9c3c25d725c7fc41eb3",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:07.030004Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/12/2/1231.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 14
+    },
+    {
+      "accepted_records": 753,
+      "expected_sha256": "99c414824dbf74b93b025ed1856f9c6014bd7e24fae42e63f32c3c6761f5f823",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "99c414824dbf74b93b025ed1856f9c6014bd7e24fae42e63f32c3c6761f5f823",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:07.405064Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/12/5/1234.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 15
+    },
+    {
+      "accepted_records": 757,
+      "expected_sha256": "71d7dd2a01f31aac65a3d26c4048315259fec9e3a22ad654dd86efda4b700ac9",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "71d7dd2a01f31aac65a3d26c4048315259fec9e3a22ad654dd86efda4b700ac9",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:07.872904Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/12/9/0621.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 16
+    },
+    {
+      "accepted_records": 758,
+      "expected_sha256": "d3b3b5ff0aa35d5630c7887e968d233324f5b0d27f51831e92f532df9fb1641a",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "d3b3b5ff0aa35d5630c7887e968d233324f5b0d27f51831e92f532df9fb1641a",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:08.285769Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/12/15/1822.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 17
+    },
+    {
+      "accepted_records": 765,
+      "expected_sha256": "f15075d28ca8f94e5e7865de4f75a103ebf196f7f23b8a59fe9118dfc2827894",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "f15075d28ca8f94e5e7865de4f75a103ebf196f7f23b8a59fe9118dfc2827894",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:08.781776Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/12/21/1820.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 18
+    },
+    {
+      "accepted_records": 769,
+      "expected_sha256": "8c1afb2e560104ffadf5cbfadfc931654dd15e9466319959827749a4a663b5df",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "8c1afb2e560104ffadf5cbfadfc931654dd15e9466319959827749a4a663b5df",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:09.190844Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/12/26/0622.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 19
+    },
+    {
+      "accepted_records": 771,
+      "expected_sha256": "e6e61fe6dea39797a00e210274602fbf8c1c558bbcb50fb850e8ef700f101bba",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "e6e61fe6dea39797a00e210274602fbf8c1c558bbcb50fb850e8ef700f101bba",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:09.562647Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2023/12/30/0621.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 20
+    },
+    {
+      "accepted_records": 775,
+      "expected_sha256": "0c26466f53b3d773a656960f281ca7e60ef8b2d712900a70d8c96f45c651e57b",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "0c26466f53b3d773a656960f281ca7e60ef8b2d712900a70d8c96f45c651e57b",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:09.925153Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/1/12/1234.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 21
+    },
+    {
+      "accepted_records": 790,
+      "expected_sha256": "dc0059444028b457256892611cd3e9e2f7fa92360291682716a84959e9280a72",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "dc0059444028b457256892611cd3e9e2f7fa92360291682716a84959e9280a72",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:10.485131Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/1/30/1231.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 22
+    },
+    {
+      "accepted_records": 808,
+      "expected_sha256": "7460ee769625d84f152439016e3a21e935d29152938b808980d1eb7b07e8c90a",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "7460ee769625d84f152439016e3a21e935d29152938b808980d1eb7b07e8c90a",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:10.884352Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/2/3/0620.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 23
+    },
+    {
+      "accepted_records": 809,
+      "expected_sha256": "6e2c636d474660ac13be1245dc9c9da036ffc229b13af353796af53a1f49eaa9",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "6e2c636d474660ac13be1245dc9c9da036ffc229b13af353796af53a1f49eaa9",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:11.260228Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/2/10/0620.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 24
+    },
+    {
+      "accepted_records": 815,
+      "expected_sha256": "68ac14b405d6de055ef217314a00ed91052c732d99301d06555fb8a0576fd8be",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "68ac14b405d6de055ef217314a00ed91052c732d99301d06555fb8a0576fd8be",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:11.644308Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/2/17/0621.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 25
+    },
+    {
+      "accepted_records": 823,
+      "expected_sha256": "0335f951cbf4f3d4efd6fe7867866690d5f1266c084e56d35e9e3f9c90939be8",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "0335f951cbf4f3d4efd6fe7867866690d5f1266c084e56d35e9e3f9c90939be8",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:12.123399Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/2/24/1229.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 26
+    },
+    {
+      "accepted_records": 828,
+      "expected_sha256": "dbea5d88e42b579ce06dc9a96bb02b076dd8e5ed8e12f5cc39fd3ca2015c29f4",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "dbea5d88e42b579ce06dc9a96bb02b076dd8e5ed8e12f5cc39fd3ca2015c29f4",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:12.574750Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/3/2/1229.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 27
+    },
+    {
+      "accepted_records": 832,
+      "expected_sha256": "3c0e98dfe91b5284f61052ce93bb0d5b9a301900380fa3ce26ec888679aa897c",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "3c0e98dfe91b5284f61052ce93bb0d5b9a301900380fa3ce26ec888679aa897c",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:12.961953Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/3/9/0623.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 28
+    },
+    {
+      "accepted_records": 838,
+      "expected_sha256": "45de01bfb4871256625ed8482b493140d0197d3a13a0ade8650976693c44893b",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "45de01bfb4871256625ed8482b493140d0197d3a13a0ade8650976693c44893b",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:13.337980Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/3/16/1231.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 29
+    },
+    {
+      "accepted_records": 838,
+      "expected_sha256": "e3b56f084c9cfb6dd12119535c6334aa6037847724e27c33b43fd91cfac586e3",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "e3b56f084c9cfb6dd12119535c6334aa6037847724e27c33b43fd91cfac586e3",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:13.757879Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/3/30/0621.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 30
+    },
+    {
+      "accepted_records": 842,
+      "expected_sha256": "2f9a48646650d9538bba95de7220ead400f0faae2f594d646e0c1c37c5661243",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "2f9a48646650d9538bba95de7220ead400f0faae2f594d646e0c1c37c5661243",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:14.123235Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/4/2/1233.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 31
+    },
+    {
+      "accepted_records": 844,
+      "expected_sha256": "0dcd99bbde52a8a7b95054243c46b50ea2858cc1a21de078b7db77cedab7c318",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "0dcd99bbde52a8a7b95054243c46b50ea2858cc1a21de078b7db77cedab7c318",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:14.580358Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/4/6/0621.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 32
+    },
+    {
+      "accepted_records": 846,
+      "expected_sha256": "2b2c9ed73b07cae22ed02c912a1016ac6ffb037bb3f1469526cb8d140cb7b7e7",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "2b2c9ed73b07cae22ed02c912a1016ac6ffb037bb3f1469526cb8d140cb7b7e7",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:14.991749Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/4/13/0617.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 33
+    },
+    {
+      "accepted_records": 851,
+      "expected_sha256": "d5b25a1e20ae52db82522feaa4dc386c5a3450ed375773802cf7e20d9c990942",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "d5b25a1e20ae52db82522feaa4dc386c5a3450ed375773802cf7e20d9c990942",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:15.370254Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/4/20/0621.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 34
+    },
+    {
+      "accepted_records": 856,
+      "expected_sha256": "9db02c677c0a17761fda19e262a232cce17efc841ba571f3260e55ea87f59feb",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "9db02c677c0a17761fda19e262a232cce17efc841ba571f3260e55ea87f59feb",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:15.747901Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/4/27/0623.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 35
+    },
+    {
+      "accepted_records": 859,
+      "expected_sha256": "2baa009ae500f57bea658ff474945679d18e4b08fbc6016f2c401cd3f34d2f13",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "2baa009ae500f57bea658ff474945679d18e4b08fbc6016f2c401cd3f34d2f13",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:16.118992Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/5/3/1232.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 36
+    },
+    {
+      "accepted_records": 859,
+      "expected_sha256": "e6efa35c918930b5389e0de017fafb9c378cc13cd74df0af3b0f48e69e77f744",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "e6efa35c918930b5389e0de017fafb9c378cc13cd74df0af3b0f48e69e77f744",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:16.501634Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/5/11/0622.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 37
+    },
+    {
+      "accepted_records": 861,
+      "expected_sha256": "5c60766cc9542f403ef9ad0bdb5ee056f7d4829294acefc41417650716b0509d",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "5c60766cc9542f403ef9ad0bdb5ee056f7d4829294acefc41417650716b0509d",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:16.883069Z",
+      "reused_from_verified_cache": true,
+      "season": "2023-24",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/5/19/1233.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 38
+    },
+    {
+      "accepted_records": 27283,
+      "expected_sha256": "5bbbcba6353b4c72ad273adcc8e3aa451946a826564679788f45b1cb3325b84e",
+      "kind": "player_fixture",
+      "observed_sha256": "5bbbcba6353b4c72ad273adcc8e3aa451946a826564679788f45b1cb3325b84e",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 322,
+      "retrieval_timestamp": "2026-08-25T14:35:59.699676Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "c2add969e11ec19002a091f8aa60164c9a255854",
+      "source_file_path": "data/2024-25/gws/merged_gw.csv",
+      "source_repository": "vaastav/Fantasy-Premier-League",
+      "target_gameweek": null
+    },
+    {
+      "accepted_records": 380,
+      "expected_sha256": "ce696e187569ca7c45da2562811d3c38f525b58e65575531be37bebd0769ee28",
+      "kind": "fixtures",
+      "observed_sha256": "ce696e187569ca7c45da2562811d3c38f525b58e65575531be37bebd0769ee28",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:00.262477Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "c2add969e11ec19002a091f8aa60164c9a255854",
+      "source_file_path": "data/2024-25/fixtures.csv",
+      "source_repository": "vaastav/Fantasy-Premier-League",
+      "target_gameweek": null
+    },
+    {
+      "accepted_records": 784,
+      "expected_sha256": "75686051b265cbe7755ac71213ecaad21b26ee1cc46a8bafbba19c39ce894b05",
+      "kind": "player_identity",
+      "observed_sha256": "75686051b265cbe7755ac71213ecaad21b26ee1cc46a8bafbba19c39ce894b05",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:00.702772Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "c2add969e11ec19002a091f8aa60164c9a255854",
+      "source_file_path": "data/2024-25/players_raw.csv",
+      "source_repository": "vaastav/Fantasy-Premier-League",
+      "target_gameweek": null
+    },
+    {
+      "accepted_records": 20,
+      "expected_sha256": "d10a6db8feca6db9e44a3ba50b15168396667ea387fee9235d6b211c7f598c3b",
+      "kind": "teams",
+      "observed_sha256": "d10a6db8feca6db9e44a3ba50b15168396667ea387fee9235d6b211c7f598c3b",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:01.033978Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "c2add969e11ec19002a091f8aa60164c9a255854",
+      "source_file_path": "data/2024-25/teams.csv",
+      "source_repository": "vaastav/Fantasy-Premier-League",
+      "target_gameweek": null
+    },
+    {
+      "accepted_records": 610,
+      "expected_sha256": "039f3d6584e510aee89802dbf91ec0be0ccc69ee412a47e2104ec553d7037d51",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "039f3d6584e510aee89802dbf91ec0be0ccc69ee412a47e2104ec553d7037d51",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:17.339223Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/8/16/1238.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 1
+    },
+    {
+      "accepted_records": 625,
+      "expected_sha256": "c4ae1aa11edc4940b4b964469f3e7bbe70087595818781b52554a79b622dc721",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "c4ae1aa11edc4940b4b964469f3e7bbe70087595818781b52554a79b622dc721",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:17.716673Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/8/24/0627.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 2
+    },
+    {
+      "accepted_records": 637,
+      "expected_sha256": "0d6c4800cf20f1a17fa7647e6db612acf01ee5b8821cca266c713bd7c8ed4143",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "0d6c4800cf20f1a17fa7647e6db612acf01ee5b8821cca266c713bd7c8ed4143",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:18.090982Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/8/31/0627.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 3
+    },
+    {
+      "accepted_records": 655,
+      "expected_sha256": "e7bea990fa0f8b5d20d98607ff499d39d2a6952386bdbba7f8d9fe1d9db10f2f",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "e7bea990fa0f8b5d20d98607ff499d39d2a6952386bdbba7f8d9fe1d9db10f2f",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:18.459834Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/9/14/0629.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 4
+    },
+    {
+      "accepted_records": 659,
+      "expected_sha256": "d87c99edc17bad545c2563bd9bc299d246e9f84c05e8dc534504e841c1e1e733",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "d87c99edc17bad545c2563bd9bc299d246e9f84c05e8dc534504e841c1e1e733",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:18.810945Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/9/21/0628.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 5
+    },
+    {
+      "accepted_records": 661,
+      "expected_sha256": "5daf40ee59f0606e3c2e3c41bf43325f0400c17d8f61f63a0d75ae2f26bb6b7a",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "5daf40ee59f0606e3c2e3c41bf43325f0400c17d8f61f63a0d75ae2f26bb6b7a",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:19.245014Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/9/28/0628.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 6
+    },
+    {
+      "accepted_records": 664,
+      "expected_sha256": "302448e2f4b5c0abc414f51a7ef3312597302f3292abe3e84f7eeb3ef83998af",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "302448e2f4b5c0abc414f51a7ef3312597302f3292abe3e84f7eeb3ef83998af",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:19.614263Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/10/5/0629.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 7
+    },
+    {
+      "accepted_records": 666,
+      "expected_sha256": "f81521531d3b115279c385c9c5e2c6000f13c4e88c20a818d32baec855eb1c71",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "f81521531d3b115279c385c9c5e2c6000f13c4e88c20a818d32baec855eb1c71",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:20.054719Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/10/19/0628.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 8
+    },
+    {
+      "accepted_records": 667,
+      "expected_sha256": "a67508d5bce013ed1c616829140e588ef7bd4400a49a0f96f2c9d99225e7666a",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "a67508d5bce013ed1c616829140e588ef7bd4400a49a0f96f2c9d99225e7666a",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:20.428516Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/10/25/1243.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 9
+    },
+    {
+      "accepted_records": 670,
+      "expected_sha256": "5145cbe5bd03bba6a4cbedfa244ee7667ff02181590ca3032292a34e0534433b",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "5145cbe5bd03bba6a4cbedfa244ee7667ff02181590ca3032292a34e0534433b",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:20.785628Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/11/2/0630.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 10
+    },
+    {
+      "accepted_records": 674,
+      "expected_sha256": "324fabd726b905cde3a42dd91ea08eb57b9ec1c93b5bbd55bb7f5ac338742ec0",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "324fabd726b905cde3a42dd91ea08eb57b9ec1c93b5bbd55bb7f5ac338742ec0",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:21.190710Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/11/9/1238.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 11
+    },
+    {
+      "accepted_records": 678,
+      "expected_sha256": "daef571b36bdedc211ee356aab1df6bedef842038daf23c816af44fdc5a8fe35",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "daef571b36bdedc211ee356aab1df6bedef842038daf23c816af44fdc5a8fe35",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:21.593650Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/11/23/0630.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 12
+    },
+    {
+      "accepted_records": 684,
+      "expected_sha256": "ac662fba3b0b0b87b57884beeb4bdacc1cc4990ac5854e035002ee88c2b031b3",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "ac662fba3b0b0b87b57884beeb4bdacc1cc4990ac5854e035002ee88c2b031b3",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:21.987699Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/11/29/1247.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 13
+    },
+    {
+      "accepted_records": 690,
+      "expected_sha256": "47a84c44b18975879e8fd5c62bd0faa844618ce3f12b176b2aae69171e64a763",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "47a84c44b18975879e8fd5c62bd0faa844618ce3f12b176b2aae69171e64a763",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:22.346954Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/12/3/1248.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 14
+    },
+    {
+      "accepted_records": 693,
+      "expected_sha256": "27ad7fc3778f5e7f17955e28f9a9975dc8ae137ddbaee58bb8fd7fb681fc3bff",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "27ad7fc3778f5e7f17955e28f9a9975dc8ae137ddbaee58bb8fd7fb681fc3bff",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:22.715016Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/12/7/0631.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 15
+    },
+    {
+      "accepted_records": 693,
+      "expected_sha256": "b6807223f57d60f28dfe848d4cae3f22eef9961bb4f1df5c746b0195fbfdd3ef",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "b6807223f57d60f28dfe848d4cae3f22eef9961bb4f1df5c746b0195fbfdd3ef",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:23.099579Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/12/14/1243.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 16
+    },
+    {
+      "accepted_records": 701,
+      "expected_sha256": "7fc3c43081fff59a586ef8679323f1a08939c072738608a4ed16da1704b2551c",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "7fc3c43081fff59a586ef8679323f1a08939c072738608a4ed16da1704b2551c",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:23.454058Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/12/21/0628.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 17
+    },
+    {
+      "accepted_records": 701,
+      "expected_sha256": "28566dd7cdba24ad9f395f635fff1fa3483f14526c2aa38d0b166b74c74c77b6",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "28566dd7cdba24ad9f395f635fff1fa3483f14526c2aa38d0b166b74c74c77b6",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:23.879050Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/12/26/0631.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 18
+    },
+    {
+      "accepted_records": 705,
+      "expected_sha256": "05ca7934911c585fd51425e88baff73e03081aa0c7dd2c3e3409c4d52bd1bef8",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "05ca7934911c585fd51425e88baff73e03081aa0c7dd2c3e3409c4d52bd1bef8",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:24.279218Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2024/12/29/1239.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 19
+    },
+    {
+      "accepted_records": 709,
+      "expected_sha256": "7ea80f19102e41567202b81e2f5e77734060b608ff10fabd178d43a991c19507",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "7ea80f19102e41567202b81e2f5e77734060b608ff10fabd178d43a991c19507",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:24.673386Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/1/4/0629.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 20
+    },
+    {
+      "accepted_records": 718,
+      "expected_sha256": "d167faf62d41f05053bf55c4f2b97c9f58571be2fcb65eab8b1b4530e261a583",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "d167faf62d41f05053bf55c4f2b97c9f58571be2fcb65eab8b1b4530e261a583",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:25.059498Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/1/14/1241.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 21
+    },
+    {
+      "accepted_records": 726,
+      "expected_sha256": "c9ce77d7e5c3d2869b06ce21a6f0f0fb0202491214039a7a1f4dff7107ad325c",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "c9ce77d7e5c3d2869b06ce21a6f0f0fb0202491214039a7a1f4dff7107ad325c",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-25T14:36:25.438180Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/1/18/0627.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 22
+    },
+    {
+      "accepted_records": 735,
+      "expected_sha256": "8b27730a0f89aaa185496f2b4478b3463672b90ac957a52df3aede0c5dad6ecf",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "8b27730a0f89aaa185496f2b4478b3463672b90ac957a52df3aede0c5dad6ecf",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:25.811522Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/1/25/1238.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 23
+    },
+    {
+      "accepted_records": 737,
+      "expected_sha256": "defec1e4132073efa69356ee67ccdf97fdb3b6e1ae2998561b9c0104024d4dd8",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "defec1e4132073efa69356ee67ccdf97fdb3b6e1ae2998561b9c0104024d4dd8",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:26.238551Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/2/1/0628.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 24
+    },
+    {
+      "accepted_records": 753,
+      "expected_sha256": "9b424eab523e3e88125f1d4e434a07eeb6b153b6011476078844460c2ba64f12",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "9b424eab523e3e88125f1d4e434a07eeb6b153b6011476078844460c2ba64f12",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:26.696333Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/2/14/1243.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 25
+    },
+    {
+      "accepted_records": 759,
+      "expected_sha256": "bcb377af43c784e6a750437ece4d915451755f47fbb4c272bdff3b7bf0673835",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "bcb377af43c784e6a750437ece4d915451755f47fbb4c272bdff3b7bf0673835",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:27.133075Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/2/21/1244.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 26
+    },
+    {
+      "accepted_records": 763,
+      "expected_sha256": "76a4a39d6b9b8364085e80043bf21dbbac642a080c45af99a0f71e1924bf4511",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "76a4a39d6b9b8364085e80043bf21dbbac642a080c45af99a0f71e1924bf4511",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:27.533233Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/2/25/1245.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 27
+    },
+    {
+      "accepted_records": 765,
+      "expected_sha256": "5bfe4a25cba3a035cc7d9990433bd29adeae07092b3ef05e37320fc7a8d547c1",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "5bfe4a25cba3a035cc7d9990433bd29adeae07092b3ef05e37320fc7a8d547c1",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:27.955653Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/3/8/0625.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 28
+    },
+    {
+      "accepted_records": 769,
+      "expected_sha256": "9a3ebd94707ce3453822fe49a8bf3ae2789dbb60b31c2a993dd0811952becd97",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "9a3ebd94707ce3453822fe49a8bf3ae2789dbb60b31c2a993dd0811952becd97",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:28.381168Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/3/15/1241.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 29
+    },
+    {
+      "accepted_records": 769,
+      "expected_sha256": "4e9a21ee6bc996453b31344b552e590efa5bb80dec33e473ab77a6e934d20564",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "4e9a21ee6bc996453b31344b552e590efa5bb80dec33e473ab77a6e934d20564",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:28.941464Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/4/1/1250.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 30
+    },
+    {
+      "accepted_records": 771,
+      "expected_sha256": "e7f1038bf684e1b75770800f72ea57b56042b0fbfacf524a3c36652b9d4b4045",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "e7f1038bf684e1b75770800f72ea57b56042b0fbfacf524a3c36652b9d4b4045",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:29.433791Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/4/5/0631.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 31
+    },
+    {
+      "accepted_records": 772,
+      "expected_sha256": "7e7efc36acab5ca3d8157693e6b07a44357f06fa6cd2e21d73f5db2c7eda2a88",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "7e7efc36acab5ca3d8157693e6b07a44357f06fa6cd2e21d73f5db2c7eda2a88",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:29.905763Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/4/12/0631.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 32
+    },
+    {
+      "accepted_records": 778,
+      "expected_sha256": "0a4e081203f79bf7e44882faf82d04b077491e4e4280eeaaff36d68ec1a5df1a",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "0a4e081203f79bf7e44882faf82d04b077491e4e4280eeaaff36d68ec1a5df1a",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:30.313702Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/4/19/0631.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 33
+    },
+    {
+      "accepted_records": 779,
+      "expected_sha256": "54b0704e0e071c6c742c0099301c6fd55ee6ae77f243371a07e9d9135e60c373",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "54b0704e0e071c6c742c0099301c6fd55ee6ae77f243371a07e9d9135e60c373",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:30.906234Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/4/26/0631.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 34
+    },
+    {
+      "accepted_records": 780,
+      "expected_sha256": "75fb742cf6b256fe52f2b83bd6450addaba51da3a6a767a55977202eef512bb8",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "75fb742cf6b256fe52f2b83bd6450addaba51da3a6a767a55977202eef512bb8",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:31.312222Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/5/2/1249.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 35
+    },
+    {
+      "accepted_records": 781,
+      "expected_sha256": "fdf87216448b42633fe9275a49a53ebd9e494ef5899d1062adb6ea626b27affe",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "fdf87216448b42633fe9275a49a53ebd9e494ef5899d1062adb6ea626b27affe",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:31.721243Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/5/10/0632.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 36
+    },
+    {
+      "accepted_records": 781,
+      "expected_sha256": "7672e1df9c37b5d971abf698bd95c15c5360f2b14929834796b24c8dca26a6e7",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "7672e1df9c37b5d971abf698bd95c15c5360f2b14929834796b24c8dca26a6e7",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:32.137257Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/5/16/1252.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 37
+    },
+    {
+      "accepted_records": 781,
+      "expected_sha256": "3c85ba3075fb54bfa6ecabff5d7291d77a2b0a9344da66b4d7543b9ff5a3227b",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "3c85ba3075fb54bfa6ecabff5d7291d77a2b0a9344da66b4d7543b9ff5a3227b",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 20,
+      "retrieval_timestamp": "2026-08-25T14:36:32.635533Z",
+      "reused_from_verified_cache": true,
+      "season": "2024-25",
+      "source_commit": "36bdcddc5764628ec8ef9429dcdc1aafe4f6a867",
+      "source_file_path": "cache/2025/5/25/1247.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 38
+    },
+    {
+      "accepted_records": 29747,
+      "expected_sha256": "0d09f1f1cb1b5520ec8e2f25238aa652efe2a263d8ca7cb2b6538b27bf86727d",
+      "kind": "player_fixture",
+      "observed_sha256": "0d09f1f1cb1b5520ec8e2f25238aa652efe2a263d8ca7cb2b6538b27bf86727d",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 10,
+      "retrieval_timestamp": "2026-08-27T06:56:03.026800Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "f9ed3e8839b0f970e0d5d4a83c5628f6eaee755a",
+      "source_file_path": "data/2025-26/gws/merged_gw.csv",
+      "source_repository": "vaastav/Fantasy-Premier-League",
+      "target_gameweek": null
+    },
+    {
+      "accepted_records": 380,
+      "expected_sha256": "2d7e3950d346df14ca486cb09e9b9ba406d37d943775244eed06cdc021ffb3a9",
+      "kind": "fixtures",
+      "observed_sha256": "2d7e3950d346df14ca486cb09e9b9ba406d37d943775244eed06cdc021ffb3a9",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:03.457815Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "f9ed3e8839b0f970e0d5d4a83c5628f6eaee755a",
+      "source_file_path": "data/2025-26/fixtures.csv",
+      "source_repository": "vaastav/Fantasy-Premier-League",
+      "target_gameweek": null
+    },
+    {
+      "accepted_records": 841,
+      "expected_sha256": "412ce0172016f8f98f25177dc6de9f3cd2a8ec7a6135f9aa638d7fdee784d67b",
+      "kind": "player_identity",
+      "observed_sha256": "412ce0172016f8f98f25177dc6de9f3cd2a8ec7a6135f9aa638d7fdee784d67b",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:03.834295Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "f9ed3e8839b0f970e0d5d4a83c5628f6eaee755a",
+      "source_file_path": "data/2025-26/players_raw.csv",
+      "source_repository": "vaastav/Fantasy-Premier-League",
+      "target_gameweek": null
+    },
+    {
+      "accepted_records": 20,
+      "expected_sha256": "b29df099cb0ad25413e284e53116099b0e0496874f99743dbc0870d8241b46c5",
+      "kind": "teams",
+      "observed_sha256": "b29df099cb0ad25413e284e53116099b0e0496874f99743dbc0870d8241b46c5",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:04.186722Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "f9ed3e8839b0f970e0d5d4a83c5628f6eaee755a",
+      "source_file_path": "data/2025-26/teams.csv",
+      "source_repository": "vaastav/Fantasy-Premier-League",
+      "target_gameweek": null
+    },
+    {
+      "accepted_records": 685,
+      "expected_sha256": "eee31c9ece4864963bff4d88543ac5d440ca4d574ec89512e680d6e697f9a086",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "eee31c9ece4864963bff4d88543ac5d440ca4d574ec89512e680d6e697f9a086",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:04.679132Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/8/15/1252.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 1
+    },
+    {
+      "accepted_records": 698,
+      "expected_sha256": "4fc61f6f89d925af550887c05eeb84648d9860cf974ddee113306a89a1d36f51",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "4fc61f6f89d925af550887c05eeb84648d9860cf974ddee113306a89a1d36f51",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:05.046217Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/8/22/1251.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 2
+    },
+    {
+      "accepted_records": 709,
+      "expected_sha256": "02366ddb44914b5a8f846af64886a657d5dd6fa9115b77b990112d647d4d37c0",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "02366ddb44914b5a8f846af64886a657d5dd6fa9115b77b990112d647d4d37c0",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:05.503960Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/8/30/0632.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 3
+    },
+    {
+      "accepted_records": 738,
+      "expected_sha256": "0bbfb0d3a5f580ca7ada903c3d9ad25b1036ecc258160eb2b415715c5c03697a",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "0bbfb0d3a5f580ca7ada903c3d9ad25b1036ecc258160eb2b415715c5c03697a",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:05.906540Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/9/13/0631.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 4
+    },
+    {
+      "accepted_records": 740,
+      "expected_sha256": "7d7a0bcb8206f816b772d9d354d0f4690cdfa52c271f5f938b07ddfbc5e04084",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "7d7a0bcb8206f816b772d9d354d0f4690cdfa52c271f5f938b07ddfbc5e04084",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:06.337914Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/9/20/0632.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 5
+    },
+    {
+      "accepted_records": 741,
+      "expected_sha256": "d24eb9d137739682a71090d4abf7b9c49245624f5ffab316c127781ebe514838",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "d24eb9d137739682a71090d4abf7b9c49245624f5ffab316c127781ebe514838",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:06.737235Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/9/27/0631.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 6
+    },
+    {
+      "accepted_records": 742,
+      "expected_sha256": "45371fe22f35ede4f644052a0918b1e5fb58d52bb671557be1aa3904a5fdb467",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "45371fe22f35ede4f644052a0918b1e5fb58d52bb671557be1aa3904a5fdb467",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:07.144592Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/10/3/1249.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 7
+    },
+    {
+      "accepted_records": 743,
+      "expected_sha256": "e81984e8ed02ab4e214d8276580d851c97f130d87cc6e13dc265e1b456bac48e",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "e81984e8ed02ab4e214d8276580d851c97f130d87cc6e13dc265e1b456bac48e",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:07.555412Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/10/18/0633.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 8
+    },
+    {
+      "accepted_records": 745,
+      "expected_sha256": "4faee9cbcd6ba4c065acba30fc0a79abc8ca67e522493611f9ab001bf20b28b6",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "4faee9cbcd6ba4c065acba30fc0a79abc8ca67e522493611f9ab001bf20b28b6",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:07.994097Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/10/24/1254.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 9
+    },
+    {
+      "accepted_records": 746,
+      "expected_sha256": "438308293493bd5bfe702c4c33371b0d7f88ecde5ea28b19cdebd2efc6a2991f",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "438308293493bd5bfe702c4c33371b0d7f88ecde5ea28b19cdebd2efc6a2991f",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:08.437275Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/11/1/1247.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 10
+    },
+    {
+      "accepted_records": 748,
+      "expected_sha256": "b9b40ee84b55e24b2ce8a3adae8116626ece5091dfd453e05eff640a6b4143fe",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "b9b40ee84b55e24b2ce8a3adae8116626ece5091dfd453e05eff640a6b4143fe",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:08.886814Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/11/8/0634.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 11
+    },
+    {
+      "accepted_records": 752,
+      "expected_sha256": "3c3a52d10e696f93f49f75d803ceb2753aa45ba09495523ee777b23377cc400d",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "3c3a52d10e696f93f49f75d803ceb2753aa45ba09495523ee777b23377cc400d",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:09.287036Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/11/22/0634.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 12
+    },
+    {
+      "accepted_records": 755,
+      "expected_sha256": "88a3689a796c51387ac427ce215f0f8a56b4d95999f422d671dc46cede87e091",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "88a3689a796c51387ac427ce215f0f8a56b4d95999f422d671dc46cede87e091",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:09.666823Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/11/29/1250.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 13
+    },
+    {
+      "accepted_records": 755,
+      "expected_sha256": "38c5c4ae749a0e10a6a9730247e9348a3753a2d129f3e50cee58624c602634b8",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "38c5c4ae749a0e10a6a9730247e9348a3753a2d129f3e50cee58624c602634b8",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:10.022940Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/12/2/1258.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 14
+    },
+    {
+      "accepted_records": 758,
+      "expected_sha256": "d8b06805b784077a35ebe3428e87ab80379e594ede823e80030e030e27e1fde5",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "d8b06805b784077a35ebe3428e87ab80379e594ede823e80030e030e27e1fde5",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:10.404423Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/12/6/0636.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 15
+    },
+    {
+      "accepted_records": 759,
+      "expected_sha256": "24854bd83cfddd66ecaa2eeecb7d857c1ee46058c27627c9f1a337593454b250",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "24854bd83cfddd66ecaa2eeecb7d857c1ee46058c27627c9f1a337593454b250",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:10.821237Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/12/13/1251.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 16
+    },
+    {
+      "accepted_records": 760,
+      "expected_sha256": "125e16fb0120ad65e2fbe2998c9613b70f4310b7dfa219b6110ce4a9968bcc81",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "125e16fb0120ad65e2fbe2998c9613b70f4310b7dfa219b6110ce4a9968bcc81",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:11.211941Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/12/20/0638.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 17
+    },
+    {
+      "accepted_records": 770,
+      "expected_sha256": "beb448b597ee95631bd893f12d617406da064189db78ff4ac0eab80efa32513f",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "beb448b597ee95631bd893f12d617406da064189db78ff4ac0eab80efa32513f",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:11.573518Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/12/26/1255.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 18
+    },
+    {
+      "accepted_records": 775,
+      "expected_sha256": "e89b8875aa9734299b25130c69156abab75dc4de879422e05c347f1469dca750",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "e89b8875aa9734299b25130c69156abab75dc4de879422e05c347f1469dca750",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:11.951380Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2025/12/30/1258.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 19
+    },
+    {
+      "accepted_records": 780,
+      "expected_sha256": "c7db78778c4d0ce11478f78a0e5b993b45c615fb84827cc3862cd348542e6423",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "c7db78778c4d0ce11478f78a0e5b993b45c615fb84827cc3862cd348542e6423",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:12.513382Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/1/3/0640.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 20
+    },
+    {
+      "accepted_records": 790,
+      "expected_sha256": "637c423d6108b26dcd674d275e21a4f3ef423efc40122905ec2c4521c6dd7414",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "637c423d6108b26dcd674d275e21a4f3ef423efc40122905ec2c4521c6dd7414",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:12.996140Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/1/6/1258.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 21
+    },
+    {
+      "accepted_records": 796,
+      "expected_sha256": "2e14d23acf03415ee763d7e72864bf41d46b45666c0cadf46815560903ef2a12",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "2e14d23acf03415ee763d7e72864bf41d46b45666c0cadf46815560903ef2a12",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:13.495742Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/1/17/0639.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 22
+    },
+    {
+      "accepted_records": 802,
+      "expected_sha256": "b37dd4fbbdbd7be11c0343ba4683f305404b822dc07560bc7368ec1fa54def45",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "b37dd4fbbdbd7be11c0343ba4683f305404b822dc07560bc7368ec1fa54def45",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:13.968431Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/1/24/0640.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 23
+    },
+    {
+      "accepted_records": 808,
+      "expected_sha256": "ed930ca5b29d29de3bbfa31b505988fff8ffeb4aae35a15667613384b929925e",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "ed930ca5b29d29de3bbfa31b505988fff8ffeb4aae35a15667613384b929925e",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:14.402621Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/1/31/1303.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 24
+    },
+    {
+      "accepted_records": 817,
+      "expected_sha256": "baa605b8109f3525a3f8d042c61f7ca7512a3e6d42278f9300eb1f21132a6d41",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "baa605b8109f3525a3f8d042c61f7ca7512a3e6d42278f9300eb1f21132a6d41",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:14.937312Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/2/6/1315.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 25
+    },
+    {
+      "accepted_records": 817,
+      "expected_sha256": "c70b651cfdcf2166734fe1ac14a3a687e96bd540377fbedd6693eccca7ecbefa",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "c70b651cfdcf2166734fe1ac14a3a687e96bd540377fbedd6693eccca7ecbefa",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:15.368094Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/2/10/1341.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 26
+    },
+    {
+      "accepted_records": 817,
+      "expected_sha256": "ca5e759c6fd7e1118b649e8cfee3bd0b485a686f0b2a9db6306bd329e49952fe",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "ca5e759c6fd7e1118b649e8cfee3bd0b485a686f0b2a9db6306bd329e49952fe",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:15.738875Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/2/21/1303.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 27
+    },
+    {
+      "accepted_records": 818,
+      "expected_sha256": "8edc1cc4e1d0a05e61abb6067530217968dec324f0e0460a220c4a568d83a61d",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "8edc1cc4e1d0a05e61abb6067530217968dec324f0e0460a220c4a568d83a61d",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:16.089435Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/2/27/1314.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 28
+    },
+    {
+      "accepted_records": 819,
+      "expected_sha256": "109d57adb64e150a21725a68f1c61f0d9874daf16426d327cbc4c49e4de86b18",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "109d57adb64e150a21725a68f1c61f0d9874daf16426d327cbc4c49e4de86b18",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:16.437943Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/3/3/1314.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 29
+    },
+    {
+      "accepted_records": 820,
+      "expected_sha256": "80f6e7464eac91189732cc79715d4b76c891a42a5990423d780ebe43b886e870",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "80f6e7464eac91189732cc79715d4b76c891a42a5990423d780ebe43b886e870",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:16.799681Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/3/14/1308.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 30
+    },
+    {
+      "accepted_records": 822,
+      "expected_sha256": "60180c532341d293ec9c457a27be1b077994eab1f0f4cb9fc7e23436455d5930",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "60180c532341d293ec9c457a27be1b077994eab1f0f4cb9fc7e23436455d5930",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:17.228104Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/3/20/1316.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 31
+    },
+    {
+      "accepted_records": 825,
+      "expected_sha256": "d3ed02efc62d181101ece997ba7d12988065852286efd747d35710f4116247df",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "d3ed02efc62d181101ece997ba7d12988065852286efd747d35710f4116247df",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:17.612027Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/4/10/1326.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 32
+    },
+    {
+      "accepted_records": 826,
+      "expected_sha256": "a6d6cce56422bc2a29334c58e3d106705b8510dd1c7d2253f2aec0e484d0e92f",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "a6d6cce56422bc2a29334c58e3d106705b8510dd1c7d2253f2aec0e484d0e92f",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:17.977524Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/4/18/0719.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 33
+    },
+    {
+      "accepted_records": 829,
+      "expected_sha256": "057f28b2a0d8e326ef9a6a67efd63b91d7cf31b0d1dbfac5e7240267d70b3195",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "057f28b2a0d8e326ef9a6a67efd63b91d7cf31b0d1dbfac5e7240267d70b3195",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:18.329001Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/4/24/1355.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 34
+    },
+    {
+      "accepted_records": 830,
+      "expected_sha256": "f3a8ad4c99a8bec46bd6cfdc475cb475e4003c0c66e01a47a83dd723c0442d18",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "f3a8ad4c99a8bec46bd6cfdc475cb475e4003c0c66e01a47a83dd723c0442d18",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:18.799910Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/5/1/1343.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 35
+    },
+    {
+      "accepted_records": 832,
+      "expected_sha256": "b3db8dab3968df2ab7be35e73ed095ac0fa95394d6b82c0a99a59779975a2914",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "b3db8dab3968df2ab7be35e73ed095ac0fa95394d6b82c0a99a59779975a2914",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:19.134633Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/5/9/0804.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 36
+    },
+    {
+      "accepted_records": 838,
+      "expected_sha256": "a91d944878bcb8581fb897c32536cb99040af53df5d57dcbcb293b4b08a708eb",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "a91d944878bcb8581fb897c32536cb99040af53df5d57dcbcb293b4b08a708eb",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:19.585223Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/5/15/1423.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 37
+    },
+    {
+      "accepted_records": 840,
+      "expected_sha256": "8127526148dbe0ab0a3fb15e9f59c01f4444b8e3aed00ffa10806f42ca9f41a6",
+      "kind": "predeadline_bootstrap",
+      "observed_sha256": "8127526148dbe0ab0a3fb15e9f59c01f4444b8e3aed00ffa10806f42ca9f41a6",
+      "parser_schema_version": "historical-v3",
+      "rejected_records": 0,
+      "retrieval_timestamp": "2026-08-27T06:56:19.919707Z",
+      "reused_from_verified_cache": true,
+      "season": "2025-26",
+      "source_commit": "dea291add4556c24587f54023c177562d8d60e7d",
+      "source_file_path": "cache/2026/5/24/0839.json.xz",
+      "source_repository": "Randdalf/fplcache",
+      "target_gameweek": 38
+    }
+  ],
+  "status": "complete",
+  "temporal_policy": {
+    "kickoff_at_or_after_target_deadline_prohibited": true,
+    "later_snapshot_gap_fill_prohibited": true,
+    "most_recent_fixture_semantics_prohibited": true,
+    "prediction_history_cutoff": "performance_gameweek < target_gameweek AND fixture_kickoff < target_deadline",
+    "previous_gameweek_minutes": "sum(minutes where gameweek = target_gameweek - 1)",
+    "source_performance_must_be_known_before_target_deadline": true
+  }
+}

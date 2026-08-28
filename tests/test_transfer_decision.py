@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import tempfile
 import unittest
+from collections import Counter
 from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
@@ -40,6 +41,7 @@ from fpl_decision_engine.transfer_decision import (
     selling_price_map,
     write_one_transfer_decision,
 )
+from tests.fixture_support import FROZEN_GW2_ROOT
 
 
 OWNED = (
@@ -410,6 +412,7 @@ class OneTransferDecisionTests(unittest.TestCase):
                 self.assertEqual(len(candidate_ids - owned_ids), 1)
 
     def test_artifacts_are_immutable_and_capture_required_provenance(self) -> None:
+        """Exercise the real Task 016 writer and overwrite refusal in isolation."""
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             decision = evaluate(root, (player(18, "MID", 6, 20.0),))
@@ -461,48 +464,64 @@ class OneTransferDecisionTests(unittest.TestCase):
             parsed.selling_prices_transcribed_from_official_fpl_screenshot
         )
 
-    def test_frozen_gw2_exact_result_and_protected_hashes(self) -> None:
-        repository = Path(__file__).resolve().parents[1]
-        snapshot = "20260825T073532.450889Z"
-        manual_states = list(
-            repository.glob(
-                "data/manager/manual/fpl/2026-27/entry=*/gameweek=2/"
-                "20260826T132044.123523Z/manual_editable_state.json"
-            )
-        )
-        protected = {
-            repository
-            / f"data/features/fpl/2026-27/{snapshot}/gameweek=2/"
-            "player_gameweek_features.parquet": (
+    def test_reviewed_full_gw2_fixture_result_hashes_and_savinho_club_gate(self) -> None:
+        """Reproduce Task 016 and isolate the later Savinho club reassignment."""
+        manual_path = FROZEN_GW2_ROOT / "manual_editable_state.json"
+        reviewed_fixture_hashes = {
+            FROZEN_GW2_ROOT / "player_gameweek_features.parquet": (
                 "f7749a924f1223043f2d0d5c3be5004999157cde839a4c379c498e9a0c7a6887"
             ),
-            repository
-            / f"data/predictions/fpl/2026-27/{snapshot}/gameweek=2/"
-            "xfp_v01_fixtures.parquet": (
+            FROZEN_GW2_ROOT / "xfp_v01_fixtures.parquet": (
                 "5dc0042ca8e7da6ab96fb87e6bf8ef8b00f75ec8b4e017e68d140070de78c961"
             ),
-            repository
-            / f"data/predictions/fpl/2026-27/{snapshot}/gameweek=2/"
-            "xfp_v01_gameweek.parquet": (
+            FROZEN_GW2_ROOT / "xfp_v01_gameweek.parquet": (
                 "105fc489991b568d1d572213f188543fbe8fd07504f0f7845504fa76a3eaa5fc"
             ),
-            repository / f"data/clean/fpl/2026-27/{snapshot}/players.parquet": (
+            FROZEN_GW2_ROOT / "players.parquet": (
                 "0ddbe5be615b2e5fc7eeb631035d5b65a382d70bf7e1acf3e9a269ec9cd35589"
             ),
         }
-        if len(manual_states) != 1 or any(not path.is_file() for path in protected):
-            self.skipTest("local frozen GW2 review inputs are not available")
-        before = {path: sha256_file(path) for path in protected}
-        self.assertEqual(before, protected)
+        before = {path: sha256_file(path) for path in reviewed_fixture_hashes}
+        self.assertEqual(before, reviewed_fixture_hashes)
         projection_path = next(
-            path for path in protected if path.name == "xfp_v01_gameweek.parquet"
+            path
+            for path in reviewed_fixture_hashes
+            if path.name == "xfp_v01_gameweek.parquet"
         )
-        players_path = next(path for path in protected if path.name == "players.parquet")
+        players_path = next(
+            path for path in reviewed_fixture_hashes if path.name == "players.parquet"
+        )
         projections = XfpV01ParquetProvider(
             projection_artifact=projection_path,
             players_artifact=players_path,
         ).load(season="2026-27", target_gameweek=2)
-        manager_state = load_manual_editable_state(manual_states[0])
+        self.assertEqual(len(projections.players), 610)
+        self.assertEqual(
+            Counter(player.position for player in projections.players),
+            Counter({"GK": 67, "DEF": 202, "MID": 268, "FWD": 73}),
+        )
+        self.assertEqual(
+            Counter(player.team_id for player in projections.players),
+            Counter(
+                {
+                    1: 29, 2: 31, 3: 28, 4: 26, 5: 33,
+                    6: 38, 7: 33, 8: 32, 9: 24, 10: 24,
+                    11: 36, 12: 34, 13: 27, 14: 35, 15: 30,
+                    16: 33, 17: 27, 18: 28, 19: 37, 20: 25,
+                }
+            ),
+        )
+        self.assertEqual(
+            Counter(player.price_units for player in projections.players),
+            Counter(
+                {
+                    40: 74, 45: 138, 50: 174, 55: 113, 60: 56,
+                    65: 25, 70: 8, 75: 10, 80: 6, 85: 1,
+                    90: 1, 95: 2, 120: 1, 155: 1,
+                }
+            ),
+        )
+        manager_state = load_manual_editable_state(manual_path)
         verified_prices = {
             1: 60,
             111: 40,
@@ -575,7 +594,54 @@ class OneTransferDecisionTests(unittest.TestCase):
             winner.optimized_result.captain_bonus,
             places=12,
         )
-        self.assertEqual({path: sha256_file(path) for path in protected}, before)
+
+        old_keys = {
+            (row.outgoing.fpl_player_id, row.incoming.fpl_player_id)
+            for row in result.transfer_candidates
+        }
+        self.assertEqual(
+            {key for key in old_keys if key[1] == 403},
+            {(481, 403)},
+        )
+        savinho = next(
+            player for player in projections.players if player.fpl_player_id == 403
+        )
+        self.assertEqual((savinho.player_name, savinho.team_id), ("Savinho", 15))
+        reassigned_players = tuple(
+            replace(
+                player,
+                team_id=19,
+                team_name="Spurs",
+                team_short_name="TOT",
+            )
+            if player.fpl_player_id == 403
+            else player
+            for player in projections.players
+        )
+        reassigned = evaluate_one_transfer(
+            manager_state,
+            replace(projections, players=reassigned_players),
+            verified_prices,
+            decision_policy=APPEARANCE_ONLY_ALLOWED_POLICY,
+            selling_price_source=SELLING_PRICE_SOURCE,
+        )
+        refreshed_keys = {
+            (row.outgoing.fpl_player_id, row.incoming.fpl_player_id)
+            for row in reassigned.transfer_candidates
+        }
+        self.assertEqual(len(refreshed_keys), 2111)
+        self.assertEqual(
+            refreshed_keys - old_keys,
+            {(40, 403), (368, 403), (426, 403), (557, 403)},
+        )
+        self.assertEqual(old_keys - refreshed_keys, set())
+        self.assertEqual(
+            {key for key in refreshed_keys if key[1] == 403},
+            {(40, 403), (368, 403), (426, 403), (481, 403), (557, 403)},
+        )
+        self.assertEqual(
+            {path: sha256_file(path) for path in reviewed_fixture_hashes}, before
+        )
 
 
 if __name__ == "__main__":

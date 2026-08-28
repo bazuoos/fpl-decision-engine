@@ -24,6 +24,7 @@ from fpl_decision_engine.decision_reliability import (
     write_decision_reliability,
 )
 from fpl_decision_engine.projection_provider import sha256_file
+from tests.fixture_support import materialized_frozen_gw2
 
 
 def reliability_player(
@@ -299,55 +300,42 @@ class ReliabilityPrimitiveTests(unittest.TestCase):
 
 
 class FrozenGW2ReliabilityTests(unittest.TestCase):
+    """Exercise Task 017 on exact committed copies of reviewed GW2 source bytes."""
+
     @classmethod
     def setUpClass(cls) -> None:
-        repository = Path(__file__).resolve().parents[1]
-        snapshot = "20260825T073532.450889Z"
-        decision_dirs = list(
-            repository.glob(
-                "data/manager/decisions/fpl/2026-27/entry=*/gameweek=2/"
-                "20260826T132044.123523Z/one-transfer-decision-v1/"
-                "20260826T165408.903032Z"
-            )
-        )
-        if len(decision_dirs) != 1:
-            raise unittest.SkipTest("local frozen GW2 Task 016 input is unavailable")
-        decision_dir = decision_dirs[0]
-        cls.decision_path = decision_dir / "one_transfer_decision.json"
-        cls.candidate_path = decision_dir / "legal_transfer_candidates.json"
-        cls.feature_path = repository / (
-            f"data/features/fpl/2026-27/{snapshot}/gameweek=2/"
-            "player_gameweek_features.parquet"
-        )
-        cls.projection_path = repository / (
-            f"data/predictions/fpl/2026-27/{snapshot}/gameweek=2/"
-            "xfp_v01_gameweek.parquet"
-        )
-        cls.fixture_prediction_path = repository / (
-            f"data/predictions/fpl/2026-27/{snapshot}/gameweek=2/"
-            "xfp_v01_fixtures.parquet"
-        )
-        cls.players_path = repository / (
-            f"data/clean/fpl/2026-27/{snapshot}/players.parquet"
-        )
-        cls.expected_hashes = {
+        cls.fixture_manager = materialized_frozen_gw2()
+        fixture = cls.fixture_manager.__enter__()
+        cls.decision_path = fixture.decision
+        cls.candidate_path = fixture.candidates
+        cls.feature_path = fixture.features
+        cls.projection_path = fixture.gameweek_predictions
+        cls.fixture_prediction_path = fixture.fixture_predictions
+        cls.players_path = fixture.players
+        cls.reviewed_fixture_hashes = {
             cls.feature_path: "f7749a924f1223043f2d0d5c3be5004999157cde839a4c379c498e9a0c7a6887",
             cls.fixture_prediction_path: "5dc0042ca8e7da6ab96fb87e6bf8ef8b00f75ec8b4e017e68d140070de78c961",
             cls.projection_path: "105fc489991b568d1d572213f188543fbe8fd07504f0f7845504fa76a3eaa5fc",
             cls.players_path: "0ddbe5be615b2e5fc7eeb631035d5b65a382d70bf7e1acf3e9a269ec9cd35589",
-            cls.decision_path: "9bae364053fab15584860b6adbde9119ce41eb1cae505a87913b20078aeb72be",
+            fixture.decision_template: "9bae364053fab15584860b6adbde9119ce41eb1cae505a87913b20078aeb72be",
             cls.candidate_path: "107216cdaa224d86e380c0bd2ab67b6afef5a7a233e105710a0255e0f3510c50",
         }
-        if any(not path.is_file() for path in cls.expected_hashes):
-            raise unittest.SkipTest("local frozen GW2 Task 017 inputs are unavailable")
-        cls.before = {path: sha256_file(path) for path in cls.expected_hashes}
-        if cls.before != cls.expected_hashes:
-            raise AssertionError("frozen GW2 hashes do not match the reviewed inputs")
+        cls.fixture_hashes_before = {
+            path: sha256_file(path) for path in cls.reviewed_fixture_hashes
+        }
+        if cls.fixture_hashes_before != cls.reviewed_fixture_hashes:
+            raise AssertionError(
+                "committed GW2 fixture hashes do not match the reviewed source bytes"
+            )
         cls.context = load_reliability_context(cls.decision_path, cls.feature_path)
         cls.payload = analyze_decision_reliability(
             cls.context,
             generation_timestamp="2026-08-27T01:02:03.456789Z",
         )
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.fixture_manager.__exit__(None, None, None)
 
     def test_de_cuyper_provenance_and_warnings(self) -> None:
         official = self.payload["official_recommendation"]
@@ -575,7 +563,8 @@ class FrozenGW2ReliabilityTests(unittest.TestCase):
         ):
             analyze_decision_reliability(replace(self.context, players=missing))
 
-    def test_reliability_artifact_is_immutable_and_sources_stay_unchanged(self) -> None:
+    def test_reliability_artifact_is_immutable_and_fixture_sources_stay_unchanged(self) -> None:
+        """Use real writer refusal semantics against a temporary artifact copy."""
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             copied_decision = root / "one_transfer_decision.json"
@@ -587,7 +576,11 @@ class FrozenGW2ReliabilityTests(unittest.TestCase):
             with self.assertRaises(DecisionReliabilityOutputExistsError):
                 write_decision_reliability(context, generated_at=generated)
         self.assertEqual(
-            {path: sha256_file(path) for path in self.expected_hashes}, self.before
+            {
+                path: sha256_file(path)
+                for path in self.reviewed_fixture_hashes
+            },
+            self.fixture_hashes_before,
         )
 
 

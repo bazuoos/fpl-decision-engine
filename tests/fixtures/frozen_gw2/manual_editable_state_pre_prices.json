@@ -1,0 +1,127 @@
+{
+  "bank_m": 0.0,
+  "bank_units": 0,
+  "current_selection": null,
+  "current_selection_verified": false,
+  "current_transfer_cost_points": 0,
+  "entry_id": 6644775,
+  "free_transfers": 1,
+  "picks": [
+    {
+      "current_market_price_units": null,
+      "display_name": "Raya",
+      "element_id": 1,
+      "position": "GK",
+      "selling_price_units": null
+    },
+    {
+      "current_market_price_units": null,
+      "display_name": "Steele",
+      "element_id": 111,
+      "position": "GK",
+      "selling_price_units": null
+    },
+    {
+      "current_market_price_units": null,
+      "display_name": "Calafiori",
+      "element_id": 8,
+      "position": "DEF",
+      "selling_price_units": null
+    },
+    {
+      "current_market_price_units": null,
+      "display_name": "van Ewijk",
+      "element_id": 175,
+      "position": "DEF",
+      "selling_price_units": null
+    },
+    {
+      "current_market_price_units": null,
+      "display_name": "Mu\u00f1oz",
+      "element_id": 201,
+      "position": "DEF",
+      "selling_price_units": null
+    },
+    {
+      "current_market_price_units": null,
+      "display_name": "Gvardiol",
+      "element_id": 391,
+      "position": "DEF",
+      "selling_price_units": null
+    },
+    {
+      "current_market_price_units": null,
+      "display_name": "Pedro Porro",
+      "element_id": 499,
+      "position": "DEF",
+      "selling_price_units": null
+    },
+    {
+      "current_market_price_units": null,
+      "display_name": "Rogers",
+      "element_id": 40,
+      "position": "MID",
+      "selling_price_units": null
+    },
+    {
+      "current_market_price_units": null,
+      "display_name": "Szoboszlai",
+      "element_id": 368,
+      "position": "MID",
+      "selling_price_units": null
+    },
+    {
+      "current_market_price_units": null,
+      "display_name": "B.Fernandes",
+      "element_id": 426,
+      "position": "MID",
+      "selling_price_units": null
+    },
+    {
+      "current_market_price_units": null,
+      "display_name": "Anderson",
+      "element_id": 481,
+      "position": "MID",
+      "selling_price_units": null
+    },
+    {
+      "current_market_price_units": null,
+      "display_name": "Tzolis",
+      "element_id": 557,
+      "position": "MID",
+      "selling_price_units": null
+    },
+    {
+      "current_market_price_units": null,
+      "display_name": "Kusi-Asare",
+      "element_id": 272,
+      "position": "FWD",
+      "selling_price_units": null
+    },
+    {
+      "current_market_price_units": null,
+      "display_name": "Walle Egeli",
+      "element_id": 321,
+      "position": "FWD",
+      "selling_price_units": null
+    },
+    {
+      "current_market_price_units": null,
+      "display_name": "Haaland",
+      "element_id": 411,
+      "position": "FWD",
+      "selling_price_units": null
+    }
+  ],
+  "post_deadline_transfers_known": true,
+  "provenance_boundary": "manual editable state; distinct from public locked-deadline manager state",
+  "recorded_timestamp": "2026-08-26T12:43:07.527374Z",
+  "season": "2026-27",
+  "selling_prices_verified": false,
+  "target_gameweek": 2,
+  "third_party_price_change_effect": "none",
+  "third_party_price_change_metadata": null,
+  "verification_source": "manual_official_fpl_screen_confirmation",
+  "verification_timestamp": null,
+  "version": "manual-editable-manager-state-v1"
+}

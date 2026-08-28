@@ -38,6 +38,7 @@ from fpl_decision_engine.projection_provider import (
     XfpV01ParquetProvider,
     sha256_file,
 )
+from tests.fixture_support import FROZEN_GW2_ROOT
 
 
 POSITIONS = (
@@ -488,66 +489,44 @@ class EditableManagerTests(unittest.TestCase):
             with self.assertRaises(EditableManagerOutputExistsError):
                 self.make_state(root)
 
-    def test_frozen_gw2_appearance_only_result_and_protected_hashes(self) -> None:
-        repository = Path(__file__).resolve().parents[1]
-        snapshot = "20260825T073532.450889Z"
-        manager_manifests = list(
-            repository.glob(
-                "data/manager/raw/fpl/2026-27/entry=*/"
-                "20260826T121828.264443Z/manager_state_manifest.json"
-            )
-        )
-        manual_states = list(
-            repository.glob(
-                "data/manager/manual/fpl/2026-27/entry=*/gameweek=2/"
-                "20260826T124307.527374Z/manual_editable_state.json"
-            )
-        )
-        if len(manager_manifests) != 1 or len(manual_states) != 1:
-            self.skipTest("local frozen GW2 manager review artifacts are not available")
-        protected = {
-            repository
-            / f"data/features/fpl/2026-27/{snapshot}/gameweek=2/"
-            "player_gameweek_features.parquet": (
+    def test_reviewed_gw2_fixture_appearance_only_result_and_hashes(self) -> None:
+        """Reproduce the reviewed result from committed copies, not ignored data."""
+        manager_manifest = FROZEN_GW2_ROOT / "manager_state_manifest.json"
+        manual_path = FROZEN_GW2_ROOT / "manual_editable_state_pre_prices.json"
+        reviewed_fixture_hashes = {
+            FROZEN_GW2_ROOT / "player_gameweek_features.parquet": (
                 "f7749a924f1223043f2d0d5c3be5004999157cde839a4c379c498e9a0c7a6887"
             ),
-            repository
-            / f"data/predictions/fpl/2026-27/{snapshot}/gameweek=2/"
-            "xfp_v01_fixtures.parquet": (
+            FROZEN_GW2_ROOT / "xfp_v01_fixtures.parquet": (
                 "5dc0042ca8e7da6ab96fb87e6bf8ef8b00f75ec8b4e017e68d140070de78c961"
             ),
-            repository
-            / f"data/predictions/fpl/2026-27/{snapshot}/gameweek=2/"
-            "xfp_v01_gameweek.parquet": (
+            FROZEN_GW2_ROOT / "xfp_v01_gameweek.parquet": (
                 "105fc489991b568d1d572213f188543fbe8fd07504f0f7845504fa76a3eaa5fc"
             ),
-            repository / f"data/clean/fpl/2026-27/{snapshot}/players.parquet": (
+            FROZEN_GW2_ROOT / "players.parquet": (
                 "0ddbe5be615b2e5fc7eeb631035d5b65a382d70bf7e1acf3e9a269ec9cd35589"
             ),
-            repository
-            / f"data/decisions/fpl/2026-27/{snapshot}/gameweek=2/decision-engine-v2/"
-            "20260826T114104.043249Z/decision_manifest.json": (
+            FROZEN_GW2_ROOT / "task014_decision_manifest.json": (
                 "5f851d7890affc3f4784e5f492c32ef054e15df9a1431d202b709d71e15c3633"
             ),
-            manager_manifests[0]: (
+            manager_manifest: (
                 "287a6c8cec1f7fff753abd3e6f5b7f5b158427bf277f346acad372432ebde727"
             ),
         }
-        manual_path = manual_states[0]
-        if not manual_path.is_file() or any(not path.is_file() for path in protected):
-            self.skipTest("local frozen GW2 review artifacts are not available")
-        before = {path: sha256_file(path) for path in protected}
-        self.assertEqual(before, protected)
+        before = {path: sha256_file(path) for path in reviewed_fixture_hashes}
+        self.assertEqual(before, reviewed_fixture_hashes)
 
         manual = json.loads(manual_path.read_text())
         picks = tuple(ManualEditablePick(**row) for row in manual["picks"])
         projection_path = next(
-            path for path in protected if path.name == "xfp_v01_gameweek.parquet"
+            path
+            for path in reviewed_fixture_hashes
+            if path.name == "xfp_v01_gameweek.parquet"
         )
-        players_path = next(path for path in protected if path.name == "players.parquet")
-        benchmark_path = next(
-            path for path in protected if path.name == "decision_manifest.json"
+        players_path = next(
+            path for path in reviewed_fixture_hashes if path.name == "players.parquet"
         )
+        benchmark_path = FROZEN_GW2_ROOT / "task014_decision_manifest.json"
         projections = XfpV01ParquetProvider(
             projection_artifact=projection_path,
             players_artifact=players_path,
@@ -607,7 +586,9 @@ class EditableManagerTests(unittest.TestCase):
             self.assertEqual(diagnostic["selected_in_starting_xi"], [])
             self.assertEqual(diagnostic["total_objective_contribution"], 0.0)
 
-        self.assertEqual({path: sha256_file(path) for path in protected}, before)
+        self.assertEqual(
+            {path: sha256_file(path) for path in reviewed_fixture_hashes}, before
+        )
 
 
 if __name__ == "__main__":

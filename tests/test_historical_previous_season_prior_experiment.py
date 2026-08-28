@@ -28,6 +28,7 @@ from fpl_decision_engine.historical_previous_season_prior_experiment import (
     blend_previous_season_rate,
     evaluate_development_gates,
 )
+from tests.fixture_support import materialized_task018d_fixture
 
 
 class PriorFormulaAndEligibilityTests(unittest.TestCase):
@@ -341,25 +342,43 @@ class GateAndOutputTests(unittest.TestCase):
         self.assertNotIn(SEALED_HOLDOUT_SEASON, CANDIDATES)
 
 
-@unittest.skipUnless(
-    Path(
-        "data/historical/experiments/"
-        "previous-season-attacking-prior-development-v1/experiment_manifest.json"
-    ).is_file(),
-    "immutable Task 018D development artifact is not present",
-)
 class DevelopmentArtifactTests(unittest.TestCase):
-    def test_artifact_is_development_only_and_hashes_are_valid(self) -> None:
-        root = Path("data/historical/experiments") / EXPERIMENT_VERSION
-        manifest = json.loads((root / "experiment_manifest.json").read_bytes())
-        self.assertEqual(manifest["experiment_scope"], "development_only")
-        self.assertFalse(manifest["holdout_evaluated"])
-        self.assertEqual(manifest["holdout_input_files_read"], [])
-        self.assertEqual(manifest["pseudo_minutes"], 450.0)
-        self.assertEqual(manifest["development_gate_count"], 21)
-        self.assertTrue(all("2025-26" not in row["path"] for row in manifest["immutable_inputs"]))
+    """Validate reviewed development metadata without copying metric tables."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.fixture_manager = materialized_task018d_fixture()
+        cls.metadata_path, cls.manifest_path = cls.fixture_manager.__enter__()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.fixture_manager.__exit__(None, None, None)
+
+    def test_reviewed_metadata_is_development_only_and_synthetic_hashes_are_valid(self) -> None:
+        """Use real manifest metadata with metric-free temporary output bodies."""
+        metadata = json.loads(self.metadata_path.read_bytes())
+        manifest = json.loads(self.manifest_path.read_bytes())
+        root = self.manifest_path.parent
+        self.assertEqual(
+            hashlib.sha256(self.metadata_path.read_bytes()).hexdigest(),
+            "4c2f427f9baabc731433bf0448284dcdf6d914f9baf14a65093f8979261bae4a",
+        )
+        self.assertEqual(metadata["experiment_scope"], "development_only")
+        self.assertFalse(metadata["holdout_evaluated"])
+        self.assertEqual(metadata["holdout_input_files_read"], [])
+        self.assertEqual(metadata["pseudo_minutes"], 450.0)
+        self.assertEqual(metadata["development_gate_count"], 21)
+        self.assertTrue(
+            all("2025-26" not in row["path"] for row in metadata["immutable_inputs"])
+        )
         for output in manifest["outputs"]:
-            digest = hashlib.sha256((root / output["path"]).read_bytes()).hexdigest()
+            body = (root / output["path"]).read_bytes()
+            self.assertEqual(
+                body,
+                f"test-only synthetic output: {output['path']}\n".encode(),
+            )
+            self.assertEqual(output["rows"], 0)
+            digest = hashlib.sha256(body).hexdigest()
             self.assertEqual(digest, output["sha256"])
 
 
