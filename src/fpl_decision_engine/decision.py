@@ -31,6 +31,17 @@ DECISION_OUTPUT_CLASSIFICATION = (
 )
 DEFAULT_BUDGET_UNITS = 1000
 SQUAD_POSITION_COUNTS = {"GK": 2, "DEF": 5, "MID": 5, "FWD": 3}
+SQUAD_SIZE = sum(SQUAD_POSITION_COUNTS.values())
+STARTING_XI_SIZE = 11
+BENCH_SIZE = SQUAD_SIZE - STARTING_XI_SIZE
+STARTING_POSITION_BOUNDS = {
+    "GK": (1, 1),
+    "DEF": (3, 5),
+    "MID": (2, 5),
+    "FWD": (1, 3),
+}
+BENCH_GOALKEEPER_COUNT = 1
+BENCH_OUTFIELD_COUNT = BENCH_SIZE - BENCH_GOALKEEPER_COUNT
 POSITION_ORDER = {"GK": 1, "DEF": 2, "MID": 3, "FWD": 4}
 OBJECTIVE_TOLERANCE = 1e-8
 DECISION_POLICY_VERSION = "decision-eligibility-policy-v1"
@@ -49,6 +60,29 @@ class DecisionError(Exception):
 
 class DecisionOutputExistsError(DecisionError):
     """Raised rather than overwriting a generated decision artifact."""
+
+
+@dataclass(frozen=True)
+class DecisionSelectionViolation:
+    """One named structural defect in a persisted decision selection."""
+
+    code: str
+    message: str
+
+
+class DecisionSelectionValidationError(DecisionError):
+    """Raised with every detected structural defect in a persisted selection."""
+
+    def __init__(self, violations: Iterable[DecisionSelectionViolation]) -> None:
+        self.violations = tuple(violations)
+        if not self.violations:
+            raise ValueError("at least one decision selection violation is required")
+        self.violation_codes = tuple(violation.code for violation in self.violations)
+        detail = "; ".join(
+            f"{violation.code}: {violation.message}"
+            for violation in self.violations
+        )
+        super().__init__(f"persisted decision selection is structurally invalid: {detail}")
 
 
 def budget_m_to_units(value: str | float | Decimal) -> int:
@@ -121,6 +155,215 @@ class DecisionArtifacts:
     rankings_sha256: str
     squad_sha256: str
     manifest_sha256: str
+
+
+@dataclass(frozen=True)
+class ValidatedDecisionSelection:
+    """Trusted structural facts derived from a valid persisted selection."""
+
+    squad_ids: tuple[int, ...]
+    starting_xi_ids: tuple[int, ...]
+    bench_ids: tuple[int, ...]
+    captain_id: int
+    vice_captain_id: int
+    formation: str
+
+
+def validate_decision_selection(
+    squad: Iterable[ProjectionPlayer],
+    *,
+    starting_xi_ids: Iterable[int],
+    bench_ids: Iterable[int],
+    captain_id: int | None,
+    vice_captain_id: int | None,
+) -> ValidatedDecisionSelection:
+    """Validate only the structure of an already-materialized FPL decision.
+
+    Positions come exclusively from the supplied trusted ``ProjectionPlayer``
+    records. Prices, projections, availability, policy eligibility, club limits,
+    transfer legality, and bench order are intentionally outside this contract.
+    """
+    players = tuple(squad)
+    starters = tuple(starting_xi_ids)
+    bench = tuple(bench_ids)
+    violations: list[DecisionSelectionViolation] = []
+
+    def add(code: str, message: str) -> None:
+        violations.append(DecisionSelectionViolation(code=code, message=message))
+
+    def valid_id(value: object) -> bool:
+        return isinstance(value, int) and not isinstance(value, bool) and value > 0
+
+    squad_ids = tuple(player.fpl_player_id for player in players)
+    malformed_squad_ids = tuple(
+        player_id for player_id in squad_ids if not valid_id(player_id)
+    )
+    malformed_starter_ids = tuple(
+        player_id for player_id in starters if not valid_id(player_id)
+    )
+    malformed_bench_ids = tuple(
+        player_id for player_id in bench if not valid_id(player_id)
+    )
+    if malformed_squad_ids:
+        add(
+            "malformed_squad_player_id",
+            f"squad player IDs must be positive integers, found {malformed_squad_ids!r}",
+        )
+    if malformed_starter_ids:
+        add(
+            "malformed_starting_xi_id",
+            "starting-XI player IDs must be positive integers, found "
+            f"{malformed_starter_ids!r}",
+        )
+    if malformed_bench_ids:
+        add(
+            "malformed_bench_id",
+            f"bench player IDs must be positive integers, found {malformed_bench_ids!r}",
+        )
+
+    if len(players) != SQUAD_SIZE:
+        add(
+            "squad_size",
+            f"squad must contain exactly {SQUAD_SIZE} players, found {len(players)}",
+        )
+    valid_squad_ids = tuple(player_id for player_id in squad_ids if valid_id(player_id))
+    valid_starters = tuple(player_id for player_id in starters if valid_id(player_id))
+    valid_bench = tuple(player_id for player_id in bench if valid_id(player_id))
+    if len(set(valid_squad_ids)) != len(valid_squad_ids):
+        add("duplicate_squad_players", "squad player IDs must be unique")
+    if len(starters) != STARTING_XI_SIZE:
+        add(
+            "starter_count",
+            f"starting XI must contain exactly {STARTING_XI_SIZE} players, found {len(starters)}",
+        )
+    if len(bench) != BENCH_SIZE:
+        add(
+            "bench_count",
+            f"bench must contain exactly {BENCH_SIZE} players, found {len(bench)}",
+        )
+    if len(set(valid_starters)) != len(valid_starters):
+        add("duplicate_starters", "starting-XI player IDs must be unique")
+    if len(set(valid_bench)) != len(valid_bench):
+        add("duplicate_substitutes", "bench player IDs must be unique")
+
+    squad_set = set(valid_squad_ids)
+    starter_set = set(valid_starters)
+    bench_set = set(valid_bench)
+    overlap = starter_set & bench_set
+    if overlap:
+        add(
+            "starter_substitute_overlap",
+            f"players cannot be both starters and substitutes: {sorted(overlap, key=repr)!r}",
+        )
+    selected_set = starter_set | bench_set
+    unaccounted = squad_set - selected_set
+    if unaccounted:
+        add(
+            "unaccounted_squad_players",
+            "every squad player must be selected exactly once; missing "
+            f"{sorted(unaccounted, key=repr)!r}",
+        )
+    non_squad = selected_set - squad_set
+    if non_squad:
+        add(
+            "non_squad_selection",
+            f"selection contains non-squad player IDs {sorted(non_squad, key=repr)!r}",
+        )
+
+    position_by_id: dict[int, str] = {}
+    for player in players:
+        player_id = player.fpl_player_id
+        if valid_id(player_id) and player_id not in position_by_id:
+            position_by_id[player_id] = player.position
+        if player.position not in STARTING_POSITION_BOUNDS:
+            add(
+                "unsupported_position",
+                f"player {player_id!r} has unsupported trusted position {player.position!r}",
+            )
+
+    squad_positions = Counter(
+        player.position for player in players if player.position in SQUAD_POSITION_COUNTS
+    )
+    if any(
+        squad_positions[position] != required
+        for position, required in SQUAD_POSITION_COUNTS.items()
+    ):
+        add(
+            "squad_position_counts",
+            f"squad positions must be {SQUAD_POSITION_COUNTS}, found {dict(squad_positions)}",
+        )
+
+    starter_positions = Counter(
+        position_by_id[player_id]
+        for player_id in starters
+        if player_id in position_by_id
+        and position_by_id[player_id] in STARTING_POSITION_BOUNDS
+    )
+    for position, (minimum, maximum) in STARTING_POSITION_BOUNDS.items():
+        count = starter_positions[position]
+        if not minimum <= count <= maximum:
+            label = {
+                "GK": "goalkeeper",
+                "DEF": "defender",
+                "MID": "midfielder",
+                "FWD": "forward",
+            }[position]
+            add(
+                f"starting_{label}_count",
+                f"starting {position} count must be {minimum}–{maximum}, found {count}",
+            )
+
+    bench_positions = Counter(
+        position_by_id[player_id]
+        for player_id in bench
+        if player_id in position_by_id
+        and position_by_id[player_id] in STARTING_POSITION_BOUNDS
+    )
+    bench_goalkeepers = bench_positions["GK"]
+    bench_outfield = sum(
+        bench_positions[position] for position in ("DEF", "MID", "FWD")
+    )
+    if bench_goalkeepers != BENCH_GOALKEEPER_COUNT:
+        add(
+            "bench_goalkeeper_count",
+            f"bench must contain exactly {BENCH_GOALKEEPER_COUNT} GK, found {bench_goalkeepers}",
+        )
+    if bench_outfield != BENCH_OUTFIELD_COUNT:
+        add(
+            "bench_outfield_count",
+            f"bench must contain exactly {BENCH_OUTFIELD_COUNT} outfield players, found {bench_outfield}",
+        )
+
+    if captain_id is None:
+        add("captain_required", "captain must be non-null")
+    elif not valid_id(captain_id):
+        add("malformed_captain_id", "captain ID must be a positive integer")
+    elif captain_id not in starter_set:
+        add("captain_in_starting_xi", "captain must be in the starting XI")
+    if vice_captain_id is None:
+        add("vice_captain_required", "vice captain must be non-null")
+    elif not valid_id(vice_captain_id):
+        add("malformed_vice_captain_id", "vice-captain ID must be a positive integer")
+    elif vice_captain_id not in starter_set:
+        add("vice_captain_in_starting_xi", "vice captain must be in the starting XI")
+    if captain_id is not None and captain_id == vice_captain_id:
+        add("captain_vice_distinct", "captain and vice captain must be distinct")
+
+    if violations:
+        raise DecisionSelectionValidationError(violations)
+
+    formation = (
+        f"{starter_positions['DEF']}-{starter_positions['MID']}-"
+        f"{starter_positions['FWD']}"
+    )
+    return ValidatedDecisionSelection(
+        squad_ids=tuple(sorted(squad_ids)),
+        starting_xi_ids=tuple(sorted(starters)),
+        bench_ids=tuple(sorted(bench)),
+        captain_id=captain_id,
+        vice_captain_id=vice_captain_id,
+        formation=formation,
+    )
 
 
 def projection_exclusion_counts(players: Iterable[ProjectionPlayer]) -> dict[str, int]:
@@ -212,8 +455,10 @@ def _validate_squad_players(
     if decision_policy not in DECISION_POLICIES:
         raise DecisionError(f"unsupported decision policy: {decision_policy!r}")
     players = tuple(squad)
-    if len(players) != 15:
-        raise DecisionError(f"a squad must contain exactly 15 players, found {len(players)}")
+    if len(players) != SQUAD_SIZE:
+        raise DecisionError(
+            f"a squad must contain exactly {SQUAD_SIZE} players, found {len(players)}"
+        )
     ids = [player.fpl_player_id for player in players]
     if len(set(ids)) != len(ids):
         raise DecisionError("a squad cannot contain duplicate player IDs")
@@ -277,10 +522,13 @@ def resolve_existing_squad(
 
 def _formation_counts() -> tuple[tuple[int, int, int], ...]:
     formations: list[tuple[int, int, int]] = []
-    for defenders in range(3, 6):
-        for midfielders in range(2, 6):
-            forwards = 10 - defenders - midfielders
-            if 1 <= forwards <= 3:
+    defender_minimum, defender_maximum = STARTING_POSITION_BOUNDS["DEF"]
+    midfielder_minimum, midfielder_maximum = STARTING_POSITION_BOUNDS["MID"]
+    forward_minimum, forward_maximum = STARTING_POSITION_BOUNDS["FWD"]
+    for defenders in range(defender_minimum, defender_maximum + 1):
+        for midfielders in range(midfielder_minimum, midfielder_maximum + 1):
+            forwards = STARTING_XI_SIZE - 1 - defenders - midfielders
+            if forward_minimum <= forwards <= forward_maximum:
                 formations.append((defenders, midfielders, forwards))
     return tuple(formations)
 
