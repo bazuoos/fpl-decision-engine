@@ -1119,6 +1119,35 @@ schema. A MAJOR denotes an incompatible contract change. Because v1 uses
 the exact `1.0.0` schema and therefore requires an explicit contract-version
 change rather than silently modifying a published schema.
 
+## Operational run identity and manifests
+
+Task 023A defines the immutable contract for a future two-phase operational
+runner; it does not implement that runner. A `preparation_id` hashes only the
+target gameweek, canonical UTC deadline, frozen refresh-manifest hash, and
+preparation-contract version. A `decision_id` hashes that `preparation_id` and
+the immutable manager-state hash. Neither ID depends on paths, clocks, manager
+environment, or JSON insertion order.
+
+Preparation manifests contain frozen football evidence only. Final operational
+manifests add verified manager evidence and hash references to the legality-
+checked candidate set, Task 016 one-transfer decision, Task 017 reliability
+artifact, and Task 021 `GameweekDecision` schema and contract. They do not
+repeat ROLL, recommendation, reliability, or model-output content as a second
+source of truth.
+
+Every accepted source retains its own explicit UTC observation timestamp.
+`evidence_cutoff` is the maximum of those timestamps (including manager
+verification in the final manifest), and every evidence time must be strictly
+before the official deadline. Processing and finalization times are separate
+and never affect the cutoff or semantic IDs. Finalization must also be strictly
+pre-deadline. Chip state is an explicit enum; Engine v1's modeled transfer cost
+is derived and validated as exactly zero.
+
+The idempotency contract for the future runner is: a completed `decision_id`
+returns its already-validated output without regeneration. Changed manager
+evidence creates a new decision ID, and a changed refresh creates a new
+preparation ID; neither may overwrite the earlier immutable run.
+
 ## Run tests
 
 ```bash
