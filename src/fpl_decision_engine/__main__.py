@@ -86,6 +86,11 @@ from .official_data import (
     fetch_fixtures_for_snapshot,
     fetch_player_histories_for_snapshot,
 )
+from .operational_runner import (
+    OperationalRunnerError,
+    prepare_gameweek,
+    resume_gameweek,
+)
 from .pipeline import FetchError, fetch_bootstrap_static
 from .predictions import predict_xfp_v01
 from .projection_provider import ProjectionProviderError, XfpV01ParquetProvider
@@ -127,6 +132,8 @@ COMMANDS = {
     "evaluate-editable-squad",
     "evaluate-one-transfer",
     "analyze-decision-reliability",
+    "prepare-gameweek",
+    "resume-gameweek",
 }
 
 
@@ -741,6 +748,44 @@ def build_parser() -> argparse.ArgumentParser:
         help="Frozen player_gameweek_features.parquet linked by the prediction.",
     )
     reliability_parser.add_argument("--json", action="store_true")
+
+    prepare_parser = subparsers.add_parser(
+        "prepare-gameweek",
+        help="Freeze official inputs and xFP for one explicit official-next gameweek.",
+    )
+    prepare_parser.add_argument("--gw", type=int, required=True, dest="target_gameweek")
+    prepare_parser.add_argument("--season", default="2026-27")
+    _add_raw_root(prepare_parser)
+    _add_clean_root(prepare_parser)
+    prepare_parser.add_argument(
+        "--feature-data-root", type=Path, default=Path("data/features/fpl")
+    )
+    prepare_parser.add_argument(
+        "--prediction-data-root", type=Path, default=Path("data/predictions/fpl")
+    )
+    prepare_parser.add_argument(
+        "--operations-root", type=Path, default=Path("data/operations/fpl")
+    )
+    prepare_parser.add_argument(
+        "--resume-refresh",
+        dest="resume_refresh_snapshot_timestamp",
+        metavar="SNAPSHOT_TIMESTAMP",
+        help="Explicitly resume one incomplete official refresh before freezing it.",
+    )
+    prepare_parser.add_argument(
+        "--delay-seconds", type=float, default=DEFAULT_HISTORY_DELAY_SECONDS
+    )
+    prepare_parser.add_argument("--json", action="store_true")
+
+    resume_parser = subparsers.add_parser(
+        "resume-gameweek",
+        help="Resume one exact preparation using verified editable-manager evidence.",
+    )
+    resume_parser.add_argument(
+        "--preparation-manifest", type=Path, required=True
+    )
+    resume_parser.add_argument("--manager-evidence", type=Path, required=True)
+    resume_parser.add_argument("--json", action="store_true")
     return parser
 
 
@@ -1274,6 +1319,61 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print(f"SHA-256: {artifacts.reliability_sha256}")
         except DecisionReliabilityError as exc:
             logging.error("Decision reliability analysis failed: %s", exc)
+            return 1
+    elif args.command == "prepare-gameweek":
+        try:
+            result = prepare_gameweek(
+                target_gameweek=args.target_gameweek,
+                season=args.season,
+                raw_data_root=args.raw_data_root,
+                clean_data_root=args.clean_data_root,
+                feature_data_root=args.feature_data_root,
+                prediction_data_root=args.prediction_data_root,
+                operations_root=args.operations_root,
+                resume_refresh_snapshot_timestamp=args.resume_refresh_snapshot_timestamp,
+                history_delay_seconds=args.delay_seconds,
+            )
+            payload = {
+                "status": result.status,
+                "preparation_id": result.preparation_id,
+                "preparation_manifest_path": str(result.preparation_manifest_path),
+                "preparation_manifest_sha256": result.preparation_manifest_sha256,
+                "reused": result.reused,
+            }
+            if args.json:
+                print(json.dumps(payload, indent=2, sort_keys=True))
+            else:
+                print(result.status)
+                print(f"Preparation: {result.preparation_id}")
+                print(f"Manifest: {result.preparation_manifest_path}")
+        except OperationalRunnerError as exc:
+            logging.error("Operational preparation failed [%s]: %s", exc.code.value, exc)
+            return 1
+    elif args.command == "resume-gameweek":
+        try:
+            result = resume_gameweek(
+                preparation_manifest_path=args.preparation_manifest,
+                manager_evidence_path=args.manager_evidence,
+            )
+            payload = {
+                "status": result.status,
+                "preparation_id": result.preparation_id,
+                "decision_id": result.decision_id,
+                "gameweek_decision_path": str(result.gameweek_decision_path),
+                "gameweek_decision_sha256": result.gameweek_decision_sha256,
+                "final_manifest_path": str(result.final_manifest_path),
+                "final_manifest_sha256": result.final_manifest_sha256,
+                "reused": result.reused,
+            }
+            if args.json:
+                print(json.dumps(payload, indent=2, sort_keys=True))
+            else:
+                print(result.status)
+                print(f"Decision: {result.decision_id}")
+                print(f"GameweekDecision: {result.gameweek_decision_path}")
+                print(f"Final manifest: {result.final_manifest_path}")
+        except OperationalRunnerError as exc:
+            logging.error("Operational resume failed [%s]: %s", exc.code.value, exc)
             return 1
     elif args.command == "build-historical":
         try:

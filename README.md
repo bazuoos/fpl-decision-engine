@@ -1148,6 +1148,76 @@ returns its already-validated output without regeneration. Changed manager
 evidence creates a new decision ID, and a changed refresh creates a new
 preparation ID; neither may overwrite the earlier immutable run.
 
+## Trustworthy Engine v1 operational runner
+
+The production workflow is deliberately split at the point where public FPL
+data stops and private editable-manager evidence is required. Prepare one
+explicit target gameweek with:
+
+```bash
+python -m fpl_decision_engine prepare-gameweek --gw 2
+```
+
+The command performs the existing official refresh, proves that the requested
+gameweek is the unique official `is_next` event, freezes its UTC deadline,
+builds or validates the matching features and xFP v0.1 predictions, and writes
+an immutable preparation manifest. Its successful terminal status is
+`BLOCKED: VERIFIED_MANAGER_STATE_REQUIRED`; this is the expected human evidence
+gate, not a pipeline failure.
+
+If the underlying official refresh was interrupted, resume that exact refresh
+without choosing a newer snapshot by adding
+`--resume-refresh <snapshot_timestamp>` to the preparation command.
+
+Resume only by naming that exact manifest and a locally prepared verified
+manager-evidence JSON file:
+
+```bash
+python -m fpl_decision_engine resume-gameweek \
+  --preparation-manifest data/operations/fpl/2026-27/gameweek=2/<preparation_id>/preparation_manifest.json \
+  --manager-evidence /secure/local/path/verified-manager-evidence.json
+```
+
+The manager input uses `version=verified-manager-evidence-v1` and contains the
+entry ID, season, target gameweek, bank, free-transfer count, explicit chip
+state, provenance description and optional source SHA-256, an explicit current-
+selection confirmation, and exactly 15 players with ID, display name, position,
+and manually verified selling price. It intentionally has no authoritative
+verification-time or transfer-cost field. The runner captures verification time
+from its UTC clock, never infers selling prices from current prices, and derives
+the modeled transfer cost as zero. Engine v1 accepts only `NO_CHIP`; wildcard,
+free hit, bench boost, and triple captain each fail closed with a distinct code.
+
+Operational outputs use this identity-addressed layout:
+
+```text
+data/operations/fpl/<season>/gameweek=<N>/<preparation_id>/
+  preparation_manifest.json
+  artifacts/                         # copied, hash-pinned Phase 1 inputs
+  manager_submissions/<input_sha256>/
+  decisions/<decision_id>/
+    task016/                          # authoritative candidates/decision/reliability
+    gameweek_decision.json
+    final_operational_manifest.json
+```
+
+Resume never searches for `latest`, refreshes, or switches frozen inputs. A
+new official refresh creates a new preparation identity and leaves prior runs
+untouched. A completed decision is hash-validated and returned without rerunning
+trusted calculation stages. Safe partial states are resumed conservatively:
+validated manager state is reused, Task 016 candidate/decision publication must
+be complete, and an existing GameweekDecision without a final manifest must
+match a deterministic rebuild byte for byte. Conflicting or corrupt bytes are
+never repaired by overwrite.
+
+All accepted football evidence, manager verification, and final publication
+must be strictly earlier than the official UTC deadline. `evidence_cutoff` is
+only the latest accepted evidence-observation time; decision, reliability,
+serialization, and finalization processing times do not enter it. The persisted
+GameweekDecision is the engine recommendation only and carries no human
+override. It is built through the existing Task 016 decision, Task 017
+reliability, and Task 021 trusted persisted-selection validation paths.
+
 ## Run tests
 
 ```bash

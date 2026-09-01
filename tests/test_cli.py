@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 from fpl_decision_engine.__main__ import main
@@ -27,6 +28,72 @@ from fpl_decision_engine.refresh import RefreshResult, RefreshUnlockResult
 
 
 class CLITests(unittest.TestCase):
+    @patch("fpl_decision_engine.__main__.prepare_gameweek")
+    def test_prepare_gameweek_requires_explicit_target_and_dispatches_roots(self, prepare) -> None:
+        prepare.return_value = SimpleNamespace(
+            status="BLOCKED: VERIFIED_MANAGER_STATE_REQUIRED",
+            preparation_id="prep_" + "1" * 64,
+            preparation_manifest_path=Path("operations/preparation_manifest.json"),
+            preparation_manifest_sha256="2" * 64,
+            reused=False,
+        )
+        self.assertEqual(
+            main(
+                [
+                    "prepare-gameweek",
+                    "--gw",
+                    "2",
+                    "--operations-root",
+                    "custom/operations",
+                    "--resume-refresh",
+                    "20260825T073532.450889Z",
+                    "--delay-seconds",
+                    "0",
+                ]
+            ),
+            0,
+        )
+        prepare.assert_called_once_with(
+            target_gameweek=2,
+            season="2026-27",
+            raw_data_root=Path("data/raw/fpl"),
+            clean_data_root=Path("data/clean/fpl"),
+            feature_data_root=Path("data/features/fpl"),
+            prediction_data_root=Path("data/predictions/fpl"),
+            operations_root=Path("custom/operations"),
+            resume_refresh_snapshot_timestamp="20260825T073532.450889Z",
+            history_delay_seconds=0.0,
+        )
+
+    @patch("fpl_decision_engine.__main__.resume_gameweek")
+    def test_resume_gameweek_dispatches_exact_preparation_and_manager_evidence(self, resume) -> None:
+        resume.return_value = SimpleNamespace(
+            status="COMPLETED",
+            preparation_id="prep_" + "1" * 64,
+            decision_id="decision_" + "2" * 64,
+            gameweek_decision_path=Path("operations/gameweek_decision.json"),
+            gameweek_decision_sha256="3" * 64,
+            final_manifest_path=Path("operations/final_operational_manifest.json"),
+            final_manifest_sha256="4" * 64,
+            reused=False,
+        )
+        self.assertEqual(
+            main(
+                [
+                    "resume-gameweek",
+                    "--preparation-manifest",
+                    "exact/preparation_manifest.json",
+                    "--manager-evidence",
+                    "verified/manager.json",
+                ]
+            ),
+            0,
+        )
+        resume.assert_called_once_with(
+            preparation_manifest_path=Path("exact/preparation_manifest.json"),
+            manager_evidence_path=Path("verified/manager.json"),
+        )
+
     @patch("fpl_decision_engine.__main__.fetch_bootstrap_static")
     def test_legacy_arguments_still_dispatch_to_fetch(self, fetch) -> None:
         self.assertEqual(main(["--season", "2025-26"]), 0)
