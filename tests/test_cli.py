@@ -94,6 +94,74 @@ class CLITests(unittest.TestCase):
             manager_evidence_path=Path("verified/manager.json"),
         )
 
+    @patch("fpl_decision_engine.__main__.record_decision_journal_entry")
+    def test_record_decision_journal_dispatches_structured_action_without_timestamp(
+        self, record
+    ) -> None:
+        record.return_value = SimpleNamespace(
+            journal_entry_id="journal_" + "1" * 64,
+            entry_path=Path("operations/decision_journal_entry.json"),
+            entry_sha256="2" * 64,
+            reused=False,
+        )
+        self.assertEqual(
+            main(
+                [
+                    "record-decision-journal",
+                    "--final-manifest",
+                    "operations/final_operational_manifest.json",
+                    "--human-action",
+                    "TRANSFER",
+                    "--outgoing-element-id",
+                    "42",
+                    "--incoming-element-id",
+                    "43",
+                    "--override-reason",
+                    "Contemporaneous reason",
+                ]
+            ),
+            0,
+        )
+        from fpl_decision_engine.decision_journal import (
+            HumanActionKind,
+            JournalClassification,
+        )
+
+        record.assert_called_once_with(
+            final_manifest_path=Path("operations/final_operational_manifest.json"),
+            human_action=HumanActionKind.TRANSFER,
+            outgoing_element_id=42,
+            incoming_element_id=43,
+            override_reason="Contemporaneous reason",
+            classification=JournalClassification.PROSPECTIVE,
+            historical_evidence_path=None,
+        )
+
+    @patch("fpl_decision_engine.__main__.record_decision_outcome")
+    def test_record_decision_outcome_dispatches_exact_artifact_paths(self, record) -> None:
+        record.return_value = SimpleNamespace(
+            outcome_id="outcome_" + "1" * 64,
+            outcome_path=Path("operations/decision_outcome.json"),
+            outcome_sha256="2" * 64,
+            reused=False,
+        )
+        self.assertEqual(
+            main(
+                [
+                    "record-decision-outcome",
+                    "--journal-entry",
+                    "operations/decision_journal_entry.json",
+                    "--completion-bootstrap",
+                    "official/completed-bootstrap.json",
+                ]
+            ),
+            0,
+        )
+        record.assert_called_once_with(
+            journal_entry_path=Path("operations/decision_journal_entry.json"),
+            completion_bootstrap_path=Path("official/completed-bootstrap.json"),
+        )
+
     @patch("fpl_decision_engine.__main__.fetch_bootstrap_static")
     def test_legacy_arguments_still_dispatch_to_fetch(self, fetch) -> None:
         self.assertEqual(main(["--season", "2025-26"]), 0)

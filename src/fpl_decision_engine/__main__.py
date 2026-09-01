@@ -28,6 +28,13 @@ from .decision_reliability import (
     load_reliability_context,
     write_decision_reliability,
 )
+from .decision_journal import (
+    DecisionJournalError,
+    HumanActionKind,
+    JournalClassification,
+    record_decision_journal_entry,
+    record_decision_outcome,
+)
 from .evaluation import evaluate_xfp
 from .editable_manager import (
     EditableManagerError,
@@ -134,6 +141,8 @@ COMMANDS = {
     "analyze-decision-reliability",
     "prepare-gameweek",
     "resume-gameweek",
+    "record-decision-journal",
+    "record-decision-outcome",
 }
 
 
@@ -786,6 +795,35 @@ def build_parser() -> argparse.ArgumentParser:
     )
     resume_parser.add_argument("--manager-evidence", type=Path, required=True)
     resume_parser.add_argument("--json", action="store_true")
+
+    journal_parser = subparsers.add_parser(
+        "record-decision-journal",
+        help="Record a prospective or explicitly historical human decision.",
+    )
+    journal_parser.add_argument("--final-manifest", type=Path, required=True)
+    journal_parser.add_argument(
+        "--human-action",
+        choices=tuple(item.value for item in HumanActionKind),
+        required=True,
+    )
+    journal_parser.add_argument("--outgoing-element-id", type=int)
+    journal_parser.add_argument("--incoming-element-id", type=int)
+    journal_parser.add_argument("--override-reason")
+    journal_parser.add_argument(
+        "--classification",
+        choices=tuple(item.value for item in JournalClassification),
+        default=JournalClassification.PROSPECTIVE.value,
+    )
+    journal_parser.add_argument("--historical-evidence", type=Path)
+    journal_parser.add_argument("--json", action="store_true")
+
+    outcome_parser = subparsers.add_parser(
+        "record-decision-outcome",
+        help="Record official post-gameweek completion for an immutable journal entry.",
+    )
+    outcome_parser.add_argument("--journal-entry", type=Path, required=True)
+    outcome_parser.add_argument("--completion-bootstrap", type=Path, required=True)
+    outcome_parser.add_argument("--json", action="store_true")
     return parser
 
 
@@ -1374,6 +1412,51 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print(f"Final manifest: {result.final_manifest_path}")
         except OperationalRunnerError as exc:
             logging.error("Operational resume failed [%s]: %s", exc.code.value, exc)
+            return 1
+    elif args.command == "record-decision-journal":
+        try:
+            result = record_decision_journal_entry(
+                final_manifest_path=args.final_manifest,
+                human_action=HumanActionKind(args.human_action),
+                outgoing_element_id=args.outgoing_element_id,
+                incoming_element_id=args.incoming_element_id,
+                override_reason=args.override_reason,
+                classification=JournalClassification(args.classification),
+                historical_evidence_path=args.historical_evidence,
+            )
+            payload = {
+                "journal_entry_id": result.journal_entry_id,
+                "entry_path": str(result.entry_path),
+                "entry_sha256": result.entry_sha256,
+                "reused": result.reused,
+            }
+            if args.json:
+                print(json.dumps(payload, indent=2, sort_keys=True))
+            else:
+                print(f"Journal entry: {result.journal_entry_id}")
+                print(f"Artifact: {result.entry_path}")
+        except DecisionJournalError as exc:
+            logging.error("Decision journal failed: %s", exc)
+            return 1
+    elif args.command == "record-decision-outcome":
+        try:
+            result = record_decision_outcome(
+                journal_entry_path=args.journal_entry,
+                completion_bootstrap_path=args.completion_bootstrap,
+            )
+            payload = {
+                "outcome_id": result.outcome_id,
+                "outcome_path": str(result.outcome_path),
+                "outcome_sha256": result.outcome_sha256,
+                "reused": result.reused,
+            }
+            if args.json:
+                print(json.dumps(payload, indent=2, sort_keys=True))
+            else:
+                print(f"Outcome: {result.outcome_id}")
+                print(f"Artifact: {result.outcome_path}")
+        except DecisionJournalError as exc:
+            logging.error("Decision outcome failed: %s", exc)
             return 1
     elif args.command == "build-historical":
         try:

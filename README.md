@@ -1218,6 +1218,64 @@ GameweekDecision is the engine recommendation only and carries no human
 override. It is built through the existing Task 016 decision, Task 017
 reliability, and Task 021 trusted persisted-selection validation paths.
 
+## Decision journal / flight recorder v1
+
+The journal keeps pre-deadline human decisions structurally separate from
+post-gameweek evidence. `DecisionJournalEntry v1` validates a completed Engine
+v1 final manifest and its hash-pinned GameweekDecision/reliability chain, then
+records a structured `FOLLOW_ENGINE`, `ROLL`, or exact `TRANSFER` action. The
+runner clock supplies the authoritative action timestamp; prospective records
+must be created strictly before the official deadline. Override status is
+derived from the two structured actions, and a prospective override requires a
+non-empty contemporaneous reason.
+
+```bash
+python -m fpl_decision_engine record-decision-journal \
+  --final-manifest data/operations/fpl/<season>/gameweek=<N>/<preparation_id>/decisions/<decision_id>/final_operational_manifest.json \
+  --human-action FOLLOW_ENGINE
+```
+
+Historical backfills are never represented as prospective entries. They use
+`classification=HISTORICAL_BACKFILL`, require a preserved evidence artifact,
+record the later creation time, and retain the unprovable original human-action
+timestamp as null. Task 024 does not create a GW2 backfill automatically.
+
+```bash
+python -m fpl_decision_engine record-decision-journal \
+  --final-manifest <final_operational_manifest.json> \
+  --human-action ROLL \
+  --classification HISTORICAL_BACKFILL \
+  --historical-evidence <preserved-evidence-file>
+```
+
+`DecisionOutcome v1` is a separate immutable child artifact. It is allowed only
+when the exact official event in a supplied frozen bootstrap snapshot has both
+`finished=true` and `data_checked=true`; being after the deadline alone is not
+completion evidence.
+
+```bash
+python -m fpl_decision_engine record-decision-outcome \
+  --journal-entry <decision_journal_entry.json> \
+  --completion-bootstrap <completed-bootstrap-static.json>
+```
+
+Outcome v1 records official gameweek completion only. It deliberately leaves
+manager points and the unchosen engine-action counterfactual null because the
+current archived response contract cannot prove those values and manager
+identity without extra assumptions. Later versions may add independently
+verified outcome sources without modifying v1 journal entries.
+
+Storage is identity-addressed and does not determine semantic identity:
+
+```text
+decisions/<decision_id>/journal/<journal_entry_id>/
+  decision_journal_entry.json
+  outcomes/<outcome_id>/decision_outcome.json
+```
+
+Both contracts use canonical JSON and SHA-256. Byte-identical reuse is safe;
+conflicting existing bytes fail closed and are never overwritten.
+
 ## Run tests
 
 ```bash
