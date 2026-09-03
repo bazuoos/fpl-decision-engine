@@ -1,0 +1,401 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://fpl-decision-engine.local/schemas/decision_diff_v1.schema.json",
+  "title": "DecisionDiff v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_name",
+    "schema_version",
+    "classification",
+    "decision_diff_id",
+    "scope",
+    "run_provenance",
+    "official_player_state",
+    "projections",
+    "manager_state",
+    "engine_action",
+    "reliability",
+    "summary"
+  ],
+  "properties": {
+    "schema_name": {"const": "DecisionDiff"},
+    "schema_version": {"const": "1.0.0"},
+    "classification": {"const": "read_only_trusted_decision_diff"},
+    "decision_diff_id": {"type": "string", "pattern": "^decision_diff_[0-9a-f]{64}$"},
+    "scope": {"$ref": "#/$defs/scope"},
+    "run_provenance": {"$ref": "#/$defs/runProvenance"},
+    "official_player_state": {"$ref": "#/$defs/officialDiff"},
+    "projections": {"$ref": "#/$defs/projectionDiff"},
+    "manager_state": {"$ref": "#/$defs/managerDiff"},
+    "engine_action": {"$ref": "#/$defs/engineDiff"},
+    "reliability": {"$ref": "#/$defs/reliabilityDiff"},
+    "summary": {"$ref": "#/$defs/summary"}
+  },
+  "$defs": {
+    "nullableScalar": {
+      "anyOf": [
+        {"type": "null"},
+        {"type": "string"},
+        {"type": "integer"},
+        {"type": "number"},
+        {"type": "boolean"}
+      ]
+    },
+    "runIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["preparation_id", "decision_id"],
+      "properties": {
+        "preparation_id": {"type": "string", "pattern": "^prep_[0-9a-f]{64}$"},
+        "decision_id": {"type": "string", "pattern": "^decision_[0-9a-f]{64}$"}
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["season", "target_gameweek", "official_deadline", "left", "right"],
+      "properties": {
+        "season": {"type": "string", "minLength": 1},
+        "target_gameweek": {"type": "integer", "minimum": 1, "maximum": 38},
+        "official_deadline": {"type": "string", "minLength": 1},
+        "left": {"$ref": "#/$defs/runIdentity"},
+        "right": {"$ref": "#/$defs/runIdentity"}
+      }
+    },
+    "runField": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "left", "right", "changed"],
+      "properties": {
+        "field": {"type": "string", "minLength": 1},
+        "left": {"$ref": "#/$defs/nullableScalar"},
+        "right": {"$ref": "#/$defs/nullableScalar"},
+        "changed": {"type": "boolean"}
+      }
+    },
+    "runProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changed", "fields"],
+      "properties": {
+        "changed": {"type": "boolean"},
+        "fields": {"type": "array", "items": {"$ref": "#/$defs/runField"}}
+      }
+    },
+    "officialPlayer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "element_id", "name", "team_id", "team_name", "team_short_name",
+        "position_id", "position", "price_units", "status",
+        "chance_of_playing_next_round", "news"
+      ],
+      "properties": {
+        "element_id": {"type": "integer", "minimum": 1},
+        "name": {"type": "string"},
+        "team_id": {"type": "integer", "minimum": 1},
+        "team_name": {"type": "string"},
+        "team_short_name": {"type": "string"},
+        "position_id": {"type": "integer", "minimum": 1},
+        "position": {"type": "string"},
+        "price_units": {"type": "integer", "minimum": 0},
+        "status": {"type": "string"},
+        "chance_of_playing_next_round": {
+          "anyOf": [
+            {"type": "null"},
+            {"type": "integer", "minimum": 0, "maximum": 100}
+          ]
+        },
+        "news": {"type": "string"}
+      }
+    },
+    "officialChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["element_id", "name", "before", "after", "changed_fields", "price_delta_units"],
+      "properties": {
+        "element_id": {"type": "integer", "minimum": 1},
+        "name": {"type": "string"},
+        "before": {"$ref": "#/$defs/officialPlayer"},
+        "after": {"$ref": "#/$defs/officialPlayer"},
+        "changed_fields": {"type": "array", "items": {"type": "string"}},
+        "price_delta_units": {"type": "integer"}
+      }
+    },
+    "officialDiff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["added", "removed", "changed", "changed_count"],
+      "properties": {
+        "added": {"type": "array", "items": {"$ref": "#/$defs/officialPlayer"}},
+        "removed": {"type": "array", "items": {"$ref": "#/$defs/officialPlayer"}},
+        "changed": {"type": "array", "items": {"$ref": "#/$defs/officialChange"}},
+        "changed_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "element_id", "name", "projected_xfp", "expected_minutes",
+        "projection_state", "prediction_complete", "attacking_rate_available",
+        "low_sample", "fixture_count"
+      ],
+      "properties": {
+        "element_id": {"type": "integer", "minimum": 1},
+        "name": {"type": "string"},
+        "projected_xfp": {"type": ["number", "null"]},
+        "expected_minutes": {"type": ["number", "null"]},
+        "projection_state": {
+          "enum": ["valid_projection", "verified_blank", "incomplete_projection", "missing_projection"]
+        },
+        "prediction_complete": {"type": "boolean"},
+        "attacking_rate_available": {"type": "boolean"},
+        "low_sample": {"type": "boolean"},
+        "fixture_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "projectionChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["element_id", "name", "before", "after", "changed_fields", "xfp_delta"],
+      "properties": {
+        "element_id": {"type": "integer", "minimum": 1},
+        "name": {"type": "string"},
+        "before": {"$ref": "#/$defs/projection"},
+        "after": {"$ref": "#/$defs/projection"},
+        "changed_fields": {"type": "array", "items": {"type": "string"}},
+        "xfp_delta": {"type": ["number", "null"]}
+      }
+    },
+    "projectionDiff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["added", "removed", "changed", "changed_count"],
+      "properties": {
+        "added": {"type": "array", "items": {"$ref": "#/$defs/projection"}},
+        "removed": {"type": "array", "items": {"$ref": "#/$defs/projection"}},
+        "changed": {"type": "array", "items": {"$ref": "#/$defs/projectionChange"}},
+        "changed_count": {"type": "integer", "minimum": 0}
+      }
+    },
+    "fieldChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "left", "right"],
+      "properties": {
+        "field": {"type": "string", "minLength": 1},
+        "left": {"$ref": "#/$defs/nullableScalar"},
+        "right": {"$ref": "#/$defs/nullableScalar"}
+      }
+    },
+    "sellingPriceChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["element_id", "name", "left_price_units", "right_price_units"],
+      "properties": {
+        "element_id": {"type": "integer", "minimum": 1},
+        "name": {"type": "string"},
+        "left_price_units": {"type": ["integer", "null"], "minimum": 0},
+        "right_price_units": {"type": ["integer", "null"], "minimum": 0}
+      }
+    },
+    "managerDiff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "semantic_changed", "provenance_changed", "field_changes",
+        "provenance_changes", "squad_added", "squad_removed", "selling_price_changes"
+      ],
+      "properties": {
+        "semantic_changed": {"type": "boolean"},
+        "provenance_changed": {"type": "boolean"},
+        "field_changes": {"type": "array", "items": {"$ref": "#/$defs/fieldChange"}},
+        "provenance_changes": {"type": "array", "items": {"$ref": "#/$defs/fieldChange"}},
+        "squad_added": {"type": "array", "items": {"type": "integer", "minimum": 1}},
+        "squad_removed": {"type": "array", "items": {"type": "integer", "minimum": 1}},
+        "selling_price_changes": {"type": "array", "items": {"$ref": "#/$defs/sellingPriceChange"}}
+      }
+    },
+    "selection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "squad", "starting_xi", "bench", "formation", "captain", "vice_captain",
+        "base_xi_xfp", "captain_bonus_xfp", "total_xfp"
+      ],
+      "properties": {
+        "squad": {"type": "array", "items": {"type": "integer", "minimum": 1}},
+        "starting_xi": {"type": "array", "items": {"type": "integer", "minimum": 1}},
+        "bench": {"type": "array", "items": {"type": "integer", "minimum": 1}},
+        "formation": {"type": "string", "minLength": 1},
+        "captain": {"type": "integer", "minimum": 1},
+        "vice_captain": {"type": "integer", "minimum": 1},
+        "base_xi_xfp": {"type": "number"},
+        "captain_bonus_xfp": {"type": "number"},
+        "total_xfp": {"type": "number"}
+      }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_type", "outgoing_element_id", "outgoing_name",
+        "incoming_element_id", "incoming_name",
+        "resulting_bank_units", "transfer_cost_points", "objective_gain_vs_roll_xfp", "selection"
+      ],
+      "properties": {
+        "action_type": {"enum": ["ROLL", "TRANSFER"]},
+        "outgoing_element_id": {"type": ["integer", "null"], "minimum": 1},
+        "outgoing_name": {"type": ["string", "null"]},
+        "incoming_element_id": {"type": ["integer", "null"], "minimum": 1},
+        "incoming_name": {"type": ["string", "null"]},
+        "resulting_bank_units": {"type": "integer", "minimum": 0},
+        "transfer_cost_points": {"type": "integer", "minimum": 0},
+        "objective_gain_vs_roll_xfp": {"type": "number"},
+        "selection": {"$ref": "#/$defs/selection"}
+      }
+    },
+    "numericChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "left", "right", "delta"],
+      "properties": {
+        "field": {"type": "string", "minLength": 1},
+        "left": {"type": "number"},
+        "right": {"type": "number"},
+        "delta": {"type": "number"}
+      }
+    },
+    "roleChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changed", "left", "right"],
+      "properties": {
+        "changed": {"type": "boolean"},
+        "left": {"type": "integer", "minimum": 1},
+        "right": {"type": "integer", "minimum": 1}
+      }
+    },
+    "lineupDiff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "starters_added", "starters_removed", "bench_added", "bench_removed",
+        "formation_changed", "left_formation", "right_formation"
+      ],
+      "properties": {
+        "starters_added": {"type": "array", "items": {"type": "integer", "minimum": 1}},
+        "starters_removed": {"type": "array", "items": {"type": "integer", "minimum": 1}},
+        "bench_added": {"type": "array", "items": {"type": "integer", "minimum": 1}},
+        "bench_removed": {"type": "array", "items": {"type": "integer", "minimum": 1}},
+        "formation_changed": {"type": "boolean"},
+        "left_formation": {"type": "string", "minLength": 1},
+        "right_formation": {"type": "string", "minLength": 1}
+      }
+    },
+    "engineDiff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "changed", "lineup_changed", "captaincy_changed", "left", "right",
+        "action_changes", "lineup", "captain", "vice_captain", "objective_changes"
+      ],
+      "properties": {
+        "changed": {"type": "boolean"},
+        "lineup_changed": {"type": "boolean"},
+        "captaincy_changed": {"type": "boolean"},
+        "left": {"$ref": "#/$defs/action"},
+        "right": {"$ref": "#/$defs/action"},
+        "action_changes": {"type": "array", "items": {"$ref": "#/$defs/fieldChange"}},
+        "lineup": {"$ref": "#/$defs/lineupDiff"},
+        "captain": {"$ref": "#/$defs/roleChange"},
+        "vice_captain": {"$ref": "#/$defs/roleChange"},
+        "objective_changes": {"type": "array", "items": {"$ref": "#/$defs/numericChange"}}
+      }
+    },
+    "reliabilityView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "view_id", "category", "action_type", "outgoing_element_id", "incoming_element_id",
+        "objective_xfp", "gain_vs_roll_xfp", "retains_official_exact_action"
+      ],
+      "properties": {
+        "view_id": {"type": "string", "minLength": 1},
+        "category": {"type": "string", "minLength": 1},
+        "action_type": {"enum": ["ROLL", "TRANSFER"]},
+        "outgoing_element_id": {"type": ["integer", "null"], "minimum": 1},
+        "incoming_element_id": {"type": ["integer", "null"], "minimum": 1},
+        "objective_xfp": {"type": "number"},
+        "gain_vs_roll_xfp": {"type": "number"},
+        "retains_official_exact_action": {"type": "boolean"}
+      }
+    },
+    "reliabilityViewChange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["view_id", "before", "after"],
+      "properties": {
+        "view_id": {"type": "string", "minLength": 1},
+        "before": {"$ref": "#/$defs/reliabilityView"},
+        "after": {"$ref": "#/$defs/reliabilityView"}
+      }
+    },
+    "reliabilitySummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sensitivity_view_count", "same_exact_action_count", "changed_action_count",
+        "captaincy_materially_changes_gain"
+      ],
+      "properties": {
+        "sensitivity_view_count": {"type": "integer", "minimum": 0},
+        "same_exact_action_count": {"type": "integer", "minimum": 0},
+        "changed_action_count": {"type": "integer", "minimum": 0},
+        "captaincy_materially_changes_gain": {"type": "boolean"}
+      }
+    },
+    "reliabilityDiff": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "changed", "left_summary", "right_summary", "headline_changes",
+        "views_added", "views_removed", "views_changed",
+        "warning_codes_added", "warning_codes_removed"
+      ],
+      "properties": {
+        "changed": {"type": "boolean"},
+        "left_summary": {"$ref": "#/$defs/reliabilitySummary"},
+        "right_summary": {"$ref": "#/$defs/reliabilitySummary"},
+        "headline_changes": {"type": "array", "items": {"$ref": "#/$defs/fieldChange"}},
+        "views_added": {"type": "array", "items": {"$ref": "#/$defs/reliabilityView"}},
+        "views_removed": {"type": "array", "items": {"$ref": "#/$defs/reliabilityView"}},
+        "views_changed": {"type": "array", "items": {"$ref": "#/$defs/reliabilityViewChange"}},
+        "warning_codes_added": {"type": "array", "items": {"type": "string"}},
+        "warning_codes_removed": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_provenance_changed", "official_state_changed", "projections_changed",
+        "manager_state_changed", "manager_provenance_changed", "engine_action_changed",
+        "lineup_changed", "captaincy_changed", "reliability_changed"
+      ],
+      "properties": {
+        "run_provenance_changed": {"type": "boolean"},
+        "official_state_changed": {"type": "boolean"},
+        "projections_changed": {"type": "boolean"},
+        "manager_state_changed": {"type": "boolean"},
+        "manager_provenance_changed": {"type": "boolean"},
+        "engine_action_changed": {"type": "boolean"},
+        "lineup_changed": {"type": "boolean"},
+        "captaincy_changed": {"type": "boolean"},
+        "reliability_changed": {"type": "boolean"}
+      }
+    }
+  }
+}

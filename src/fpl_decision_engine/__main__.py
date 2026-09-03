@@ -35,6 +35,7 @@ from .decision_journal import (
     record_decision_journal_entry,
     record_decision_outcome,
 )
+from .decision_diff import DecisionDiffError, write_decision_diff
 from .evaluation import evaluate_xfp
 from .editable_manager import (
     EditableManagerError,
@@ -143,6 +144,7 @@ COMMANDS = {
     "resume-gameweek",
     "record-decision-journal",
     "record-decision-outcome",
+    "diff-decisions",
 }
 
 
@@ -824,6 +826,23 @@ def build_parser() -> argparse.ArgumentParser:
     outcome_parser.add_argument("--journal-entry", type=Path, required=True)
     outcome_parser.add_argument("--completion-bootstrap", type=Path, required=True)
     outcome_parser.add_argument("--json", action="store_true")
+
+    diff_parser = subparsers.add_parser(
+        "diff-decisions",
+        help="Compare two explicitly addressed trusted completed Engine-v1 runs.",
+    )
+    diff_parser.add_argument(
+        "--left-final-manifest", type=Path, required=True
+    )
+    diff_parser.add_argument(
+        "--right-final-manifest", type=Path, required=True
+    )
+    diff_parser.add_argument(
+        "--output-root",
+        type=Path,
+        default=Path("data/operations/fpl/decision-diffs"),
+    )
+    diff_parser.add_argument("--json", action="store_true")
     return parser
 
 
@@ -1457,6 +1476,29 @@ def main(argv: Sequence[str] | None = None) -> int:
                 print(f"Artifact: {result.outcome_path}")
         except DecisionJournalError as exc:
             logging.error("Decision outcome failed: %s", exc)
+            return 1
+    elif args.command == "diff-decisions":
+        try:
+            result = write_decision_diff(
+                left_final_manifest_path=args.left_final_manifest,
+                right_final_manifest_path=args.right_final_manifest,
+                output_root=args.output_root,
+            )
+            payload = {
+                "artifact_path": str(result.artifact_path),
+                "artifact_sha256": result.artifact_sha256,
+                "decision_diff_id": result.decision_diff_id,
+                "reused": result.reused,
+                "summary": dict(result.summary),
+            }
+            if args.json:
+                print(json.dumps(payload, indent=2, sort_keys=True))
+            else:
+                print(f"Decision diff: {result.decision_diff_id}")
+                print(f"Artifact: {result.artifact_path}")
+                print(json.dumps(result.summary, sort_keys=True))
+        except DecisionDiffError as exc:
+            logging.error("Decision diff failed [%s]: %s", exc.code.value, exc)
             return 1
     elif args.command == "build-historical":
         try:

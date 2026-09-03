@@ -28,6 +28,36 @@ from fpl_decision_engine.refresh import RefreshResult, RefreshUnlockResult
 
 
 class CLITests(unittest.TestCase):
+    @patch("fpl_decision_engine.__main__.write_decision_diff")
+    def test_diff_decisions_dispatches_two_explicit_trusted_runs(self, write) -> None:
+        write.return_value = SimpleNamespace(
+            decision_diff_id="decision_diff_" + "1" * 64,
+            artifact_path=Path("operations/decision_diff.json"),
+            artifact_sha256="2" * 64,
+            reused=False,
+            summary={"engine_action_changed": True},
+        )
+        self.assertEqual(
+            main(
+                [
+                    "diff-decisions",
+                    "--left-final-manifest",
+                    "left/final_operational_manifest.json",
+                    "--right-final-manifest",
+                    "right/final_operational_manifest.json",
+                    "--output-root",
+                    "custom/diffs",
+                    "--json",
+                ]
+            ),
+            0,
+        )
+        write.assert_called_once_with(
+            left_final_manifest_path=Path("left/final_operational_manifest.json"),
+            right_final_manifest_path=Path("right/final_operational_manifest.json"),
+            output_root=Path("custom/diffs"),
+        )
+
     @patch("fpl_decision_engine.__main__.prepare_gameweek")
     def test_prepare_gameweek_requires_explicit_target_and_dispatches_roots(self, prepare) -> None:
         prepare.return_value = SimpleNamespace(

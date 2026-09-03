@@ -1276,6 +1276,41 @@ decisions/<decision_id>/journal/<journal_entry_id>/
 Both contracts use canonical JSON and SHA-256. Byte-identical reuse is safe;
 conflicting existing bytes fail closed and are never overwritten.
 
+## Decision Diff v1
+
+Decision Diff is a deterministic, read-only comparison of two explicitly named,
+completed Engine v1 runs for the same season, target gameweek, and official
+deadline. It first revalidates each full Task 023 trust chain—including the
+preparation, frozen inputs, Task 016 decision, Task 017 reliability result, and
+GameweekDecision—and then reports co-occurring structural differences. It does
+not recalculate xFP or reliability, run an optimizer, make a decision, or claim
+that one observed change caused another.
+
+The versioned contract records the ordered left/right preparation and decision
+identities; trusted hash/version changes; official player additions, removals,
+team, price, status, availability, and news changes; projection values and their
+null/completeness states; semantic manager-state changes separately from new
+verification evidence; engine action, XI, bench, captaincy, and objective
+changes; existing reliability-view changes; and a mechanically derived boolean
+summary. The semantic ID hashes only the schema version, common comparison
+scope, and ordered run identities. It contains no filesystem path, discovery of
+`latest`, generation clock, or reuse/fresh flag.
+
+Compare and immutably publish one explicit A→B diff with:
+
+```bash
+python -m fpl_decision_engine diff-decisions \
+  --left-final-manifest <left/final_operational_manifest.json> \
+  --right-final-manifest <right/final_operational_manifest.json> \
+  --json
+```
+
+Outputs are stored below
+`data/operations/fpl/decision-diffs/<season>/gameweek=<N>/<decision_diff_id>/`.
+Repeating the same comparison safely reuses byte-identical output; conflicting
+bytes at the same identity fail closed. Reverse order has a distinct identity
+and reversed before/after semantics.
+
 ## Run tests
 
 ```bash
