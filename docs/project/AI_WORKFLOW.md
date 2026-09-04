@@ -19,6 +19,13 @@ Design -> Codex implementation -> Claude adversarial review
        -> Claude verification -> authorized commit -> CI
 ```
 
+The human designated this Work conversation as the main project/control-room
+on 2026-09-04 for natural planning, architecture, FPL reasoning, research
+synthesis and repository-aware discussion. Codex remains the primary
+implementer, Claude the independent adversarial reviewer, and CI the mechanical
+verifier. The coordinator must not replace Codex for substantial engineering
+unless the human explicitly changes that workflow.
+
 Claude should normally review independently rather than edit Codex's work.
 Evaluate findings against code/evidence; do not automatically implement every
 suggestion. Name the tests and trust-chain checks proving each blocker closed.

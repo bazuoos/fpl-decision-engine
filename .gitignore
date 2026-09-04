@@ -3,29 +3,11 @@ __pycache__/
 *.py[codz]
 *$py.class
 
-# Raw pipeline snapshots
-data/raw/
-
-# Clean analytical datasets
-data/clean/
-
-# Prediction-ready feature datasets
-data/features/
-
-# Generated expected-points predictions
-data/predictions/
-
-# Generated decision-layer outputs
-data/decisions/
-
-# Public manager-state responses and manager-specific decisions
-data/manager/
-
-# Immutable model-evaluation outputs
-data/evaluations/
-
-# Generated/cache-only community-preserved historical FPL archives
-data/historical/
+# Private/local evidence and deliberately local recovery outputs.
+# Repository fixtures remain visible: these patterns are root-anchored.
+/data/
+/.private-recovery/
+.DS_Store
 
 # C extensions
 *.so
