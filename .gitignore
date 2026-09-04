@@ -32,6 +32,8 @@ data/historical/
 
 # Distribution / packaging
 .Python
+web/node_modules/
+web/.vite/
 build/
 develop-eggs/
 dist/

@@ -38,6 +38,74 @@ DuckDB provides typed analytical validation and Parquet output without pandas
 or PyArrow. The lightweight HiGHS mixed-integer solver is used only by the
 decision layer for exact squad optimization.
 
+## Web/application skeleton
+
+Task026B adds a local, read-only application seam around completed Engine v1
+decisions. The engine artifact remains the sole authority: the application
+authorizes an explicit `decision_id`, resolves it through a configured index,
+and delegates complete trust-chain validation to the engine's public trusted
+reader before returning the canonical `GameweekDecision` payload. The API and
+browser do not calculate xFP, transfer legality, squad/XI legality, formation,
+captaincy, objectives, or reliability.
+
+Install the Python package as above. Configure a local artifact root and a
+test/development index with `version=decision-artifact-index-v1`, explicit
+identity-addressed relative final-manifest paths, and expected SHA-256 values:
+
+```json
+{
+  "version": "decision-artifact-index-v1",
+  "decisions": [
+    {
+      "decision_id": "decision_<64 lowercase hex characters>",
+      "final_manifest_relative_path": "season/gameweek/preparation/decision/final_operational_manifest.json",
+      "final_manifest_sha256": "<64 lowercase hex characters>"
+    }
+  ]
+}
+```
+
+Then run the API on localhost only:
+
+```bash
+export FPL_APP_ARTIFACT_ROOT=/absolute/read-only/artifact/root
+export FPL_APP_ARTIFACT_INDEX=/absolute/path/to/decision-index.json
+python -m uvicorn fpl_decision_app.api:app --host 127.0.0.1 --port 8000
+```
+
+In another terminal, run the browser application:
+
+```bash
+cd web
+npm ci
+npm run dev
+```
+
+Open the local URL and provide an explicit decision identity. There is no
+authoritative `latest` route or fallback. Missing decisions and invalid trust
+chains are distinct fail-closed UI states. Task026B's single-user local policy
+is a physical authorization seam for testing the boundary, not production
+authentication and must not be exposed on a network.
+
+The versioned OpenAPI contract is checked at
+`contracts/api/v1/openapi.json`. All committed examples and test evidence are
+synthetic and generated in temporary directories; the test suite never reads
+live manager data, screenshots, ignored `data/`, or sealed experiment inputs.
+Run all application checks with:
+
+```bash
+python -m unittest discover -s tests
+cd web
+npm test
+npm run typecheck
+npm run build
+npm run check:boundary
+```
+
+OIDC, multi-user ownership, uploads, writes, PostgreSQL, object storage,
+commands/workers, research export, and caching are deliberately deferred to
+later RFC phases. See `docs/rfcs/0026a-web-product-architecture.md`.
+
 ## Fetch data
 
 From the repository root, run:

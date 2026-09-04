@@ -1,0 +1,37 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  color: #ecf3ed;
+  background: #07130d;
+  font-synthesis: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+main { width: min(900px, calc(100% - 2rem)); margin: 0 auto; padding: 4rem 0; }
+header { max-width: 720px; }
+h1 { margin: .4rem 0 1rem; font-size: clamp(2.2rem, 7vw, 4.6rem); line-height: .98; letter-spacing: -.05em; }
+h2 { font-size: 2.4rem; margin: .4rem 0; }
+h3 { margin-bottom: .4rem; }
+.eyebrow { color: #76e6a5; text-transform: uppercase; letter-spacing: .14em; font-weight: 750; font-size: .78rem; }
+.lede { color: #a8b8ae; line-height: 1.65; font-size: 1.05rem; }
+.lookup { margin: 2.5rem 0 1.5rem; }
+.lookup label { display: block; font-weight: 700; margin-bottom: .5rem; }
+.lookup div { display: flex; gap: .65rem; }
+input, button { font: inherit; border-radius: .55rem; padding: .8rem 1rem; }
+input { min-width: 0; flex: 1; color: inherit; background: #0d2117; border: 1px solid #315642; }
+button { border: 0; color: #041008; background: #76e6a5; font-weight: 800; cursor: pointer; }
+button:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid #f5cf68; outline-offset: 3px; }
+.state, .decision-card { border: 1px solid #315642; background: #0d2117; border-radius: 1rem; padding: 1.4rem; }
+.state span { display: block; margin-top: .4rem; }
+.state.danger { border-color: #d36b6b; background: #271111; }
+.trust { display: inline-block; border-radius: 99px; padding: .35rem .7rem; background: #16492d; color: #9df2bd; font-weight: 750; }
+.transfer { font-size: 1.35rem; }
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: .7rem; margin: 1.5rem 0; }
+.summary-grid div { padding: 1rem; border-radius: .65rem; background: #122c1e; }
+dt { color: #99aa9f; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
+dd { margin: .3rem 0 0; font-weight: 750; overflow-wrap: anywhere; }
+section p { color: #c6d2ca; line-height: 1.6; }
+details { margin-top: 1.6rem; }
+summary { cursor: pointer; }
+.identity { display: grid; grid-template-columns: minmax(100px, 160px) 1fr; gap: .6rem; margin-top: 1rem; }
+@media (max-width: 540px) { .lookup div { flex-direction: column; } main { padding-top: 2rem; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
