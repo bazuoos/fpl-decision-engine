@@ -2,6 +2,9 @@
 
 A small, growing data pipeline for Fantasy Premier League (FPL) data.
 
+For AI/session continuity, start with [CURRENT_HANDOFF](docs/project/CURRENT_HANDOFF.md).
+The pack is a checkpoint and navigation aid; repository evidence takes precedence.
+
 ## Raw and clean data
 
 Raw data is the official API response preserved byte-for-byte as an immutable
