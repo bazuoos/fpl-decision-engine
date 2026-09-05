@@ -12,6 +12,15 @@ settings are untouched.
 There is no network operation in the tool. No real data/key capture or holdout
 evaluation is part of this implementation.
 
+Task027D was committed as
+`60d00dd994cf3b418515c2bb63a22b8e1c39eec2` after independent adversarial review
+and remediation review reported no blockers. CI run
+[`33947059987`](https://github.com/bazuoos/fpl-decision-engine/actions/runs/33947059987)
+passed the pinned age installation, 447 Python tests, four frontend tests,
+typecheck, build, boundary checks, and whitespace checks at that exact commit.
+This closes Task027D's implementation/CI gate only; no production key, real
+checkpoint, provider readback, disconnected copy, or real restore drill exists.
+
 ## Dependency and execution boundary
 
 Requires Python 3.10+, system Git with SHA-1 repositories and bundle v2 support,
