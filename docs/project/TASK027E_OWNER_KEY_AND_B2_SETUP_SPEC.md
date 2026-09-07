@@ -125,16 +125,27 @@ Required bucket settings:
   the client-side confidentiality boundary;
 - Object Lock enabled at bucket creation for this setup; Backblaze also permits
   enabling it later, but once enabled it cannot be disabled;
-- default **governance-mode retention of 90 days** during the initial season; and
+- default **compliance-mode retention of 90 days** during the initial season; and
 - no public sharing, CORS, replication, event notification, or application
   integration.
 
-Governance mode is the initial recommendation because restricted operational keys
-cannot bypass it, while the owner can still recover from a serious configuration
-or cost mistake. Compliance mode provides stronger account-compromise protection
-but cannot be shortened even by the account owner; consider it only after the
-synthetic drill and retention policy have operated successfully. The owner account
-uses strong unique authentication, MFA, and separately recoverable account codes.
+The standard personal B2 web console exposes the retention duration but does not
+expose a governance/compliance selector; Backblaze's console documentation says
+that retained files created through this path display Compliance Mode. The mode
+selector documented by Backblaze belongs to its enterprise console. The Native API
+can set governance mode, but doing so would require a temporary credential with
+bucket-management capabilities. For this small, dedicated bucket, accept the
+standard console's 90-day compliance retention instead of introducing that more
+powerful setup credential. Compliance retention cannot be shortened or removed
+from an uploaded version, even by the account owner, so verify the mode and period
+before the first upload and treat every upload as a 90-day storage commitment.
+This bucket is intended to become the permanent real-checkpoint destination if the
+synthetic drill passes. Before Task027F's first real upload, the owner must
+explicitly accept that every real checkpoint will inherit the same irreversible
+90-day compliance lock; otherwise Task027F must stop and review a different
+destination. Task027E authorizes synthetic ciphertext only.
+The owner account uses strong unique authentication, MFA, and separately
+recoverable account codes.
 
 Use unique immutable object paths such as an opaque checkpoint identifier plus the
 fixed ciphertext/receipt role. Never upload to `latest` and never overwrite an
@@ -149,6 +160,9 @@ through its 90-day lock, retain deadline checkpoints for the current and previou
 FPL seasons, and retain at least one verified season-end checkpoint until the owner
 approves deletion. A lifecycle rule must never be introduced merely to control an
 unexpected bill without first preserving required versions elsewhere.
+Extending a compliance-mode version beyond its initial 90-day lock requires the
+owner's console session or a separately reviewed privileged procedure; the
+restricted uploader and restore keys cannot extend retention.
 
 ## Least-privilege application keys
 
@@ -222,7 +236,7 @@ no real paths, names, account data, or FPL evidence. The drill proceeds in order
 3. With the uploader key, upload the ciphertext under a new opaque object name.
    Empirically determine whether B2 CLI 4.7.1's upload response exposes encryption
    and retention without extra uploader capabilities. Do not widen the uploader
-   key if it does not: confirm server-side encryption and unexpired governance
+   key if it does not: confirm server-side encryption and unexpired compliance
    retention through the restore key or owner console instead.
 4. Record the exact file ID/version and expected ciphertext SHA-256 only in an
    owner-private receipt. Keep a separately held copy of the expected hash outside
@@ -255,7 +269,7 @@ remain outside Git.
 | Mac lost | Obtain the age identity from either independent custody copy and use the restore credential/account recovery path to fetch the exact B2 version. Task027F must prove this without the Mac. |
 | B2 account/provider unavailable | Use the later disconnected encrypted copy. Task027E alone does not close this risk. |
 | B2 operational key stolen | Bucket/prefix scope, missing deletion/bypass rights, expiry, and Object Lock limit damage; revoke and replace it. Client-side encryption protects plaintext. |
-| Owner account stolen | Governance retention may be bypassed by sufficiently privileged account access. MFA and the disconnected copy are required; compliance mode is the stronger later option. |
+| Owner account stolen | Active compliance retention cannot be shortened or removed, but an attacker may upload data, extend retention, or act after retention expires. MFA and the disconnected copy remain required. |
 | Age identity lost | Recover from the other custody copy. Loss of both copies makes ciphertext permanently unrecoverable. |
 | Age identity exposed | Rotate for new captures; assume all old checkpoint plaintext is exposed to the attacker. Recapture and deletion require owner review. |
 | Local corruption | Fetch the exact B2 version and compare with the separately trusted ciphertext hash before decrypting. |
