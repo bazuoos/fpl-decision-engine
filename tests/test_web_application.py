@@ -37,6 +37,19 @@ from web_fixture_support import materialized_synthetic_completed_decision
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 
 
+def imported_module_names(tree: ast.AST) -> set[str]:
+    imported: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imported.add(node.module)
+            imported.update(
+                f"{node.module}.{alias.name}" for alias in node.names
+            )
+    return imported
+
+
 class RecordingPolicy:
     def __init__(self, events: list[str], *, deny: bool = False) -> None:
         self.events = events
@@ -370,26 +383,27 @@ class DependencyBoundaryTests(unittest.TestCase):
     def test_trusted_engine_never_imports_application_package(self) -> None:
         for path in (REPOSITORY_ROOT / "src" / "fpl_decision_engine").rglob("*.py"):
             tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-            imported = [
-                node.module
-                for node in ast.walk(tree)
-                if isinstance(node, ast.ImportFrom) and node.module
-            ] + [
-                alias.name
-                for node in ast.walk(tree)
-                if isinstance(node, ast.Import)
-                for alias in node.names
-            ]
+            imported = imported_module_names(tree)
             self.assertFalse(
                 any(name.startswith("fpl_decision_app") for name in imported),
                 path,
             )
+
+    def test_import_extraction_expands_from_package_members(self) -> None:
+        tree = ast.parse(
+            "from fpl_decision_engine import decision_journal as journal"
+        )
+        self.assertIn(
+            "fpl_decision_engine.decision_journal",
+            imported_module_names(tree),
+        )
 
     def test_application_imports_only_the_public_trusted_reader_seam(self) -> None:
         forbidden = {
             "duckdb",
             "highspy",
             "fpl_decision_engine.decision",
+            "fpl_decision_engine.decision_journal",
             "fpl_decision_engine.decision_reliability",
             "fpl_decision_engine.features",
             "fpl_decision_engine.predictions",
@@ -397,16 +411,7 @@ class DependencyBoundaryTests(unittest.TestCase):
         }
         for path in (REPOSITORY_ROOT / "src" / "fpl_decision_app").rglob("*.py"):
             tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-            imported = [
-                node.module
-                for node in ast.walk(tree)
-                if isinstance(node, ast.ImportFrom) and node.module
-            ] + [
-                alias.name
-                for node in ast.walk(tree)
-                if isinstance(node, ast.Import)
-                for alias in node.names
-            ]
+            imported = imported_module_names(tree)
             violations = sorted(
                 name
                 for name in imported
