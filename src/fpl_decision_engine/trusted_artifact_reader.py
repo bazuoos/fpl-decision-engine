@@ -18,6 +18,7 @@ from .decision_journal import DecisionJournalError, _load_completed_evidence
 from .presentation.gameweek_decision import (
     GAMEWEEK_DECISION_SCHEMA_NAME,
     GAMEWEEK_DECISION_SCHEMA_VERSION,
+    _schema_document,
 )
 
 
@@ -51,6 +52,56 @@ class VerifiedGameweekDecision:
                 "verified GameweekDecision payload is not an object"
             )
         return value
+
+
+def gameweek_decision_openapi_components() -> dict[str, dict[str, Any]]:
+    """Return OpenAPI components derived from the authoritative payload schema."""
+    schema, _, _ = _schema_document(None)
+
+    definitions = schema.get("$defs")
+    if not isinstance(definitions, dict):  # pragma: no cover - packaged invariant
+        raise TrustedArtifactValidationError(
+            "GameweekDecision schema definitions are not an object"
+        )
+
+    def convert(value: Any) -> Any:
+        if isinstance(value, dict):
+            return {
+                key: (
+                    (
+                        "#/components/schemas/GameweekDecision_"
+                        + item.removeprefix("#/$defs/")
+                    )
+                    if key == "$ref"
+                    and isinstance(item, str)
+                    and item.startswith("#/$defs/")
+                    else (
+                        "#/components/schemas/GameweekDecision" + item[1:]
+                        if key == "$ref"
+                        and isinstance(item, str)
+                        and item.startswith("#/")
+                        else convert(item)
+                    )
+                )
+                for key, item in value.items()
+                if key not in {"$schema", "$id", "$defs"}
+            }
+        if isinstance(value, list):
+            return [convert(item) for item in value]
+        return value
+
+    root = convert(schema)
+    converted_definitions = {
+        f"GameweekDecision_{name}": convert(value)
+        for name, value in definitions.items()
+    }
+    if not isinstance(root, dict) or not all(
+        isinstance(value, dict) for value in converted_definitions.values()
+    ):  # pragma: no cover - packaged invariant
+        raise TrustedArtifactValidationError(
+            "GameweekDecision schema is not an object"
+        )
+    return {"GameweekDecision": root, **converted_definitions}
 
 
 def load_verified_gameweek_decision(

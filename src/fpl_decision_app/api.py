@@ -7,8 +7,13 @@ from pathlib import Path
 from typing import Any, Literal
 
 from fastapi import FastAPI, Request, Response
+from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict
+
+from fpl_decision_engine.trusted_artifact_reader import (
+    gameweek_decision_openapi_components,
+)
 
 from .artifacts import EmptyDecisionArtifactStore, FilesystemDecisionArtifactStore
 from .authorization import LOCAL_SINGLE_USER_PRINCIPAL, SingleUserAllowAllPolicy
@@ -133,6 +138,29 @@ def create_app(facade: TrustedArtifactReadFacade | None = None) -> FastAPI:
         response.headers["ETag"] = f'"{envelope["artifact_identity"]["sha256"]}"'
         response.headers["Cache-Control"] = "private, immutable"
         return envelope
+
+    def versioned_openapi() -> dict[str, Any]:
+        if app.openapi_schema is None:
+            schema = get_openapi(
+                title=app.title,
+                version=app.version,
+                routes=app.routes,
+            )
+            components = schema.setdefault("components", {}).setdefault(
+                "schemas", {}
+            )
+            payload_components = gameweek_decision_openapi_components()
+            collisions = components.keys() & payload_components.keys()
+            if collisions:
+                raise RuntimeError("GameweekDecision OpenAPI component collision")
+            components.update(payload_components)
+            components["DecisionReadResponse"]["properties"]["payload"] = {
+                "$ref": "#/components/schemas/GameweekDecision"
+            }
+            app.openapi_schema = schema
+        return app.openapi_schema
+
+    app.openapi = versioned_openapi
 
     return app
 

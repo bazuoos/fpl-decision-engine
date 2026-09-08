@@ -54,9 +54,7 @@
             "$ref": "#/components/schemas/ArtifactIdentityResponse"
           },
           "payload": {
-            "additionalProperties": true,
-            "title": "Payload",
-            "type": "object"
+            "$ref": "#/components/schemas/GameweekDecision"
           },
           "trust": {
             "$ref": "#/components/schemas/TrustResponse"
@@ -69,6 +67,831 @@
           "payload"
         ],
         "title": "DecisionReadResponse",
+        "type": "object"
+      },
+      "GameweekDecision": {
+        "additionalProperties": false,
+        "properties": {
+          "classification": {
+            "const": "read_only_validated_single_gameweek_decision"
+          },
+          "engine": {
+            "$ref": "#/components/schemas/GameweekDecision_engine"
+          },
+          "frozen_deadline": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "generation_timestamp": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "generation_timestamp_semantics": {
+            "const": "copied_from_upstream_decision_artifact"
+          },
+          "manager_state": {
+            "$ref": "#/components/schemas/GameweekDecision_manager_state"
+          },
+          "players": {
+            "items": {
+              "$ref": "#/components/schemas/GameweekDecision_player"
+            },
+            "minItems": 15,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "recommended_action": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/GameweekDecision_roll_action"
+              },
+              {
+                "$ref": "#/components/schemas/GameweekDecision_transfer_action"
+              }
+            ]
+          },
+          "reliability": {
+            "$ref": "#/components/schemas/GameweekDecision_reliability"
+          },
+          "roll": {
+            "$ref": "#/components/schemas/GameweekDecision_selection"
+          },
+          "schema_name": {
+            "const": "GameweekDecision"
+          },
+          "schema_version": {
+            "const": "1.0.0"
+          },
+          "season": {
+            "pattern": "^[0-9]{4}-[0-9]{2}$",
+            "type": "string"
+          },
+          "source_artifacts": {
+            "items": {
+              "$ref": "#/components/schemas/GameweekDecision_source_artifact"
+            },
+            "minItems": 8,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "target_gameweek": {
+            "maximum": 38,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "validation": {
+            "$ref": "#/components/schemas/GameweekDecision_validation"
+          }
+        },
+        "required": [
+          "schema_name",
+          "schema_version",
+          "classification",
+          "generation_timestamp",
+          "generation_timestamp_semantics",
+          "season",
+          "target_gameweek",
+          "frozen_deadline",
+          "engine",
+          "source_artifacts",
+          "manager_state",
+          "players",
+          "roll",
+          "recommended_action",
+          "reliability",
+          "validation"
+        ],
+        "title": "GameweekDecision v1",
+        "type": "object"
+      },
+      "GameweekDecision_action_selection": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/GameweekDecision_selection"
+          },
+          {
+            "properties": {
+              "incomplete_projection_ids": {
+                "type": "array"
+              },
+              "warnings": {
+                "type": "array"
+              }
+            },
+            "type": "object"
+          }
+        ]
+      },
+      "GameweekDecision_engine": {
+        "additionalProperties": false,
+        "properties": {
+          "decision_artifact_version": {
+            "type": "string"
+          },
+          "decision_engine_version": {
+            "type": "string"
+          },
+          "decision_policy": {
+            "type": "string"
+          },
+          "decision_policy_version": {
+            "type": "string"
+          },
+          "model_id": {
+            "type": "string"
+          },
+          "model_scope": {
+            "type": "string"
+          },
+          "reliability_version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "decision_artifact_version",
+          "decision_engine_version",
+          "model_id",
+          "model_scope",
+          "decision_policy",
+          "decision_policy_version",
+          "reliability_version"
+        ],
+        "type": "object"
+      },
+      "GameweekDecision_manager_state": {
+        "additionalProperties": false,
+        "properties": {
+          "bank_units": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "chip_state": {
+            "enum": [
+              "NONE_MODELED"
+            ]
+          },
+          "current_transfer_cost_points": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "entry_id": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "free_transfers": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "squad": {
+            "items": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "maxItems": 15,
+            "minItems": 15,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "verified_provenance": {
+            "additionalProperties": false,
+            "properties": {
+              "authentication_data_exposed": {
+                "const": false
+              },
+              "manager_specific_selling_prices": {
+                "const": true
+              },
+              "manager_state_source": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "selling_price_source": {
+                "minLength": 1,
+                "type": "string"
+              }
+            },
+            "required": [
+              "manager_state_source",
+              "selling_price_source",
+              "manager_specific_selling_prices",
+              "authentication_data_exposed"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "entry_id",
+          "bank_units",
+          "free_transfers",
+          "current_transfer_cost_points",
+          "chip_state",
+          "squad",
+          "verified_provenance"
+        ],
+        "type": "object"
+      },
+      "GameweekDecision_material_reliability": {
+        "additionalProperties": false,
+        "properties": {
+          "element_id": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "low_sample": {
+            "type": "boolean"
+          },
+          "prediction_complete": {
+            "type": "boolean"
+          },
+          "prior_appearances": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "prior_starts": {
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "prior_total_minutes": {
+            "minimum": 0,
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "prior_xa_per_90": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "prior_xg_per_90": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "roles": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "unusually_extreme_attacking_rate": {
+            "type": "boolean"
+          },
+          "xa_position_population": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "xa_position_rank": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "xg_position_population": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "xg_position_rank": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "element_id",
+          "roles",
+          "prior_total_minutes",
+          "prior_appearances",
+          "prior_starts",
+          "prior_xg_per_90",
+          "prior_xa_per_90",
+          "low_sample",
+          "prediction_complete",
+          "unusually_extreme_attacking_rate",
+          "xg_position_rank",
+          "xg_position_population",
+          "xa_position_rank",
+          "xa_position_population"
+        ],
+        "type": "object"
+      },
+      "GameweekDecision_objective": {
+        "additionalProperties": false,
+        "properties": {
+          "base_xi_xfp": {
+            "type": "number"
+          },
+          "captain_bonus_xfp": {
+            "type": "number"
+          },
+          "total_xfp": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "base_xi_xfp",
+          "captain_bonus_xfp",
+          "total_xfp"
+        ],
+        "type": "object"
+      },
+      "GameweekDecision_player": {
+        "additionalProperties": false,
+        "properties": {
+          "element_id": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "expected_minutes": {
+            "minimum": 0,
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "position": {
+            "enum": [
+              "GK",
+              "DEF",
+              "MID",
+              "FWD"
+            ]
+          },
+          "prediction_complete": {
+            "type": "boolean"
+          },
+          "projected_xfp": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "projection_state": {
+            "enum": [
+              "valid_projection",
+              "verified_blank",
+              "incomplete_projection",
+              "missing_projection"
+            ]
+          },
+          "purchase_price_units": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "selling_price_units": {
+            "minimum": 0,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "team_id": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "team_name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "team_short_name": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "element_id",
+          "name",
+          "team_id",
+          "team_name",
+          "team_short_name",
+          "position",
+          "purchase_price_units",
+          "selling_price_units",
+          "projected_xfp",
+          "expected_minutes",
+          "prediction_complete",
+          "projection_state"
+        ],
+        "type": "object"
+      },
+      "GameweekDecision_player_transfer_in": {
+        "additionalProperties": false,
+        "properties": {
+          "element_id": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "purchase_price_units": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "element_id",
+          "name",
+          "purchase_price_units"
+        ],
+        "type": "object"
+      },
+      "GameweekDecision_player_transfer_out": {
+        "additionalProperties": false,
+        "properties": {
+          "element_id": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "selling_price_units": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "element_id",
+          "name",
+          "selling_price_units"
+        ],
+        "type": "object"
+      },
+      "GameweekDecision_reliability": {
+        "additionalProperties": false,
+        "properties": {
+          "captaincy_materially_changes_gain": {
+            "type": "boolean"
+          },
+          "changed_action_count": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "diagnostic_only": {
+            "const": true
+          },
+          "material_players": {
+            "items": {
+              "$ref": "#/components/schemas/GameweekDecision_material_reliability"
+            },
+            "type": "array"
+          },
+          "official_recommendation_unchanged": {
+            "const": true
+          },
+          "same_exact_action_count": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "sensitivity_results": {
+            "items": {
+              "$ref": "#/components/schemas/GameweekDecision_sensitivity_result"
+            },
+            "type": "array"
+          },
+          "sensitivity_view_count": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/GameweekDecision_warning"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "diagnostic_only",
+          "official_recommendation_unchanged",
+          "sensitivity_view_count",
+          "same_exact_action_count",
+          "changed_action_count",
+          "captaincy_materially_changes_gain",
+          "warnings",
+          "material_players",
+          "sensitivity_results"
+        ],
+        "type": "object"
+      },
+      "GameweekDecision_roll_action": {
+        "additionalProperties": false,
+        "properties": {
+          "action_type": {
+            "const": "ROLL"
+          },
+          "objective_gain_vs_roll_xfp": {
+            "const": 0.0
+          },
+          "selection": {
+            "$ref": "#/components/schemas/GameweekDecision_selection"
+          }
+        },
+        "required": [
+          "action_type",
+          "objective_gain_vs_roll_xfp",
+          "selection"
+        ],
+        "type": "object"
+      },
+      "GameweekDecision_selection": {
+        "additionalProperties": false,
+        "properties": {
+          "bench": {
+            "items": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "maxItems": 4,
+            "minItems": 4,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "bench_order_semantics": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "captain": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "formation": {
+            "pattern": "^[3-5]-[2-5]-[1-3]$",
+            "type": "string"
+          },
+          "incomplete_projection_ids": {
+            "items": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "type": "array",
+            "uniqueItems": true
+          },
+          "objective": {
+            "$ref": "#/components/schemas/GameweekDecision_objective"
+          },
+          "squad": {
+            "items": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "maxItems": 15,
+            "minItems": 15,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "starting_xi": {
+            "items": {
+              "minimum": 1,
+              "type": "integer"
+            },
+            "maxItems": 11,
+            "minItems": 11,
+            "type": "array",
+            "uniqueItems": true
+          },
+          "vice_captain": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "warnings": {
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "squad",
+          "starting_xi",
+          "bench",
+          "captain",
+          "vice_captain",
+          "formation",
+          "bench_order_semantics",
+          "objective",
+          "incomplete_projection_ids",
+          "warnings"
+        ],
+        "type": "object"
+      },
+      "GameweekDecision_sensitivity_result": {
+        "additionalProperties": false,
+        "properties": {
+          "action_type": {
+            "enum": [
+              "ROLL",
+              "TRANSFER"
+            ]
+          },
+          "category": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "gain_vs_roll_xfp": {
+            "type": "number"
+          },
+          "incoming_element_id": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "objective_xfp": {
+            "type": "number"
+          },
+          "outgoing_element_id": {
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "retains_official_exact_action": {
+            "type": "boolean"
+          },
+          "view_id": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "view_id",
+          "category",
+          "action_type",
+          "outgoing_element_id",
+          "incoming_element_id",
+          "objective_xfp",
+          "gain_vs_roll_xfp",
+          "retains_official_exact_action"
+        ],
+        "type": "object"
+      },
+      "GameweekDecision_source_artifact": {
+        "additionalProperties": false,
+        "properties": {
+          "artifact_name": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "hash_validated": {
+            "const": true
+          },
+          "role": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "artifact_name",
+          "sha256",
+          "hash_validated"
+        ],
+        "type": "object"
+      },
+      "GameweekDecision_transfer_action": {
+        "additionalProperties": false,
+        "properties": {
+          "action_type": {
+            "const": "TRANSFER"
+          },
+          "incoming": {
+            "$ref": "#/components/schemas/GameweekDecision_player_transfer_in"
+          },
+          "objective_gain_vs_roll_xfp": {
+            "type": "number"
+          },
+          "outgoing": {
+            "$ref": "#/components/schemas/GameweekDecision_player_transfer_out"
+          },
+          "resulting_bank_units": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "selection": {
+            "$ref": "#/components/schemas/GameweekDecision_selection"
+          },
+          "transfer_cost_points": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "action_type",
+          "outgoing",
+          "incoming",
+          "resulting_bank_units",
+          "transfer_cost_points",
+          "objective_gain_vs_roll_xfp",
+          "selection"
+        ],
+        "type": "object"
+      },
+      "GameweekDecision_transfer_validation": {
+        "additionalProperties": false,
+        "properties": {
+          "applicable": {
+            "type": "boolean"
+          },
+          "candidate_count": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "passed": {
+            "const": true
+          },
+          "proof": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "applicable",
+          "passed",
+          "proof",
+          "candidate_count"
+        ],
+        "type": "object"
+      },
+      "GameweekDecision_validation": {
+        "additionalProperties": false,
+        "properties": {
+          "all_source_hashes_validated": {
+            "const": true
+          },
+          "bench_accounting_passed": {
+            "const": true
+          },
+          "captain_vice_constraints_passed": {
+            "const": true
+          },
+          "reliability_provenance_validated": {
+            "const": true
+          },
+          "squad_legality_passed": {
+            "const": true
+          },
+          "transfer_legality": {
+            "$ref": "#/components/schemas/GameweekDecision_transfer_validation"
+          },
+          "xi_legality_passed": {
+            "const": true
+          }
+        },
+        "required": [
+          "squad_legality_passed",
+          "xi_legality_passed",
+          "bench_accounting_passed",
+          "captain_vice_constraints_passed",
+          "transfer_legality",
+          "all_source_hashes_validated",
+          "reliability_provenance_validated"
+        ],
+        "type": "object"
+      },
+      "GameweekDecision_warning": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "message": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
         "type": "object"
       },
       "HealthResponse": {

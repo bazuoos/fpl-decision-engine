@@ -91,7 +91,15 @@ is a physical authorization seam for testing the boundary, not production
 authentication and must not be exposed on a network.
 
 The versioned OpenAPI contract is checked at
-`contracts/api/v1/openapi.json`. All committed examples and test evidence are
+`contracts/api/v1/openapi.json`. Its `GameweekDecision` components are derived
+from the engine's authoritative JSON Schema. Browser types are generated at
+`web/src/api/generated-contracts.ts` with the checksum-locked
+`openapi-typescript` dependency; edit the source contracts, run
+`npm run generate:contracts`, and commit both outputs. CI runs
+`npm run check:contracts` and fails when the generated file is stale. Generated
+TypeScript types are compile-time checks, not browser-side runtime validation;
+the server's trusted reader remains authoritative. All committed examples and
+test evidence are
 synthetic and generated in temporary directories; the test suite never reads
 live manager data, screenshots, ignored `data/`, or sealed experiment inputs.
 Run all application checks with:
@@ -99,6 +107,7 @@ Run all application checks with:
 ```bash
 python -m unittest discover -s tests
 cd web
+npm run check:contracts
 npm test
 npm run typecheck
 npm run build

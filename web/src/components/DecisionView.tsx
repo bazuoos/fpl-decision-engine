@@ -1,4 +1,7 @@
-import type { DecisionEnvelope, Player } from "../api/contracts";
+import type {
+  DecisionReadResponse as DecisionEnvelope,
+  GameweekDecisionPlayer as Player,
+} from "../api/generated-contracts";
 
 function names(ids: number[], players: Map<number, Player>): string {
   return ids.map((id) => players.get(id)?.name ?? `Player ${id}`).join(", ");

@@ -1,4 +1,7 @@
-import type { DecisionEnvelope, ProblemDetails } from "./contracts";
+import type {
+  DecisionReadResponse as DecisionEnvelope,
+  ProblemResponse as ProblemDetails,
+} from "./generated-contracts";
 
 export class ApiProblem extends Error {
   constructor(readonly problem: ProblemDetails) {

@@ -8,7 +8,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "build": "vite build",
-    "check:boundary": "node scripts/check-boundary.mjs"
+    "check:boundary": "node scripts/check-boundary.mjs",
+    "generate:contracts": "openapi-typescript ../contracts/api/v1/openapi.json --root-types --root-types-no-schema-prefix --output src/api/generated-contracts.ts",
+    "check:contracts": "openapi-typescript ../contracts/api/v1/openapi.json --root-types --root-types-no-schema-prefix --output src/api/generated-contracts.ts --check"
   },
   "dependencies": {
     "@tanstack/react-query": "5.90.9",
@@ -23,6 +25,7 @@
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "5.1.4",
     "jsdom": "28.1.0",
+    "openapi-typescript": "7.13.0",
     "typescript": "5.9.3",
     "vite": "7.3.6",
     "vitest": "4.1.11"

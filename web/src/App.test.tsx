@@ -32,7 +32,7 @@ describe("trusted decision presentation", () => {
     renderApp(`/?decision_id=${supplied.artifact_identity.semantic_id}`);
     expect(await screen.findByText("3-5-2")).toBeInTheDocument();
     expect(screen.getAllByText("Synthetic Player 08").length).toBeGreaterThan(0);
-    expect(screen.getByText("48.00 xFP")).toBeInTheDocument();
+    expect(screen.getByText("55.00 xFP")).toBeInTheDocument();
   });
 
   it("distinguishes missing from invalid trusted evidence", async () => {

@@ -36,6 +36,7 @@ from fpl_decision_engine.artifact_snapshot import (
 )
 from fpl_decision_engine.trusted_artifact_reader import (
     TrustedArtifactValidationError,
+    gameweek_decision_openapi_components,
     load_verified_gameweek_decision,
 )
 from web_fixture_support import materialized_synthetic_completed_decision
@@ -533,6 +534,44 @@ class DependencyBoundaryTests(unittest.TestCase):
             )
         )
         self.assertEqual(create_app().openapi(), expected)
+
+    def test_openapi_payload_schema_is_the_authoritative_engine_schema(self) -> None:
+        document = create_app().openapi()
+        schema = document["components"]["schemas"]
+        expected = gameweek_decision_openapi_components()
+        self.assertLessEqual(expected.keys(), schema.keys())
+        self.assertEqual(
+            {name: schema[name] for name in expected},
+            expected,
+        )
+        self.assertEqual(
+            schema["DecisionReadResponse"]["properties"]["payload"],
+            {"$ref": "#/components/schemas/GameweekDecision"},
+        )
+
+        def resolve_local_reference(reference: str) -> object:
+            value: object = document
+            for token in reference.removeprefix("#/").split("/"):
+                self.assertIsInstance(value, dict)
+                value = value[token.replace("~1", "/").replace("~0", "~")]
+            return value
+
+        references = []
+        pending: list[object] = [expected]
+        while pending:
+            value = pending.pop()
+            if isinstance(value, dict):
+                reference = value.get("$ref")
+                if isinstance(reference, str):
+                    references.append(reference)
+                pending.extend(value.values())
+            elif isinstance(value, list):
+                pending.extend(value)
+        self.assertTrue(references)
+        for reference in references:
+            with self.subTest(reference=reference):
+                self.assertTrue(reference.startswith("#/"))
+                self.assertIsInstance(resolve_local_reference(reference), dict)
 
     def test_trusted_engine_never_imports_application_package(self) -> None:
         for path in (REPOSITORY_ROOT / "src" / "fpl_decision_engine").rglob("*.py"):
