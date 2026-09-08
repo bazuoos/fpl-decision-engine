@@ -1,6 +1,6 @@
 # Roadmap
 
-As of `824b504` (2026-09-08). This is a planning map, not authorization to
+As of `76c10f2` (2026-09-08). This is a planning map, not authorization to
 execute. The [RFC phased plan](../rfcs/0026a-web-product-architecture.md#28-phased-implementation-plan)
 is the source for Tasks026B–D. Proposed capabilities are not completed merely
 because they appear in that RFC.
@@ -26,14 +26,16 @@ because they appear in that RFC.
   guard and Task027E 90-day B2 compliance-retention design.
 - Task026B follow-up #1: application forbidden-import coverage now includes
   `decision_journal` and package-member import syntax (`824b504`).
+- Task026B follow-up #2: the current explicit decision-read chain captures
+  original artifact paths once per request, then validates stable private
+  snapshots with fail-closed filesystem checks (`76c10f2`).
 
 ## NEXT — proposed planning boundary, not work started
 
-1. While Task027E is paused for a dedicated disconnected medium, select and scope
-   one of the four remaining
-   [Task026B follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups):
-   chain-wide read-once semantics, schema/type drift detection, disposable
-   navigation, and preservation of the undecided UX boundary.
+1. Review this continuity refresh, then separately scope the selected remaining
+   [Task026B follow-up](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups):
+   stronger API/engine-schema/TypeScript drift detection. The selection is a
+   planning decision, not authorization to implement it.
 2. Reconcile RFC scope with the delivered narrower read slice. Decide whether
    additional artifact read routes are needed; they are not implemented now.
    Also record the missing reliability/model-caveat rendering envisaged by the

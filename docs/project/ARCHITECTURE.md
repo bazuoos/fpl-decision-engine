@@ -96,7 +96,11 @@ preparation directories, ordered sides and same season/GW/deadline.
 to the existing completed-evidence reader and returns canonical decision bytes.
 [Read facade](../../src/fpl_decision_app/read_facade.py) authorizes before
 resolution, checks indexed final-manifest hash and returned identity/hash, and
-returns one canonical payload. It does not generate decisions.
+returns one canonical payload. The facade supplies its already-read final
+manifest bytes to a request-scoped snapshot; downstream completed-evidence and
+GameweekDecision validation use stable private copies rather than reopening the
+original paths. Snapshot capture rejects symlinks, hardlinks, non-regular files
+and files that change during capture. It does not generate decisions.
 
 [OpenAPI](../../contracts/api/v1/openapi.json) currently exposes only health and
 explicit decision reads. [GameweekDecision / DecisionDiff schemas](../../src/fpl_decision_engine/presentation/schemas/)
@@ -121,9 +125,10 @@ it remains a test-time denylist rather than a runtime import boundary.
 caveats; documenting this gap authorizes no frontend implementation.
 
 There is no app database, command worker,
-research export or multi-tenant service yet. The read-bytes-once aspiration is
-not fully implemented across the chain; see
-[handoff follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups).
+research export or multi-tenant service yet. Request-scoped snapshots protect
+the current explicit decision-read chain; they do not provide process-wide file
+immutability, an object store, verified-by-hash caching or a general rule for
+unrelated engine reads.
 
 ## Recovery boundary today
 

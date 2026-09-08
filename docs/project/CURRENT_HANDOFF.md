@@ -5,13 +5,14 @@
 > contradiction. Verify current Git state before acting.
 
 - Implementation checkpoint summarized: **2026-09-08**,
-  `824b504ee9acc6941fc6cec97e8456f8b97498e5`. It was on `main`, aligned with
+  `76c10f2d5e1853fcbad7a4675ff5c3f4f2b768ee`. It was on `main`, aligned with
   `origin/main`, with successful CI. Identify this document's own revision and
   any later work from Git history rather than assuming the embedded SHA is HEAD.
-- Latest completed implementation: **Task026B deferred follow-up #1**. The application
-  import guard now covers `decision_journal`, including
-  `from fpl_decision_engine import decision_journal`; independent remediation
-  review reported SAFE and CI passed.
+- Latest completed implementation: **Task026B deferred follow-up #2**. The
+  current explicit decision-read chain captures each original artifact path once
+  per request and validates stable private snapshot copies. It fails closed on
+  symlinks, hardlinks, non-regular files and source changes during capture;
+  independent remediation review reported SAFE and CI passed.
 - Resilience work: Task027C local safeguards, Task027D encrypted-checkpoint
   tooling and Task027E1 staged sensitive-content guard are committed. Task027E
   owner custody/destination setup is **PAUSED** before production key generation,
@@ -22,8 +23,14 @@
 - Outside this five-file continuity refresh, the only visible working-tree items
   are unrelated untracked `task025_claude_review_bundle.txt` and
   `task025_review.patch`. Preserve them. Root `data/`, `.private-recovery/` and
-  `.DS_Store` paths are ignored and guarded against staging; ignored/private
-  contents were not inspected for this refresh.
+  `.DS_Store` paths are ignored and guarded against staging.
+- **Local operational state, not repository-established:** an authorized refresh
+  captured finalized, data-checked Gameweek 3 public data at
+  `20260908T120547.189577Z`, and a leakage-safe xFP v0.1 evaluation used the
+  pre-deadline prediction snapshot `20260903T061943.538960Z`. The complete local
+  evaluation covers 626 of 654 player rows. These ignored artifacts are not part
+  of this documentation change and have **NO VERIFIED OFFSITE BACKUP**. No
+  prospective GW3 journal or outcome was created or retrospectively invented.
 
 ## Current restrictions and limits
 
@@ -47,15 +54,14 @@
 
 ## Unresolved Task026B follow-ups
 
-Follow-up #1 closed at `824b504`. Four review follow-ups remain planning inputs,
+Follow-ups #1 and #2 closed at `824b504` and `76c10f2`. Three review follow-ups
+remain planning inputs,
 not authorization for implementation:
 
-1. Design chain-wide read-once semantics. Returned-hash equality checks exist,
-   but the facade and downstream validators still make path-based rereads.
-2. Strengthen API/engine-schema/TypeScript drift detection; OpenAPI snapshot and
+1. Strengthen API/engine-schema/TypeScript drift detection; OpenAPI snapshot and
    TS checks exist, but payload types are manually maintained.
-3. Keep `App.tsx` and explicit-ID navigation disposable.
-4. Keep final styling and the UX paradigm **UNDECIDED**.
+2. Keep `App.tsx` and explicit-ID navigation disposable.
+3. Keep final styling and the UX paradigm **UNDECIDED**.
 
 Additional documented RFC gap: current `DecisionView` omits reliability and
 model caveats. This does not authorize frontend work. See
@@ -63,8 +69,9 @@ model caveats. This does not authorize frontend work. See
 
 ## Immediate next question
 
-While Task027E waits for a dedicated removable medium, which remaining Task026B
-follow-up should receive the next separately approved scope?
+The human selected API/engine-schema/TypeScript drift detection as the next
+proposed Task026B follow-up after this documentation-only refresh. That selection
+does not authorize implementation before this refresh is reviewed and handled.
 
 **REQUIRES HUMAN CONTEXT:** next approved priority; private evidence locations
 and completeness; credential/key custody and private backup receipts; explicit

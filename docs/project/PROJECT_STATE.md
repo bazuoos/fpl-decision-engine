@@ -1,7 +1,7 @@
 # Project state
 
 Implementation checkpoint summarized: 2026-09-08, commit
-`824b504ee9acc6941fc6cec97e8456f8b97498e5`. Identify this document's own
+`76c10f2d5e1853fcbad7a4675ff5c3f4f2b768ee`. Identify this document's own
 revision and any later work from Git history.
 Start with [CURRENT_HANDOFF](CURRENT_HANDOFF.md); this pack is navigation and
 continuity context, not a replacement for code, contracts, or frozen evidence.
@@ -82,16 +82,17 @@ a delivery gap, not authorization to implement it.
 
 ## Validation evidence and procedure
 
-**Repository-established at this review:** HEAD `824b504`, branch `main`, 127
+**Repository-established at this review:** HEAD `76c10f2`, branch `main`, 128
 tracked files and four frontend tests in source. The CI workflow configures
 Python 3.10, Node 22 and checksum-pinned age 1.3.1 installation.
 
-At this exact commit, [CI run 34190635299](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34190635299)
-passed 461 Python tests, four frontend tests, TypeScript, production build,
-browser dependency-boundary and whitespace checks in 3m20s. The preceding
-Task026B follow-up remediation review independently reported the same 461/18
-Python full-suite/application-module counts and a clean diff. Historical success
-does not establish future checkout health. The CI run also emitted a non-failing
+At this exact commit, [CI run 34222962259](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34222962259)
+passed 468 Python tests, four frontend tests, TypeScript, production build,
+browser dependency-boundary and whitespace checks. The preceding Task026B
+follow-up #2 remediation review independently reported SAFE after adversarial
+tests covered original-path replacement, symlinks, hardlinks, FIFO handling and
+private snapshot creation. Historical success does not establish future checkout
+health. The CI run also emitted a non-failing
 GitHub-hosted-actions annotation that the Node.js 20 runtime used internally by
 the current checkout/setup actions is deprecated and being forced to Node.js 24;
 review action-version upgrades as maintenance before platform enforcement.
@@ -125,12 +126,32 @@ The RFC remains proposed and its original no-web/API findings predate Task026B.
 Only health and decision read routes exist; do not infer diff/journal routes
 from the RFC or CLI. README's Task023A “future runner” and older transfer
 exclusions describe earlier task scopes; later modules implement both paths.
-Python locking and chain-wide read-once ambitions remain undelivered. The
-application forbidden-import guard now includes `decision_journal` and reconstructs
+Python dependency locking remains undelivered. The current explicit application
+decision-read chain now captures original artifact paths once per request and
+validates private snapshot copies; this is not process-wide file immutability,
+object storage or a general replacement for every path read elsewhere. The
+application forbidden-import guard includes `decision_journal` and reconstructs
 fully qualified members for `from package import member`; it remains a test-time
 specific denylist rather than a runtime import mechanism. See the
 [decision status index](DECISIONS.md#web-rfc-decision-status) and
 [deferred follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups).
+
+## Current local public-data evidence
+
+**Local operational state observed during the authorized 2026-09-08 session,
+not committed repository state:** the official refresh at
+`20260908T120547.189577Z` records Gameweek 3 as finished and data-checked. A
+complete xFP v0.1 evaluation manifest at
+`data/evaluations/fpl/2026-27/gameweek=3/v0.1/20260908T121934.700265Z/`
+binds the pre-deadline prediction snapshot `20260903T061943.538960Z` to that
+realized snapshot and evaluates 626 of 654 player rows.
+
+The evaluation is model-wide realized evidence, not a prospective manager
+decision, human-action record or model-promotion decision. One early-season
+gameweek is insufficient for tuning or promotion. The ignored local data is not
+included in this continuity diff and has **NO VERIFIED OFFSITE BACKUP**. A
+prospective GW3 journal cannot be recreated honestly after its deadline; none
+was created by the refresh or evaluation.
 
 ## Reproducibility and current recovery state
 
