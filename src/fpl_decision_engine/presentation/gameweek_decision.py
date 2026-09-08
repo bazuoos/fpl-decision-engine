@@ -13,6 +13,7 @@ from typing import Any
 import duckdb
 from jsonschema import Draft202012Validator, FormatChecker
 
+from ..artifact_snapshot import ArtifactSnapshotError, ReadOnceArtifactSnapshot
 from ..decision import (
     POSITION_ORDER,
     DecisionSelectionValidationError,
@@ -46,12 +47,19 @@ class GameweekDecisionSchemaError(GameweekDecisionError):
     """Raised when a GameweekDecision payload violates the v1 JSON Schema."""
 
 
-def _read_json(path: Path, label: str) -> Any:
-    if not path.is_file():
-        raise GameweekDecisionSourceValidationError(f"{label} does not exist: {path}")
+def _read_json(
+    path: Path,
+    label: str,
+    artifact_snapshot: ReadOnceArtifactSnapshot | None = None,
+) -> Any:
     try:
-        return json.loads(path.read_bytes())
-    except (OSError, json.JSONDecodeError) as exc:
+        body = (
+            artifact_snapshot.read_bytes(path)
+            if artifact_snapshot is not None
+            else path.read_bytes()
+        )
+        return json.loads(body)
+    except (ArtifactSnapshotError, OSError, json.JSONDecodeError) as exc:
         raise GameweekDecisionSourceValidationError(
             f"could not read {label}: {exc}"
         ) from exc
@@ -112,6 +120,7 @@ def _verified_artifact(
     path_field: str,
     hash_field: str,
     label: str,
+    artifact_snapshot: ReadOnceArtifactSnapshot | None = None,
 ) -> tuple[Path, str]:
     link = _object(value, f"{label} provenance")
     raw_path = link.get(path_field)
@@ -121,7 +130,16 @@ def _verified_artifact(
     if not isinstance(expected_hash, str) or len(expected_hash) != 64:
         raise GameweekDecisionSourceValidationError(f"{label} SHA-256 is missing")
     path = Path(raw_path).resolve()
-    observed = sha256_file(path) if path.is_file() else None
+    try:
+        observed = (
+            artifact_snapshot.sha256(path)
+            if artifact_snapshot is not None
+            else sha256_file(path) if path.is_file() else None
+        )
+    except ArtifactSnapshotError as exc:
+        raise GameweekDecisionSourceValidationError(
+            f"could not capture {label}"
+        ) from exc
     if observed != expected_hash:
         raise GameweekDecisionSourceValidationError(
             f"{label} hash mismatch: expected {expected_hash}, observed {observed}"
@@ -443,20 +461,53 @@ def build_gameweek_decision(
     reliability_artifact: Path,
     *,
     schema_path: Path | None = None,
+    artifact_snapshot: ReadOnceArtifactSnapshot | None = None,
 ) -> dict[str, Any]:
     """Build a read-only contract from already-materialized trusted artifacts."""
+    try:
+        if artifact_snapshot is not None:
+            return _build_gameweek_decision(
+                decision_artifact,
+                reliability_artifact,
+                schema_path=schema_path,
+                artifact_snapshot=artifact_snapshot,
+            )
+        with ReadOnceArtifactSnapshot() as snapshot:
+            return _build_gameweek_decision(
+                decision_artifact,
+                reliability_artifact,
+                schema_path=schema_path,
+                artifact_snapshot=snapshot,
+            )
+    except ArtifactSnapshotError as exc:
+        raise GameweekDecisionSourceValidationError(
+            "could not capture a stable artifact snapshot"
+        ) from exc
+
+
+def _build_gameweek_decision(
+    decision_artifact: Path,
+    reliability_artifact: Path,
+    *,
+    schema_path: Path | None,
+    artifact_snapshot: ReadOnceArtifactSnapshot,
+) -> dict[str, Any]:
     decision_path = decision_artifact.resolve()
     reliability_path = reliability_artifact.resolve()
-    decision = _object(_read_json(decision_path, "decision artifact"), "decision artifact")
+    decision = _object(
+        _read_json(decision_path, "decision artifact", artifact_snapshot),
+        "decision artifact",
+    )
     reliability = _object(
-        _read_json(reliability_path, "reliability artifact"), "reliability artifact"
+        _read_json(reliability_path, "reliability artifact", artifact_snapshot),
+        "reliability artifact",
     )
     if decision.get("version") != ONE_TRANSFER_DECISION_VERSION:
         raise GameweekDecisionSourceValidationError("decision artifact version is unsupported")
     if reliability.get("version") != DECISION_RELIABILITY_VERSION:
         raise GameweekDecisionSourceValidationError("reliability artifact version is unsupported")
-    decision_hash = sha256_file(decision_path)
-    reliability_hash = sha256_file(reliability_path)
+    decision_hash = artifact_snapshot.sha256(decision_path)
+    reliability_hash = artifact_snapshot.sha256(reliability_path)
     reliability_provenance = _object(
         reliability.get("provenance"), "reliability provenance"
     )
@@ -474,8 +525,13 @@ def build_gameweek_decision(
         path_field="path",
         hash_field="sha256",
         label="legality-checked candidate artifact",
+        artifact_snapshot=artifact_snapshot,
     )
-    candidates = _read_json(candidate_path, "legality-checked candidate artifact")
+    candidates = _read_json(
+        candidate_path,
+        "legality-checked candidate artifact",
+        artifact_snapshot,
+    )
     if not isinstance(candidates, list) or len(candidates) != decision.get(
         "legal_transfer_candidate_count"
     ):
@@ -495,25 +551,32 @@ def build_gameweek_decision(
         path_field="artifact_path",
         hash_field="artifact_sha256",
         label="frozen projection artifact",
+        artifact_snapshot=artifact_snapshot,
     )
     players_path, players_hash = _verified_artifact(
         decision.get("purchase_price_provenance"),
         path_field="players_artifact_path",
         hash_field="players_artifact_sha256",
         label="frozen player artifact",
+        artifact_snapshot=artifact_snapshot,
     )
     manual_path, manual_hash = _verified_artifact(
         decision.get("manual_state"),
         path_field="artifact_path",
         hash_field="artifact_sha256",
         label="verified manager-state artifact",
+        artifact_snapshot=artifact_snapshot,
     )
-    manual = _object(_read_json(manual_path, "verified manager-state artifact"), "manager state")
+    manual = _object(
+        _read_json(manual_path, "verified manager-state artifact", artifact_snapshot),
+        "manager state",
+    )
     feature_path, feature_hash = _verified_artifact(
         reliability_provenance.get("frozen_feature_artifact"),
         path_field="path",
         hash_field="sha256",
         label="frozen feature artifact",
+        artifact_snapshot=artifact_snapshot,
     )
     reliability_projection = _object(
         reliability_provenance.get("frozen_projection_artifact"),
@@ -556,8 +619,8 @@ def build_gameweek_decision(
             "manager state does not align with decision season/gameweek/entry"
         )
     projections = XfpV01ParquetProvider(
-        projection_artifact=projection_path,
-        players_artifact=players_path,
+        projection_artifact=artifact_snapshot.materialized_path(projection_path),
+        players_artifact=artifact_snapshot.materialized_path(players_path),
     ).load(season=season, target_gameweek=target_gameweek)
     player_by_id = {player.fpl_player_id: player for player in projections.players}
     if len(player_by_id) != len(projections.players):
@@ -794,7 +857,9 @@ def build_gameweek_decision(
         "generation_timestamp_semantics": "copied_from_upstream_decision_artifact",
         "season": season,
         "target_gameweek": target_gameweek,
-        "frozen_deadline": _deadline(feature_path, target_gameweek),
+        "frozen_deadline": _deadline(
+            artifact_snapshot.materialized_path(feature_path), target_gameweek
+        ),
         "engine": {
             "decision_artifact_version": str(decision.get("version")),
             "decision_engine_version": str(

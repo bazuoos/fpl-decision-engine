@@ -51,13 +51,20 @@ class TrustedReadError(Exception):
 
 
 class CompletedDecisionLoader(Protocol):
-    def load(self, final_manifest_path: Path) -> VerifiedGameweekDecision:
+    def load(
+        self, final_manifest_path: Path, final_manifest_bytes: bytes
+    ) -> VerifiedGameweekDecision:
         """Return a decision only after the trusted engine accepts its chain."""
 
 
 class EngineV1CompletedDecisionLoader:
-    def load(self, final_manifest_path: Path) -> VerifiedGameweekDecision:
-        return load_verified_gameweek_decision(final_manifest_path)
+    def load(
+        self, final_manifest_path: Path, final_manifest_bytes: bytes
+    ) -> VerifiedGameweekDecision:
+        return load_verified_gameweek_decision(
+            final_manifest_path,
+            final_manifest_bytes=final_manifest_bytes,
+        )
 
 
 @dataclass(frozen=True)
@@ -118,7 +125,7 @@ class TrustedArtifactReadFacade:
                 "final manifest hash does not match its indexed identity",
             )
         try:
-            verified = self.loader.load(reference.final_manifest_path)
+            verified = self.loader.load(reference.final_manifest_path, body)
         except TrustedArtifactValidationError as exc:
             raise TrustedReadError(
                 ReadFailureCode.TRUST_CHAIN_INVALID,

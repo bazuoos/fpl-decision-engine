@@ -10,6 +10,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
+from .artifact_snapshot import ArtifactSnapshotError, ReadOnceArtifactSnapshot
 from .operational_manifest import (
     OperationalContractError,
     PreparationManifest,
@@ -222,12 +223,24 @@ def _parse_utc(value: Any, label: str) -> tuple[datetime, str]:
     return _utc(parsed, label)
 
 
-def _read_json(path: Path, label: str) -> Mapping[str, Any]:
-    if not path.is_file():
-        raise DecisionJournalError(f"{label} is missing: {path}")
+def _read_json(
+    path: Path,
+    label: str,
+    artifact_snapshot: ReadOnceArtifactSnapshot | None = None,
+) -> Mapping[str, Any]:
     try:
-        payload = json.loads(path.read_bytes())
-    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        body = (
+            artifact_snapshot.read_bytes(path)
+            if artifact_snapshot is not None
+            else path.read_bytes()
+        )
+        payload = json.loads(body)
+    except (
+        ArtifactSnapshotError,
+        OSError,
+        UnicodeDecodeError,
+        json.JSONDecodeError,
+    ) as exc:
         raise DecisionJournalError(f"{label} is invalid: {exc}") from exc
     return _object(payload, label)
 
@@ -241,11 +254,23 @@ def _single(root: Path, filename: str, label: str) -> Path:
     return matches[0]
 
 
-def _matching_hash(root: Path, filename: str, expected: str, label: str) -> Path:
+def _matching_hash(
+    root: Path,
+    filename: str,
+    expected: str,
+    label: str,
+    artifact_snapshot: ReadOnceArtifactSnapshot | None = None,
+) -> Path:
     matches = [
         path
         for path in root.rglob(filename)
-        if path.is_file() and sha256_file(path) == expected
+        if path.is_file()
+        and (
+            artifact_snapshot.sha256(path)
+            if artifact_snapshot is not None
+            else sha256_file(path)
+        )
+        == expected
     ]
     if len(matches) != 1:
         raise DecisionJournalError(
@@ -254,9 +279,22 @@ def _matching_hash(root: Path, filename: str, expected: str, label: str) -> Path
     return matches[0]
 
 
-def _verify_hash(path: Path, expected: Any, label: str) -> str:
+def _verify_hash(
+    path: Path,
+    expected: Any,
+    label: str,
+    artifact_snapshot: ReadOnceArtifactSnapshot | None = None,
+) -> str:
     digest = _sha256(expected, f"{label} expected SHA-256")
-    if not path.is_file() or sha256_file(path) != digest:
+    try:
+        observed = (
+            artifact_snapshot.sha256(path)
+            if artifact_snapshot is not None
+            else sha256_file(path) if path.is_file() else None
+        )
+    except ArtifactSnapshotError as exc:
+        raise DecisionJournalError(f"{label} could not be captured: {path}") from exc
+    if observed != digest:
         raise DecisionJournalError(f"{label} hash does not match: {path}")
     return digest
 
@@ -287,23 +325,46 @@ def _engine_action(gameweek_payload: Mapping[str, Any]) -> StructuredAction:
     )
 
 
-def _load_completed_evidence(final_manifest_path: Path) -> _CompletedEvidence:
+def _load_completed_evidence(
+    final_manifest_path: Path,
+    *,
+    artifact_snapshot: ReadOnceArtifactSnapshot | None = None,
+    final_manifest_bytes: bytes | None = None,
+) -> _CompletedEvidence:
+    if artifact_snapshot is None:
+        try:
+            with ReadOnceArtifactSnapshot() as snapshot:
+                return _load_completed_evidence(
+                    final_manifest_path,
+                    artifact_snapshot=snapshot,
+                    final_manifest_bytes=final_manifest_bytes,
+                )
+        except ArtifactSnapshotError as exc:
+            raise DecisionJournalError(
+                "completed evidence could not be captured consistently"
+            ) from exc
     final_path = final_manifest_path.resolve()
+    if final_manifest_bytes is not None:
+        artifact_snapshot.seed(final_path, final_manifest_bytes)
     decision_directory = final_path.parent
     if final_path.name != "final_operational_manifest.json":
         raise DecisionJournalError("exact final_operational_manifest.json path is required")
     preparation_directory = decision_directory.parent.parent
     preparation_path = preparation_directory / "preparation_manifest.json"
-    preparation_payload = _read_json(preparation_path, "preparation manifest")
-    final_payload = _read_json(final_path, "final operational manifest")
+    preparation_payload = _read_json(
+        preparation_path, "preparation manifest", artifact_snapshot
+    )
+    final_payload = _read_json(
+        final_path, "final operational manifest", artifact_snapshot
+    )
     try:
         preparation = validate_preparation_manifest(preparation_payload)
         final = validate_final_operational_manifest(final_payload, preparation)
     except OperationalContractError as exc:
         raise DecisionJournalError(f"completed operational manifest is invalid: {exc}") from exc
-    if preparation_path.read_bytes() != preparation.canonical_bytes():
+    if artifact_snapshot.read_bytes(preparation_path) != preparation.canonical_bytes():
         raise DecisionJournalError("preparation manifest bytes are not canonical")
-    if final_path.read_bytes() != final.canonical_bytes():
+    if artifact_snapshot.read_bytes(final_path) != final.canonical_bytes():
         raise DecisionJournalError("final operational manifest bytes are not canonical")
     if preparation_directory.name != preparation.preparation_id:
         raise DecisionJournalError("preparation path does not match preparation identity")
@@ -319,33 +380,54 @@ def _load_completed_evidence(final_manifest_path: Path) -> _CompletedEvidence:
         task_root, "decision_reliability.json", "Task 017 reliability"
     )
     gameweek_path = decision_directory / "gameweek_decision.json"
-    _verify_hash(candidate_path, final.candidate_artifact_sha256, "candidate artifact")
     _verify_hash(
-        decision_path, final.one_transfer_decision_sha256, "one-transfer decision"
+        candidate_path,
+        final.candidate_artifact_sha256,
+        "candidate artifact",
+        artifact_snapshot,
     )
-    _verify_hash(reliability_path, final.reliability_artifact_sha256, "reliability")
+    _verify_hash(
+        decision_path,
+        final.one_transfer_decision_sha256,
+        "one-transfer decision",
+        artifact_snapshot,
+    )
+    _verify_hash(
+        reliability_path,
+        final.reliability_artifact_sha256,
+        "reliability",
+        artifact_snapshot,
+    )
     _verify_hash(
         gameweek_path,
         final.gameweek_decision_contract_sha256,
         "GameweekDecision",
+        artifact_snapshot,
     )
     _matching_hash(
         preparation_directory / "manager_submissions",
         "manual_editable_state.json",
         final.manager_state_sha256,
         "manager state",
+        artifact_snapshot,
     )
     try:
         rebuilt = serialize_gameweek_decision(
-            build_gameweek_decision(decision_path, reliability_path)
+            build_gameweek_decision(
+                decision_path,
+                reliability_path,
+                artifact_snapshot=artifact_snapshot,
+            )
         )
     except GameweekDecisionError as exc:
         raise DecisionJournalError(
             f"completed GameweekDecision chain is invalid: {exc}"
         ) from exc
-    if rebuilt != gameweek_path.read_bytes():
+    if rebuilt != artifact_snapshot.read_bytes(gameweek_path):
         raise DecisionJournalError("GameweekDecision does not deterministically rebuild")
-    gameweek_payload = _read_json(gameweek_path, "GameweekDecision")
+    gameweek_payload = _read_json(
+        gameweek_path, "GameweekDecision", artifact_snapshot
+    )
     gameweek_deadline, _ = _parse_utc(
         gameweek_payload.get("frozen_deadline"), "GameweekDecision frozen deadline"
     )
@@ -361,7 +443,7 @@ def _load_completed_evidence(final_manifest_path: Path) -> _CompletedEvidence:
     return _CompletedEvidence(
         preparation=preparation,
         final_payload=final.to_payload(),
-        final_sha256=sha256_file(final_path),
+        final_sha256=artifact_snapshot.sha256(final_path),
         decision_directory=decision_directory,
         gameweek_path=gameweek_path,
         gameweek_payload=gameweek_payload,

@@ -13,11 +13,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from .artifact_snapshot import ArtifactSnapshotError, ReadOnceArtifactSnapshot
 from .decision_journal import DecisionJournalError, _load_completed_evidence
 from .presentation.gameweek_decision import (
     GAMEWEEK_DECISION_SCHEMA_NAME,
     GAMEWEEK_DECISION_SCHEMA_VERSION,
-    serialize_gameweek_decision,
 )
 
 
@@ -55,6 +55,8 @@ class VerifiedGameweekDecision:
 
 def load_verified_gameweek_decision(
     final_manifest_path: Path,
+    *,
+    final_manifest_bytes: bytes | None = None,
 ) -> VerifiedGameweekDecision:
     """Re-anchor and load one explicit completed Engine v1 decision.
 
@@ -63,40 +65,42 @@ def load_verified_gameweek_decision(
     value for application consumers.
     """
     try:
-        evidence = _load_completed_evidence(final_manifest_path)
-    except DecisionJournalError as exc:
+        with ReadOnceArtifactSnapshot() as snapshot:
+            evidence = _load_completed_evidence(
+                final_manifest_path,
+                artifact_snapshot=snapshot,
+                final_manifest_bytes=final_manifest_bytes,
+            )
+            final = evidence.final_payload
+            payload = evidence.gameweek_payload
+            schema_name = payload.get("schema_name")
+            schema_version = payload.get("schema_version")
+            if (
+                schema_name != GAMEWEEK_DECISION_SCHEMA_NAME
+                or schema_version != GAMEWEEK_DECISION_SCHEMA_VERSION
+            ):
+                raise TrustedArtifactValidationError(
+                    "completed GameweekDecision schema is unsupported"
+                )
+            canonical_payload = snapshot.read_bytes(evidence.gameweek_path)
+            artifact_sha256 = hashlib.sha256(canonical_payload).hexdigest()
+            if artifact_sha256 != final["gameweek_decision_contract_sha256"]:
+                raise TrustedArtifactValidationError(
+                    "verified GameweekDecision hash does not match final manifest"
+                )
+            return VerifiedGameweekDecision(
+                preparation_id=evidence.preparation.preparation_id,
+                decision_id=str(final["decision_id"]),
+                season=str(payload["season"]),
+                target_gameweek=int(payload["target_gameweek"]),
+                official_deadline=str(payload["frozen_deadline"]),
+                final_manifest_sha256=evidence.final_sha256,
+                artifact_sha256=artifact_sha256,
+                schema_name=str(schema_name),
+                schema_version=str(schema_version),
+                canonical_payload=canonical_payload,
+            )
+    except (ArtifactSnapshotError, DecisionJournalError) as exc:
         raise TrustedArtifactValidationError(
             "completed Engine v1 decision trust chain is invalid"
         ) from exc
-
-    final = evidence.final_payload
-    payload = evidence.gameweek_payload
-    schema_name = payload.get("schema_name")
-    schema_version = payload.get("schema_version")
-    if (
-        schema_name != GAMEWEEK_DECISION_SCHEMA_NAME
-        or schema_version != GAMEWEEK_DECISION_SCHEMA_VERSION
-    ):
-        raise TrustedArtifactValidationError(
-            "completed GameweekDecision schema is unsupported"
-        )
-    # Return the canonical bytes that were already accepted by the trusted
-    # loader.  Do not perform a second filesystem read after validation.
-    canonical_payload = serialize_gameweek_decision(dict(payload))
-    artifact_sha256 = hashlib.sha256(canonical_payload).hexdigest()
-    if artifact_sha256 != final["gameweek_decision_contract_sha256"]:
-        raise TrustedArtifactValidationError(
-            "verified GameweekDecision hash does not match final manifest"
-        )
-    return VerifiedGameweekDecision(
-        preparation_id=evidence.preparation.preparation_id,
-        decision_id=str(final["decision_id"]),
-        season=str(payload["season"]),
-        target_gameweek=int(payload["target_gameweek"]),
-        official_deadline=str(payload["frozen_deadline"]),
-        final_manifest_sha256=evidence.final_sha256,
-        artifact_sha256=artifact_sha256,
-        schema_name=str(schema_name),
-        schema_version=str(schema_version),
-        canonical_payload=canonical_payload,
-    )

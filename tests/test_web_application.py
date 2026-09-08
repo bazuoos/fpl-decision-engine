@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import ast
 import json
+import os
+import stat
 import tempfile
 import unittest
 from dataclasses import replace
 from pathlib import Path
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 
@@ -26,6 +29,10 @@ from fpl_decision_app.read_facade import (
     ReadFailureCode,
     TrustedArtifactReadFacade,
     TrustedReadError,
+)
+from fpl_decision_engine.artifact_snapshot import (
+    ArtifactSnapshotError,
+    ReadOnceArtifactSnapshot,
 )
 from fpl_decision_engine.trusted_artifact_reader import (
     TrustedArtifactValidationError,
@@ -90,7 +97,7 @@ class StubLoader:
         self.value = value
         self.error = error
 
-    def load(self, final_manifest_path: Path):
+    def load(self, final_manifest_path: Path, final_manifest_bytes: bytes):
         if self.error is not None:
             raise self.error
         return self.value
@@ -207,6 +214,153 @@ class WebApplicationTests(unittest.TestCase):
             self.fixture.decision_id,
         )
         self.assertNotIn("path", json.dumps(envelope).lower())
+
+    def test_authoritative_chain_uses_facade_bytes_then_snapshot_paths(self) -> None:
+        final_body = self.fixture.final_manifest_path.read_bytes()
+        original_open = Path.open
+        fixture_root = self.fixture.root.resolve()
+
+        def reject_original_path_reads(path: Path, *args, **kwargs):
+            resolved = path.resolve()
+            mode = args[0] if args else kwargs.get("mode", "r")
+            if (
+                (resolved == fixture_root or fixture_root in resolved.parents)
+                and "r" in mode
+            ):
+                raise AssertionError("trusted validators reopened an original artifact")
+            return original_open(path, *args, **kwargs)
+
+        with patch.object(Path, "open", reject_original_path_reads):
+            verified = load_verified_gameweek_decision(
+                self.fixture.final_manifest_path,
+                final_manifest_bytes=final_body,
+            )
+        self.assertEqual(verified.decision_id, self.fixture.decision_id)
+        self.assertEqual(
+            verified.canonical_payload,
+            self.fixture.gameweek_decision_path.read_bytes(),
+        )
+
+    def test_snapshot_reuses_stable_bytes_after_original_changes(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            artifact = Path(temporary).resolve() / "artifact.json"
+            original = b'{"state":"original"}\n'
+            artifact.write_bytes(original)
+            with ReadOnceArtifactSnapshot() as snapshot:
+                self.assertEqual(snapshot.read_bytes(artifact), original)
+                digest = snapshot.sha256(artifact)
+                materialized = snapshot.materialized_path(artifact)
+                artifact.write_bytes(b'{"state":"replaced"}\n')
+                self.assertEqual(snapshot.read_bytes(artifact), original)
+                self.assertEqual(snapshot.sha256(artifact), digest)
+                self.assertEqual(materialized.read_bytes(), original)
+            self.assertFalse(materialized.exists())
+
+    def test_snapshot_rejects_final_and_intermediate_symlinks(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            target_directory = root / "target"
+            target_directory.mkdir()
+            target = target_directory / "artifact.json"
+            target.write_bytes(b"trusted\n")
+            final_link = root / "artifact-link.json"
+            final_link.symlink_to(target)
+            directory_link = root / "directory-link"
+            directory_link.symlink_to(target_directory, target_is_directory=True)
+
+            for candidate in (final_link, directory_link / target.name):
+                with self.subTest(candidate=candidate):
+                    with ReadOnceArtifactSnapshot() as snapshot:
+                        with self.assertRaises(ArtifactSnapshotError):
+                            snapshot.read_bytes(candidate)
+
+    def test_snapshot_rejects_fifo_without_blocking(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            fifo = Path(temporary).resolve() / "artifact.pipe"
+            os.mkfifo(fifo)
+            real_open = os.open
+            observed_source_open = False
+
+            def require_nonblocking(path, flags, *args, **kwargs):
+                nonlocal observed_source_open
+                if path == fifo.name and not flags & os.O_DIRECTORY:
+                    observed_source_open = True
+                    self.assertTrue(flags & os.O_NONBLOCK)
+                    self.assertTrue(flags & os.O_NOFOLLOW)
+                return real_open(path, flags, *args, **kwargs)
+
+            with patch(
+                "fpl_decision_engine.artifact_snapshot.os.open",
+                side_effect=require_nonblocking,
+            ):
+                with ReadOnceArtifactSnapshot() as snapshot:
+                    with self.assertRaisesRegex(
+                        ArtifactSnapshotError, "single-link regular file"
+                    ):
+                        snapshot.read_bytes(fifo)
+            self.assertTrue(observed_source_open)
+
+    def test_snapshot_rejects_hardlinked_source(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            source = root / "artifact.json"
+            alias = root / "artifact-alias.json"
+            source.write_bytes(b"trusted\n")
+            os.link(source, alias)
+            with ReadOnceArtifactSnapshot() as snapshot:
+                with self.assertRaisesRegex(
+                    ArtifactSnapshotError, "single-link regular file"
+                ):
+                    snapshot.read_bytes(source)
+
+    def test_snapshot_files_are_private_at_atomic_creation(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            source = root / "source.json"
+            source.write_bytes(b"captured\n")
+            real_fdopen = os.fdopen
+            creation_modes: list[int] = []
+
+            def inspect_mode(fd, *args, **kwargs):
+                creation_modes.append(stat.S_IMODE(os.fstat(fd).st_mode))
+                return real_fdopen(fd, *args, **kwargs)
+
+            with patch(
+                "fpl_decision_engine.artifact_snapshot.os.fdopen",
+                side_effect=inspect_mode,
+            ):
+                with ReadOnceArtifactSnapshot() as snapshot:
+                    snapshot.seed(root / "seeded.json", b"seeded\n")
+                    snapshot.read_bytes(source)
+            self.assertEqual(len(creation_modes), 2)
+            self.assertTrue(all(mode & 0o077 == 0 for mode in creation_modes))
+
+    def test_facade_passes_the_exact_hashed_manifest_bytes_to_the_loader(self) -> None:
+        final_path = self.fixture.final_manifest_path
+        original = final_path.read_bytes()
+
+        class ReplacingLoader:
+            def load(self, path: Path, body: bytes):
+                self.body = body
+                path.write_bytes(b'{"replaced_after_facade_read":true}\n')
+                return load_verified_gameweek_decision(
+                    path,
+                    final_manifest_bytes=body,
+                )
+
+        loader = ReplacingLoader()
+        try:
+            envelope = self.facade(loader=loader).read_decision(
+                principal_id=LOCAL_SINGLE_USER_PRINCIPAL,
+                decision_id=self.fixture.decision_id,
+            )
+            self.assertEqual(loader.body, original)
+            self.assertEqual(
+                envelope["artifact_identity"]["final_manifest_sha256"],
+                self.fixture.final_manifest_sha256,
+            )
+        finally:
+            final_path.write_bytes(original)
 
     def test_missing_artifact_and_final_manifest_hash_mismatch_fail_closed(self) -> None:
         events: list[str] = []
