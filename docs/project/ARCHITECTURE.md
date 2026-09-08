@@ -28,6 +28,12 @@ React / TypeScript / Vite -> server-verified payload or fail-closed error
 RESEARCH: historical*.py + separately stored historical/experiment artifacts
 pinned archives -> causal features -> frozen baseline / preregistered experiments
                     -X-> no automatic promotion or runtime feedback to production
+
+LOCAL/PRIVATE RECOVERY (outside decision authority and outside Git)
+authorized quiescent data + recorded clean Git revision
+    -> read-only inventory -> age-encrypted immutable checkpoint + Git bundle
+    -> local verify/restore -> future exact-version B2 + disconnected copy
+         -X-> restore success alone does not validate prospective or semantic truth
 ```
 
 Validation is not a last-minute UI step: each stage validates its inputs.
@@ -109,10 +115,31 @@ Canonical artifact verification occurs on the server. The browser client checks
 trust/version envelope markers, not full artifact schemas or hashes. OpenAPI
 snapshot and import/bundle tests enforce specific checks; they are not exhaustive
 proof of contract drift prevention or semantic isolation. The application import
-guard omits `decision_journal`, although current app imports use the public reader.
+guard includes `decision_journal` and expands `from package import member` forms;
+it remains a test-time denylist rather than a runtime import boundary.
 `DecisionView` does not yet display RFC-envisaged reliability diagnostics or model
 caveats; documenting this gap authorizes no frontend implementation.
 
 There is no app database, command worker,
 research export or multi-tenant service yet. The read-bytes-once aspiration is
-not fully implemented across the chain; see [handoff follow-ups](CURRENT_HANDOFF.md#unresolved-review-follow-ups).
+not fully implemented across the chain; see
+[handoff follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups).
+
+## Recovery boundary today
+
+Recovery tooling supplies operational support only; engine artifacts retain
+decision authority.
+[Task027C](TASK027C_LOCAL_BACKUP_READINESS.md) protects private root paths from
+ordinary staging and inventories opaque bytes without interpreting them.
+[Task027D](TASK027D_ENCRYPTED_CHECKPOINTS.md) creates manifest-first,
+age-encrypted no-overwrite checkpoints containing the selected private tree and
+a clean recorded-revision Git bundle, then provides explicit verify and restore
+operations. The Task027E1 staged-content guard scans the complete Git index for
+age identities and owner-supplied exact private values before commit.
+
+These controls do not establish that the selected evidence is complete or true.
+A restored digest proves byte identity only; trusted readers must still validate
+the restored engine chain, and missing pre-deadline evidence remains missing.
+No provider upload, production recovery identity, disconnected copy or real
+restore drill has passed. Provider identifiers, credentials, private manifests,
+object receipts and custody locations remain outside the repository.

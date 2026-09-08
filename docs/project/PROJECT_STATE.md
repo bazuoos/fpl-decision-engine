@@ -1,6 +1,8 @@
 # Project state
 
-Checkpoint: 2026-09-04, commit `95dbbb0ba069bc7011fc75b72c8213325c403227`.
+Implementation checkpoint summarized: 2026-09-08, commit
+`824b504ee9acc6941fc6cec97e8456f8b97498e5`. Identify this document's own
+revision and any later work from Git history.
 Start with [CURRENT_HANDOFF](CURRENT_HANDOFF.md); this pack is navigation and
 continuity context, not a replacement for code, contracts, or frozen evidence.
 
@@ -26,6 +28,7 @@ the selected action the objectively best FPL transfer.
 | Engine v1 operations | Two phases, explicit IDs, manager gate, UTC deadlines, immutable completed results | Fresh verified editable manager evidence is indispensable |
 | Journal / Diff | Separate human-action record; trusted same-scope structural comparison | Outcome v1 proves GW completion, not points/counterfactual performance; diff is not causal |
 | Web | Authorization seam, explicit-ID verified decision reads, canonical payload rendering | Local single-user mode only; no real auth, uploads, commands, or research service |
+| Recovery tooling | Private-path staging guards, read-only inventory, encrypted checkpoint create/verify/restore | No production key, verified remote/disconnected copy or real restore drill |
 
 Primary guide: [README](../../README.md). Implementation map:
 [ARCHITECTURE](ARCHITECTURE.md). Product constraints:
@@ -79,21 +82,19 @@ a delivery gap, not authorization to implement it.
 
 ## Validation evidence and procedure
 
-**Repository-established at this review:** HEAD `95dbbb0`, branch `main`, 109
-tracked files, 411 Python test methods and four frontend tests in source. The
-CI workflow configures Python 3.10 and Node 22. Counts and workflow configuration
-do not prove test execution or CI success.
+**Repository-established at this review:** HEAD `824b504`, branch `main`, 127
+tracked files and four frontend tests in source. The CI workflow configures
+Python 3.10, Node 22 and checksum-pinned age 1.3.1 installation.
 
-**Reported by the original continuity-pack authoring session, not independently
-rerun or verified by this review:** on 2026-09-04, 411 Python tests passed with
-zero skips in 126.303 seconds under Python 3.14.5; four frontend tests,
-TypeScript, production build, browser boundary, document-link and whitespace
-checks passed. That session reported all 109 tracked files byte-identical and
-[CI run 33848602481](https://github.com/bazuoos/fpl-decision-engine/actions/runs/33848602481)
-successful at 2026-09-04 07:33:04 UTC. Local execution logs are not linked here;
-these historical reports do not establish current or future checkout health.
-The documentation remediation intentionally changes README discoverability;
-it does not claim that all 109 tracked files remain identical after that edit.
+At this exact commit, [CI run 34190635299](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34190635299)
+passed 461 Python tests, four frontend tests, TypeScript, production build,
+browser dependency-boundary and whitespace checks in 3m20s. The preceding
+Task026B follow-up remediation review independently reported the same 461/18
+Python full-suite/application-module counts and a clean diff. Historical success
+does not establish future checkout health. The CI run also emitted a non-failing
+GitHub-hosted-actions annotation that the Node.js 20 runtime used internally by
+the current checkout/setup actions is deprecated and being forced to Node.js 24;
+review action-version upgrades as maintenance before platform enforcement.
 
 When installation/test execution is authorized, use a virtualenv and run:
 
@@ -124,11 +125,14 @@ The RFC remains proposed and its original no-web/API findings predate Task026B.
 Only health and decision read routes exist; do not infer diff/journal routes
 from the RFC or CLI. README's Task023A “future runner” and older transfer
 exclusions describe earlier task scopes; later modules implement both paths.
-Python locking and chain-wide read-once ambitions remain undelivered. See the
+Python locking and chain-wide read-once ambitions remain undelivered. The
+application forbidden-import guard now includes `decision_journal` and reconstructs
+fully qualified members for `from package import member`; it remains a test-time
+specific denylist rather than a runtime import mechanism. See the
 [decision status index](DECISIONS.md#web-rfc-decision-status) and
-[deferred follow-ups](CURRENT_HANDOFF.md#unresolved-review-follow-ups).
+[deferred follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups).
 
-## Reproducibility is not disaster recovery
+## Reproducibility and current recovery state
 
 The committed tests use offline fake responses and explicit test-only fixtures;
 they do not require a developer's generated datasets. See
@@ -141,16 +145,42 @@ procedure therefore exists, but identical future Python dependency resolution
 is not guaranteed. File-fsync plus atomic publication is not a full power-loss
 durability or backup guarantee; see README refresh durability wording.
 
+Task027C committed root ignore rules for `data/` and `.private-recovery/`, a
+full-index private-path guard, and a read-only inventory tool. Task027D committed
+age-encrypted checkpoint create/verify/restore tooling that packages a private
+manifest and a Git bundle, detects source changes and validates restored bytes.
+Task027E1 committed a fail-closed staged-blob scanner for age identities and
+owner-supplied exact sensitive values. These controls reduce accidental Git
+publication and make local encrypted recovery testable; they do not upload,
+schedule or attest to a backup.
+
+The owner reports that password-manager recovery and a private B2 bucket with
+default encryption, Object Lock and 90-day compliance retention have been
+prepared. Label this as external owner-reported state; repository evidence does
+not verify it, and identifiers and credentials do not belong here. Task027E is paused
+before production age-key generation, application-key creation or a synthetic
+upload while a dedicated disconnected medium is unavailable. The owner must
+explicitly accept the irreversible 90-day lock before Task027F uploads real
+evidence. There is no production checkpoint, exact-version readback,
+disconnected copy or clean-environment real restore drill: **NO VERIFIED OFFSITE
+BACKUP**.
+
+Task027B/027C identified original manager-input/source screenshots referenced by
+two operational runs whose matching source bytes were not found under the
+authorized `data/` inventory. They are **NOT LOCATED**, not proven destroyed;
+current data or reconstructed screenshots cannot replace prospective evidence.
+
 ### Recovery boundaries and safe sequence
 
 1. Restore a verified repository revision; inspect status/log before work.
 2. Install using the [validation commands](#validation-evidence-and-procedure) and run
    all tests. Never repurpose test fixtures as recovered production evidence.
-3. Separately obtain an authorized private backup of required raw/clean/features,
-   predictions, manager evidence, operations, journals/diffs, and experiment
-   manifests/artifacts. Preserve original bytes and referenced paths; inspect
-   path assumptions before relocation. Do not rewrite manifests to make a move
-   appear valid.
+3. Separately obtain an authorized encrypted checkpoint of required
+   raw/clean/features, predictions, manager evidence, operations, journals/diffs,
+   and experiment manifests/artifacts. Preserve original bytes and referenced
+   paths; inspect path assumptions before relocation. Do not rewrite manifests
+   to make a move appear valid. Follow the Task027D runbook rather than treating
+   this summary as an operator command.
 4. Verify the required chain with existing trusted readers before using any
    recovered decision. A digest or an index alone is not evidence recovery or
    authentication; the referenced bytes and trusted source must exist.
@@ -159,9 +189,12 @@ durability or backup guarantee; see README refresh durability wording.
    human which operations remain possible. Historical backfill has separate
    evidence rules and cannot masquerade as prospective evidence.
 
-Backup/deployment ownership, backup location, custodian, encryption/access,
-retention, restore procedures and drill, private evidence inventory, and
-recovery objectives: **REQUIRES HUMAN CONTEXT**. This documentation creates no
-backup and does not attest to private artifact integrity. Most generated roots
-are ignored, but `data/operations/` is not currently covered by `.gitignore`;
-explicit staging is essential. Do not add private data to Git to solve recovery.
+The design targets an upload after each material evidence capture/finalized
+decision, at worst by end of active day, and within one hour during the final
+24 hours before a deadline. Target RTO is four hours through B2 or one business
+day through the disconnected copy. These RPO/RTO values are unproven targets
+until Task027F measures a real restore. Private inventory completeness, custody
+locations, access/recovery records, object-version receipts, provider account
+state, deletion decisions and drill results remain **REQUIRES HUMAN CONTEXT**.
+Do not add private data to Git to solve recovery; explicitly stage reviewed paths
+and run both Task027C/Task027E1 guards immediately before every commit.

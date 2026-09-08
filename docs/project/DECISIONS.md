@@ -23,6 +23,8 @@ architecture; its own status still says proposed.
 | Offline tests must execute without private/generated files | `tests/fixtures/README.md`, isolation test, CI; `aab7432`, `c0cdfb5` | Committed test copies are not production recovery artifacts |
 | Engine is authority; app/browser consume verified output | RFC ADR-026A-01–05/10; `5ffbb4f`, `95dbbb0`; status detail below | One-way module dependency, local read-only API, no app/browser FPL semantics |
 | Research/population evidence stays separate from production | RFC sections 14–16 and ADR-026A-09 | Consent-gated export and reviewed release are designs; no runtime feedback path |
+| Private operational evidence stays outside Git and needs independent recovery | Task027C/D/E docs and guards; `2a0f389`, `60d00dd`, `744dd8e` | Inventory and encrypted checkpoints are local mechanisms; exact private values and provider receipts stay owner-private |
+| B2 with 90-day compliance retention is the proposed permanent remote destination | Task027E spec; `a0cf180` | Synthetic drill first; explicit owner acceptance before real upload; retained versions cannot be shortened or deleted during the lock |
 
 ## Historical presentation lesson (human-confirmed context and policy)
 
@@ -45,11 +47,11 @@ all its ADRs are proposed pending independent review. Human confirmation of
 project policy does not automatically accept every RFC design. IMPLEMENTED
 below describes observable code, not blanket acceptance of the entire ADR.
 
-| RFC decision | Status at `95dbbb0` | Boundary / consequence |
+| RFC decision | Status at `824b504` | Boundary / consequence |
 |---|---|---|
 | ADR-026A-01: engine artifacts are authority | IMPLEMENTED for decision reads | Public reader delegates existing validation; no second app/browser optimizer |
 | ADR-026A-02: React/TypeScript/Vite | IMPLEMENTED stack | Static client; no chosen UX paradigm; current view omits RFC-envisaged reliability/model caveats |
-| ADR-026A-03: separate Python/FastAPI app | IMPLEMENTED | One-way dependency; import tests enforce a specific forbidden list, not every possible bypass |
+| ADR-026A-03: separate Python/FastAPI app | IMPLEMENTED | One-way dependency; import tests cover the journal and package-member spelling but remain a specific test-time forbidden list |
 | ADR-026A-04: REST envelope and canonical artifact | IMPLEMENTED for health/decision API | Server verifies; browser checks markers; TypeScript payload types remain manual; broader routes are PROPOSED |
 | ADR-026A-05: immutable indexed access | IMPLEMENTED local explicit-ID/hash checks; PARTIAL RFC design | Chain-wide read-once, object storage and verified-by-hash caching remain unimplemented |
 | ADR-026A-06: separate app-user and FPL-entry identities | PROPOSED | Public entry ID does not prove control; season-scoped connections and ownership verification are not implemented |
