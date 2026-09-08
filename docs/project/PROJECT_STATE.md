@@ -1,7 +1,7 @@
 # Project state
 
 Implementation checkpoint summarized: 2026-09-08, commit
-`76c10f2d5e1853fcbad7a4675ff5c3f4f2b768ee`. Identify this document's own
+`946da7d1f99f26ea368dbf9918111589bb402214`. Identify this document's own
 revision and any later work from Git history.
 Start with [CURRENT_HANDOFF](CURRENT_HANDOFF.md); this pack is navigation and
 continuity context, not a replacement for code, contracts, or frozen evidence.
@@ -82,17 +82,18 @@ a delivery gap, not authorization to implement it.
 
 ## Validation evidence and procedure
 
-**Repository-established at this review:** HEAD `76c10f2`, branch `main`, 128
+**Repository-established at this review:** HEAD `946da7d`, branch `main`, 128
 tracked files and four frontend tests in source. The CI workflow configures
 Python 3.10, Node 22 and checksum-pinned age 1.3.1 installation.
 
-At this exact commit, [CI run 34222962259](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34222962259)
-passed 468 Python tests, four frontend tests, TypeScript, production build,
-browser dependency-boundary and whitespace checks. The preceding Task026B
-follow-up #2 remediation review independently reported SAFE after adversarial
-tests covered original-path replacement, symlinks, hardlinks, FIFO handling and
-private snapshot creation. Historical success does not establish future checkout
-health. The CI run also emitted a non-failing
+At this exact commit, [CI run 34238146592](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34238146592)
+passed 469 Python tests, four frontend tests, generated-contract freshness,
+TypeScript, production build, browser dependency-boundary and whitespace checks.
+The preceding Task026B follow-up #3 adversarial review independently verified
+the schema transformation, every OpenAPI reference, stale-output rejection,
+component-collision refusal and exact generator lock integrity, and reported
+SAFE. Historical success does not establish future checkout health. The CI run
+also emitted a non-failing
 GitHub-hosted-actions annotation that the Node.js 20 runtime used internally by
 the current checkout/setup actions is deprecated and being forced to Node.js 24;
 review action-version upgrades as maintenance before platform enforcement.
@@ -107,6 +108,7 @@ python -m unittest discover -s tests
 git diff --check
 cd web
 npm ci
+npm run check:contracts
 npm test
 npm run typecheck
 npm run build
@@ -132,8 +134,12 @@ validates private snapshot copies; this is not process-wide file immutability,
 object storage or a general replacement for every path read elsewhere. The
 application forbidden-import guard includes `decision_journal` and reconstructs
 fully qualified members for `from package import member`; it remains a test-time
-specific denylist rather than a runtime import mechanism. See the
-[decision status index](DECISIONS.md#web-rfc-decision-status) and
+specific denylist rather than a runtime import mechanism. The authoritative
+GameweekDecision JSON Schema is converted into the checked OpenAPI document, and
+browser consumers import exact-pinned, generated TypeScript types directly.
+CI detects changes between the application, checked OpenAPI and generated file;
+these compile-time types do not add browser-side runtime schema validation. See
+the [decision status index](DECISIONS.md#web-rfc-decision-status) and
 [deferred follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups).
 
 ## Current local public-data evidence

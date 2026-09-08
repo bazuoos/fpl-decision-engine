@@ -1,6 +1,6 @@
 # Roadmap
 
-As of `76c10f2` (2026-09-08). This is a planning map, not authorization to
+As of `946da7d` (2026-09-08). This is a planning map, not authorization to
 execute. The [RFC phased plan](../rfcs/0026a-web-product-architecture.md#28-phased-implementation-plan)
 is the source for Tasks026B–D. Proposed capabilities are not completed merely
 because they appear in that RFC.
@@ -29,27 +29,34 @@ because they appear in that RFC.
 - Task026B follow-up #2: the current explicit decision-read chain captures
   original artifact paths once per request, then validates stable private
   snapshots with fail-closed filesystem checks (`76c10f2`).
+- Task026B follow-up #3: authoritative GameweekDecision schema components feed
+  the checked OpenAPI and exact-pinned generated browser types; CI rejects stale
+  generated output (`946da7d`).
 
 ## NEXT — proposed planning boundary, not work started
 
-1. Review this continuity refresh, then separately scope the selected remaining
-   [Task026B follow-up](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups):
-   stronger API/engine-schema/TypeScript drift detection. The selection is a
-   planning decision, not authorization to implement it.
-2. Reconcile RFC scope with the delivered narrower read slice. Decide whether
+1. Review this continuity refresh, then separately design the selected bounded
+   official-data completion monitor. Proposed boundaries are lightweight event
+   completion polling, one deduplicated immutable refresh and optional
+   leakage-safe evaluation. Automatic decisions, journals and manager actions
+   remain excluded. No implementation or scheduler is authorized by this entry.
+2. Preserve the two remaining
+   [Task026B follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups): keep
+   the current shell/navigation disposable and the UX paradigm undecided.
+3. Reconcile RFC scope with the delivered narrower read slice. Decide whether
    additional artifact read routes are needed; they are not implemented now.
    Also record the missing reliability/model-caveat rendering envisaged by the
    RFC. Neither delivery gap authorizes implementation.
-3. Plan Task026C only after human approval: identity/ownership,
+4. Plan Task026C only after human approval: identity/ownership,
    OIDC/session/CSRF, PostgreSQL, private evidence review/storage, explicit engine
    commands/workers, consent/retention/export/deletion and isolation tests.
-4. Review the current GitHub Actions version-deprecation annotation as a small
+5. Review the current GitHub Actions version-deprecation annotation as a small
    maintenance task before platform enforcement; CI is currently passing.
 
-The next engineering choice is between a remaining Task026B boundary follow-up
-and resuming Task027E after the required owner-held medium exists. The engine
-remains the sole decision authority. Exact sequencing and acceptance criteria
-require an approved task scope.
+The next selected planning task is the completion-monitor design. Task026B
+presentation boundaries and Task027E remain available later. The engine remains
+the sole decision authority. Exact sequencing and acceptance criteria require an
+approved task scope.
 
 ## PAUSED — recovery owner setup
 

@@ -5,14 +5,14 @@
 > contradiction. Verify current Git state before acting.
 
 - Implementation checkpoint summarized: **2026-09-08**,
-  `76c10f2d5e1853fcbad7a4675ff5c3f4f2b768ee`. It was on `main`, aligned with
+  `946da7d1f99f26ea368dbf9918111589bb402214`. It was on `main`, aligned with
   `origin/main`, with successful CI. Identify this document's own revision and
   any later work from Git history rather than assuming the embedded SHA is HEAD.
-- Latest completed implementation: **Task026B deferred follow-up #2**. The
-  current explicit decision-read chain captures each original artifact path once
-  per request and validates stable private snapshot copies. It fails closed on
-  symlinks, hardlinks, non-regular files and source changes during capture;
-  independent remediation review reported SAFE and CI passed.
+- Latest completed implementation: **Task026B deferred follow-up #3**. The
+  authoritative GameweekDecision JSON Schema now feeds the checked OpenAPI
+  payload components and generated browser types. CI fails on stale generated
+  TypeScript; browser consumers no longer maintain a parallel handwritten
+  payload shape. Independent adversarial review reported SAFE and CI passed.
 - Resilience work: Task027C local safeguards, Task027D encrypted-checkpoint
   tooling and Task027E1 staged sensitive-content guard are committed. Task027E
   owner custody/destination setup is **PAUSED** before production key generation,
@@ -54,14 +54,11 @@
 
 ## Unresolved Task026B follow-ups
 
-Follow-ups #1 and #2 closed at `824b504` and `76c10f2`. Three review follow-ups
-remain planning inputs,
-not authorization for implementation:
+Follow-ups #1–#3 closed at `824b504`, `76c10f2` and `946da7d`. Two review
+follow-ups remain planning inputs, not authorization for implementation:
 
-1. Strengthen API/engine-schema/TypeScript drift detection; OpenAPI snapshot and
-   TS checks exist, but payload types are manually maintained.
-2. Keep `App.tsx` and explicit-ID navigation disposable.
-3. Keep final styling and the UX paradigm **UNDECIDED**.
+1. Keep `App.tsx` and explicit-ID navigation disposable.
+2. Keep final styling and the UX paradigm **UNDECIDED**.
 
 Additional documented RFC gap: current `DecisionView` omits reliability and
 model caveats. This does not authorize frontend work. See
@@ -69,9 +66,12 @@ model caveats. This does not authorize frontend work. See
 
 ## Immediate next question
 
-The human selected API/engine-schema/TypeScript drift detection as the next
-proposed Task026B follow-up after this documentation-only refresh. That selection
-does not authorize implementation before this refresh is reviewed and handled.
+The human selected a bounded official-data completion-monitor design as the next
+proposed task after this documentation-only refresh. The design should consider
+lightweight completion polling, one deduplicated immutable refresh and optional
+leakage-safe evaluation, while excluding automatic decisions, journals and
+manager actions. No monitor implementation, scheduling or network operation has
+started; exact scope and task identity require separate review and approval.
 
 **REQUIRES HUMAN CONTEXT:** next approved priority; private evidence locations
 and completeness; credential/key custody and private backup receipts; explicit
@@ -94,7 +94,8 @@ to unseal an experiment. Changing football facts need fresh verification.
    [public reader](../../src/fpl_decision_engine/trusted_artifact_reader.py),
    [app facade](../../src/fpl_decision_app/read_facade.py),
    [boundary tests](../../tests/test_web_application.py), and
-   [OpenAPI](../../contracts/api/v1/openapi.json). Read
+   [OpenAPI](../../contracts/api/v1/openapi.json), plus the
+   [generated browser types](../../web/src/api/generated-contracts.ts). Read
    [fixture provenance](../../tests/fixtures/README.md) before interpreting hashes.
 
 ## Fresh AI session bootstrap

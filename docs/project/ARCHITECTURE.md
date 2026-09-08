@@ -106,7 +106,11 @@ and files that change during capture. It does not generate decisions.
 explicit decision reads. [GameweekDecision / DecisionDiff schemas](../../src/fpl_decision_engine/presentation/schemas/)
 govern artifact payloads independently of API v1. Journal/manifests instead use
 typed exact-field validation. Unknown shapes/versions cannot be guessed into
-compatibility. Never migrate immutable bytes in place.
+compatibility. The public trusted-reader seam converts the authoritative
+GameweekDecision schema into collision-checked OpenAPI components. Browser code
+imports types generated from that checked document, and CI refuses stale
+generated output. This is compile-time drift detection, not browser-side runtime
+validation. Never migrate immutable bytes in place.
 
 The [local authorization policy](../../src/fpl_decision_app/authorization.py)
 assigns no client identity: the API supplies the same local principal for every
@@ -117,8 +121,8 @@ artifact readiness. See [setup](../../README.md#webapplication-skeleton).
 
 Canonical artifact verification occurs on the server. The browser client checks
 trust/version envelope markers, not full artifact schemas or hashes. OpenAPI
-snapshot and import/bundle tests enforce specific checks; they are not exhaustive
-proof of contract drift prevention or semantic isolation. The application import
+snapshot, generated-type and import/bundle tests enforce specific checks; they
+are not exhaustive proof of semantic isolation. The application import
 guard includes `decision_journal` and expands `from package import member` forms;
 it remains a test-time denylist rather than a runtime import boundary.
 `DecisionView` does not yet display RFC-envisaged reliability diagnostics or model

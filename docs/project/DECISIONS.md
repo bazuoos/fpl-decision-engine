@@ -47,12 +47,12 @@ all its ADRs are proposed pending independent review. Human confirmation of
 project policy does not automatically accept every RFC design. IMPLEMENTED
 below describes observable code, not blanket acceptance of the entire ADR.
 
-| RFC decision | Status at `76c10f2` | Boundary / consequence |
+| RFC decision | Status at `946da7d` | Boundary / consequence |
 |---|---|---|
 | ADR-026A-01: engine artifacts are authority | IMPLEMENTED for decision reads | Public reader delegates existing validation; no second app/browser optimizer |
 | ADR-026A-02: React/TypeScript/Vite | IMPLEMENTED stack | Static client; no chosen UX paradigm; current view omits RFC-envisaged reliability/model caveats |
 | ADR-026A-03: separate Python/FastAPI app | IMPLEMENTED | One-way dependency; import tests cover the journal and package-member spelling but remain a specific test-time forbidden list |
-| ADR-026A-04: REST envelope and canonical artifact | IMPLEMENTED for health/decision API | Server verifies; browser checks markers; TypeScript payload types remain manual; broader routes are PROPOSED |
+| ADR-026A-04: REST envelope and canonical artifact | IMPLEMENTED for health/decision API | Server verifies; checked OpenAPI embeds the authoritative payload schema; browser types are generated and freshness-checked; runtime browser checks remain envelope markers; broader routes are PROPOSED |
 | ADR-026A-05: immutable indexed access | IMPLEMENTED local explicit-ID/hash checks and request-scoped stable snapshots for the current decision route; PARTIAL RFC design | Each original artifact path is captured once per request; process-wide immutability, object storage and verified-by-hash caching remain unimplemented |
 | ADR-026A-06: separate app-user and FPL-entry identities | PROPOSED | Public entry ID does not prove control; season-scoped connections and ownership verification are not implemented |
 | ADR-026A-07: fresh manager evidence | IMPLEMENTED CLI evidence/deadline gate; PROPOSED web workflow | Manual evidence and selling prices are required; OCR is advisory in the proposed design |
