@@ -5,7 +5,7 @@
 > contradiction. Verify current Git state before acting.
 
 - Implementation checkpoint summarized: **2026-09-09**,
-  `e3758e47db008a3bb4d147fe4971b1e2aff7418f`. It was on `main`, aligned with
+  `33fa48ce690b96f3a090f6298897b9f8ddab38a7`. It was on `main`, aligned with
   `origin/main`, with successful CI. Identify this document's own revision and
   any later work from Git history rather than assuming the embedded SHA is HEAD.
 - Latest completed implementation: **Task028D offline LaunchAgent drill
@@ -13,9 +13,14 @@
   owner-only synthetic packages, constructs an exact-label temporary lifecycle,
   checks cleanup and produces sanitized review evidence. Automated tests replace
   `launchctl` with a fake runner. Independent adversarial review reported SAFE;
-  CI run 34342918533 passed 531 Python and four frontend tests. No real lifecycle
-  command ran and no scheduler was installed or enabled. Task028B remains the
-  implemented one-shot completion monitor beneath this separate harness.
+  CI run 34346416323 passed 531 Python and four frontend tests. Task028B remains
+  the implemented one-shot completion monitor beneath this separate harness.
+- **Local operational evidence, not a production installation:** on 2026-09-09,
+  the owner authorized distinct complete and review-required Task028D scenarios
+  on `33fa48c`. Both temporary exact-label lifecycles passed local manifest,
+  sequence, non-overlap, cleanup and quiet-window checks; both labels are absent.
+  Independent sanitized-evidence review reported SAFE and sufficient to record
+  the drill as passed. No production FPL operation ran or service remains loaded.
 - Resilience work: Task027C local safeguards, Task027D encrypted-checkpoint
   tooling and Task027E1 staged sensitive-content guard are committed. Task027E
   owner custody/destination setup is **PAUSED** before production key generation,
@@ -24,7 +29,7 @@
   VERIFIED OFFSITE BACKUP.**
 - **Task026C has not started.** The web UX paradigm remains deliberately
   **UNDECIDED**.
-- Outside this five-file continuity refresh, the only visible working-tree items
+- Outside this six-file continuity refresh, the only visible working-tree items
   are unrelated untracked `task025_claude_review_bundle.txt` and
   `task025_review.patch`. Preserve them. Root `data/`, `.private-recovery/` and
   `.DS_Store` paths are ignored and guarded against staging.
@@ -46,10 +51,10 @@
   generation. Its optional evaluation requires an explicit exact pre-deadline
   prediction and cannot substitute or generate one.
 - Task028D is also inert unless its `run` command receives the explicit temporary
-  LaunchAgent execution flag. Preparing, verifying, sanitizing or rendering a
-  plist does not load a service. The real complete/review synthetic scenarios,
-  their independent evidence review and any production-schedule design remain
-  separately gated.
+  LaunchAgent execution flag. The authorized two-scenario drill has passed;
+  preparing, verifying, sanitizing or rendering a plist still does not load a
+  service. Any production-schedule design and installation remain separately
+  gated and unauthorized.
 - Web skeleton is **localhost-only**: every request receives the same local
   principal, not client authentication. Both `FPL_APP_ARTIFACT_ROOT` and
   `FPL_APP_ARTIFACT_INDEX` are needed for indexed reads. Health can succeed with
@@ -79,13 +84,13 @@ model caveats. This does not authorize frontend work. See
 
 ## Immediate next question
 
-After this documentation-only refresh, the smallest proposed next gate is the
-**actual temporary Task028D synthetic macOS drill** on the exact reviewed commit.
-It requires separate owner authorization, unique labels for both complete and
-review-required scenarios, proved exact-label cleanup, sanitized evidence and
-independent evidence review. This proposal does not authorize execution. It uses
-no live FPL request, production data, decision, journal or manager action, and a
-pass would not authorize a production schedule.
+After this documentation-only refresh, the smallest proposed planning boundary
+is **Task028E: production completion-monitor scheduling and terminal-stop
+design**. It must resolve how automation distinguishes Task028B waiting from
+terminal success, handles sleep/missed intervals and review-required outcomes,
+binds one explicit target, preserves operator-visible evidence and owns exact
+installation/rollback. This proposal has not started and authorizes no service
+installation, live request or production schedule.
 
 **REQUIRES HUMAN CONTEXT:** next approved priority; private evidence locations
 and completeness; credential/key custody and private backup receipts; explicit

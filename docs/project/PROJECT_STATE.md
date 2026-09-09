@@ -1,7 +1,7 @@
 # Project state
 
 Implementation checkpoint summarized: 2026-09-09, commit
-`e3758e47db008a3bb4d147fe4971b1e2aff7418f`. Identify this document's own
+`33fa48ce690b96f3a090f6298897b9f8ddab38a7`. Identify this document's own
 revision and any later work from Git history.
 Start with [CURRENT_HANDOFF](CURRENT_HANDOFF.md); this pack is navigation and
 continuity context, not a replacement for code, contracts, or frozen evidence.
@@ -21,7 +21,7 @@ the selected action the objectively best FPL transfer.
 
 | Area | Implemented and trusted for | Important limit |
 |---|---|---|
-| Official data | Immutable raw bytes, typed Parquet, coherent resumable refresh; stable one-shot completion monitoring; offline scheduling-drill harness | Live collection needs network; the real scheduling drill and any production schedule remain unexecuted and unauthorized |
+| Official data | Immutable raw bytes, typed Parquet, coherent resumable refresh; stable one-shot completion monitoring; offline scheduling-drill harness | Live collection needs network; the local synthetic drill passed, but no production scheduler is installed or authorized |
 | Features / xFP | Frozen inputs and explicit missingness; xFP v0.1 | Appearance + goals + assists only; unstable early samples |
 | Optimization | Legal deterministic squad/XI/C/VC; zero-or-one-free-transfer comparison | Single GW, no chips/hits/multi-GW or future-transfer valuation |
 | Reliability | Provenance and 11 diagnostic sensitivity views | Not confidence, a veto, or a replacement recommendation |
@@ -92,18 +92,20 @@ Task028C defines a synthetic macOS scheduling drill, and Task028D implements its
 offline LaunchAgent harness outside the engine package. The harness prepares,
 validates and sanitizes synthetic evidence; its automated tests replace the
 service-manager lifecycle with a fake runner. Only an explicitly acknowledged
-`run` command can invoke `launchctl`. No real lifecycle command was executed,
-no scheduler was installed, and the future two-scenario drill still requires
-separate owner authorization and independent evidence review. Rendering a
-candidate production plist neither installs nor authorizes it.
+`run` command can invoke `launchctl`. On 2026-09-09, an owner-authorized local
+drill ran the complete and review-required synthetic scenarios from `33fa48c`;
+both exact labels were removed, sanitized evidence was independently reviewed,
+and the reviewer reported SAFE. This is local operational evidence, not a
+committed scheduler or production proof. No scheduler was installed. Rendering
+a candidate production plist neither installs nor authorizes it.
 
 ## Validation evidence and procedure
 
-**Repository-established at this review:** HEAD `e3758e4`, branch `main`, 136
+**Repository-established at this review:** HEAD `33fa48c`, branch `main`, 136
 tracked files and four frontend tests in source. The CI workflow configures
 Python 3.10, Node 22 and checksum-pinned age 1.3.1 installation.
 
-At this exact commit, [CI run 34342918533](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34342918533)
+At this exact commit, [CI run 34346416323](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34346416323)
 passed 531 Python tests, four frontend tests, generated-contract freshness,
 TypeScript, production build, browser dependency-boundary and whitespace checks.
 The Task028D adversarial review independently verified the offline harness,
@@ -164,8 +166,9 @@ the [decision status index](DECISIONS.md#web-rfc-decision-status) and
 The completion monitor is now implemented as a one-shot command, so the earlier
 Task028A future-tense design wording should be read with its implementation guide
 and current code. Task028C/D now supply a reviewed scheduling-drill design and
-offline harness, but the actual temporary `launchd` drill, live scheduling and
-automatic decision work remain unexecuted or unimplemented and unauthorized.
+offline harness. The temporary synthetic `launchd` drill subsequently passed
+local execution and independent sanitized-evidence review; live scheduling and
+automatic decision work remain unimplemented and unauthorized.
 
 ## Current local public-data evidence
 

@@ -1,6 +1,6 @@
 # Roadmap
 
-As of `e3758e4` (2026-09-09). This is a planning map, not authorization to
+As of `33fa48c` (2026-09-09). This is a planning map, not authorization to
 execute. The [RFC phased plan](../rfcs/0026a-web-product-architecture.md#28-phased-implementation-plan)
 is the source for Tasks026B–D. Proposed capabilities are not completed merely
 because they appear in that RFC.
@@ -41,35 +41,36 @@ because they appear in that RFC.
   harness (`de24e14`, `e3758e4`). The harness has strict preflight, an isolated
   synthetic worker, exact-label lifecycle/cleanup construction and sanitized
   evidence tooling. Automated tests use a fake service manager; no real
-  `launchctl` lifecycle or scheduler installation occurred.
+  `launchctl` lifecycle or scheduler installation occurred during implementation.
+- Task028D actual synthetic macOS drill: the owner separately authorized complete
+  and review-required scenarios on `33fa48c`. Both exact-label lifecycles passed
+  manifest verification and cleanup/quiet-window checks; sanitized evidence was
+  independently reviewed SAFE. This proves local scheduler mechanics only. No
+  service remains installed and no production schedule is authorized.
 
-## NEXT — proposed operational gate, not authorized
+## NEXT — proposed planning boundary, not work started
 
-1. After this continuity refresh is reviewed, separately authorize the actual
-   temporary Task028D macOS drill on the exact reviewed commit. Run both the
-   complete and review-required synthetic scenarios with unique labels, prove
-   exact-label cleanup, sanitize the evidence and obtain independent evidence
-   review. This roadmap entry does not authorize running it.
-2. Only after a successful evidence review, decide whether to design a production
-   schedule and terminal-stop control. A synthetic pass does not authorize an
-   installation or establish deadline reliability.
-3. Preserve the two remaining
+1. Consider **Task028E: production completion-monitor scheduling and terminal
+   stop design**. It must address Task028B's shared exit-0 waiting/success states,
+   explicit season/GW binding, missed intervals during sleep, retry/review stops,
+   operator-visible evidence, log retention, exact install/uninstall ownership
+   and rollback. Design and review come before any production installation.
+2. Preserve the two remaining
    [Task026B follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups): keep
    the current shell/navigation disposable and the UX paradigm undecided.
-4. Reconcile RFC scope with the delivered narrower read slice. Decide whether
+3. Reconcile RFC scope with the delivered narrower read slice. Decide whether
    additional artifact read routes are needed; they are not implemented now.
    Also record the missing reliability/model-caveat rendering envisaged by the
    RFC. Neither delivery gap authorizes implementation.
-5. Plan Task026C only after human approval: identity/ownership,
+4. Plan Task026C only after human approval: identity/ownership,
    OIDC/session/CSRF, PostgreSQL, private evidence review/storage, explicit engine
    commands/workers, consent/retention/export/deletion and isolation tests.
-6. Review the current GitHub Actions version-deprecation annotation as a small
+5. Review the current GitHub Actions version-deprecation annotation as a small
    maintenance task before platform enforcement; CI is currently passing.
 
-The real Task028D synthetic drill is the smallest proposed next gate. Task026B
-presentation boundaries and Task027E remain available later. The engine remains
-the sole decision authority. Exact execution and evidence handling require
-separate owner authorization.
+Task028E is the smallest proposed next planning boundary; it has not started.
+Task026B presentation boundaries and Task027E remain available later. The engine
+remains the sole decision authority. No production schedule is authorized.
 
 ## PAUSED — recovery owner setup
 

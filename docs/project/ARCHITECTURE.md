@@ -33,7 +33,8 @@ two stable exact public probes -> target lock / restart reconciliation
 
 OFFLINE SCHEDULER VALIDATION (outside engine and decision authority)
 Task028D synthetic worker -> generated temporary LaunchAgent package
-    -> future owner-authorized exact-label lifecycle -> sanitized drill evidence
+    -> owner-authorized exact-label lifecycle -> sanitized drill evidence
+    -> 2026-09-09 local two-scenario pass; no installed service remains
          -X-> no live monitor, FPL/private data, production installation or schedule
 
 RESEARCH: historical*.py + separately stored historical/experiment artifacts
@@ -124,9 +125,11 @@ implements an offline standard-library harness that prepares one owner-only
 synthetic package, validates exact committed inputs, drives an exact-label
 temporary LaunchAgent lifecycle only behind an explicit execution flag, and
 verifies/sanitizes the resulting evidence. Automated tests replace `launchctl`
-with a fake runner and use no FPL or private data. No actual lifecycle command,
-scheduler installation or production monitor schedule has run; those remain
-separate authorization and evidence gates.
+with a fake runner and use no FPL or private data. A separately authorized local
+run on 2026-09-09 passed both synthetic scenarios and independent sanitized
+evidence review, including exact-label absence after cleanup. It proves local
+scheduler mechanics only. No scheduler installation or production monitor
+schedule has run; production design and authorization remain separate gates.
 
 ## Application boundary today
 

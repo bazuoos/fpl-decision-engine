@@ -3,19 +3,25 @@
 ## Status and authority
 
 Task028D implements the independently reviewed
-[Task028C design](TASK028C_SYNTHETIC_SCHEDULING_DRILL_SPEC.md). This candidate
-adds an offline synthetic harness, tests and this runbook. No LaunchAgent was
+[Task028C design](TASK028C_SYNTHETIC_SCHEDULING_DRILL_SPEC.md). The committed task
+added an offline synthetic harness, tests and this runbook. No LaunchAgent was
 loaded, no `launchctl` lifecycle command was executed, and no live FPL request,
 refresh, evaluation or production-data read occurred during implementation.
 
 The harness is inert unless an owner runs its `run` command with an explicit
 execution flag. Preparing, verifying, sanitizing or rendering a property list
-does not load a service. The actual temporary macOS drill remains a separate
-human authorization after implementation review, commit and CI.
+does not load a service. On 2026-09-09, the owner separately authorized complete
+and review-required temporary macOS scenarios on `33fa48c`; both passed local
+verification and independent sanitized-evidence review. Both exact labels were
+absent after cleanup. The scenario IDs were `task028d-20260909-c01` and
+`task028d-20260909-r01`; the sanitized manifest-file SHA-256 values were
+`adb8cc794e17bf840d896d15953614a56283df91b521b21acf6427339d908d9e` and
+`a6f736262d3ed4a017c923d86998d24d5c5713d1f5c7a61a40de39a7958807a9`.
+Those local evidence bytes remain outside Git. No persistent service was installed.
 
 Task028D proves no FPL semantics and changes no production engine code. Existing
-Task028B tests remain the proof for the one-shot monitor. A future synthetic pass
-would prove only local scheduler mechanics. No production schedule is installed
+Task028B tests remain the proof for the one-shot monitor. The completed synthetic
+pass proves only local scheduler mechanics. No production schedule is installed
 or authorized, Task026C remains unstarted, and **NO VERIFIED OFFSITE BACKUP**.
 
 ## Tool boundary
@@ -222,7 +228,9 @@ mkdir -m 700 /private/tmp/task028d-sanitized
 The output reports only `SANITIZED` and a manifest hash. Manually inspect the
 sanitized bytes before sharing them with an independent reviewer. A passing hash
 proves byte consistency only; it does not prove that `launchd` or the reviewer is
-trusted.
+trusted. The invocation chain in sanitized evidence binds to pre-redaction event
+hashes but cannot reproduce them because PIDs are removed; full chain
+reproduction requires the owner-private unsanitized package.
 
 ## Candidate production rendering — never installation
 
@@ -249,7 +257,8 @@ prediction requires the exact `--prediction-snapshot-timestamp`; none is inferre
 
 ## Limits
 
-- The actual macOS lifecycle remains unexecuted until separately authorized.
+- One owner-authorized local two-scenario macOS lifecycle passed on 2026-09-09;
+  this does not generalize to another host, configuration or production target.
 - Fake-runner tests cannot prove real `launchd` behavior, permissions or timing.
 - The synthetic worker does not invoke Task028B and cannot validate live network,
   refresh, realized evidence or evaluation behavior.
