@@ -1,6 +1,6 @@
 # Roadmap
 
-As of `946da7d` (2026-09-08). This is a planning map, not authorization to
+As of `bec2343` (2026-09-09). This is a planning map, not authorization to
 execute. The [RFC phased plan](../rfcs/0026a-web-product-architecture.md#28-phased-implementation-plan)
 is the source for Tasks026B–D. Proposed capabilities are not completed merely
 because they appear in that RFC.
@@ -32,14 +32,19 @@ because they appear in that RFC.
 - Task026B follow-up #3: authoritative GameweekDecision schema components feed
   the checked OpenAPI and exact-pinned generated browser types; CI rejects stale
   generated output (`946da7d`).
+- Task028A/B: reviewed completion-monitor design and one-shot implementation.
+  Stable exact public probes, deterministic target locking/reconciliation,
+  one coherent refresh, validated immutable receipts and optional explicitly
+  pinned leakage-safe evaluation are implemented (`be7baf6`, `bec2343`). No
+  scheduler was installed or enabled.
 
 ## NEXT — proposed planning boundary, not work started
 
-1. Review this continuity refresh, then separately design the selected bounded
-   official-data completion monitor. Proposed boundaries are lightweight event
-   completion polling, one deduplicated immutable refresh and optional
-   leakage-safe evaluation. Automatic decisions, journals and manager actions
-   remain excluded. No implementation or scheduler is authorized by this entry.
+1. Review this continuity refresh, then consider a separately scoped Task028C
+   synthetic/off-season scheduling drill design. Proposed boundaries are one-shot
+   invocation, overlap prevention, retry behavior and operator-visible outcomes.
+   No production schedule, live request, decision, journal or manager action is
+   authorized by this entry.
 2. Preserve the two remaining
    [Task026B follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups): keep
    the current shell/navigation disposable and the UX paradigm undecided.
@@ -53,10 +58,10 @@ because they appear in that RFC.
 5. Review the current GitHub Actions version-deprecation annotation as a small
    maintenance task before platform enforcement; CI is currently passing.
 
-The next selected planning task is the completion-monitor design. Task026B
-presentation boundaries and Task027E remain available later. The engine remains
-the sole decision authority. Exact sequencing and acceptance criteria require an
-approved task scope.
+Task028C is the smallest proposed next planning boundary; it has not started.
+Task026B presentation boundaries and Task027E remain available later. The engine
+remains the sole decision authority. Exact sequencing and acceptance criteria
+require an approved task scope.
 
 ## PAUSED — recovery owner setup
 

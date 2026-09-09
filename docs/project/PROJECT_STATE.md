@@ -1,7 +1,7 @@
 # Project state
 
-Implementation checkpoint summarized: 2026-09-08, commit
-`946da7d1f99f26ea368dbf9918111589bb402214`. Identify this document's own
+Implementation checkpoint summarized: 2026-09-09, commit
+`bec2343acae79033d870364dcf006a394417cf46`. Identify this document's own
 revision and any later work from Git history.
 Start with [CURRENT_HANDOFF](CURRENT_HANDOFF.md); this pack is navigation and
 continuity context, not a replacement for code, contracts, or frozen evidence.
@@ -21,7 +21,7 @@ the selected action the objectively best FPL transfer.
 
 | Area | Implemented and trusted for | Important limit |
 |---|---|---|
-| Official data | Immutable raw bytes, typed Parquet, coherent resumable refresh | Live collection needs network; completion and hashes must validate |
+| Official data | Immutable raw bytes, typed Parquet, coherent resumable refresh; stable one-shot completion monitoring | Live collection needs network; no scheduler is installed or authorized |
 | Features / xFP | Frozen inputs and explicit missingness; xFP v0.1 | Appearance + goals + assists only; unstable early samples |
 | Optimization | Legal deterministic squad/XI/C/VC; zero-or-one-free-transfer comparison | Single GW, no chips/hits/multi-GW or future-transfer valuation |
 | Reliability | Provenance and 11 diagnostic sensitivity views | Not confidence, a veto, or a replacement recommendation |
@@ -80,20 +80,28 @@ The current `DecisionView` renders action, selection and identity fields, but
 not the reliability diagnostics or model caveats envisaged by the RFC. This is
 a delivery gap, not authorization to implement it.
 
+Task028B adds an explicit one-shot `monitor-completion` operation for one season
+and gameweek. It accepts completion only after two exact semantic public probes
+at least 15 minutes apart, uses a target-local lock, reconciles interrupted runs,
+performs at most one coherent refresh and validates immutable realized/evaluation
+receipts. Optional evaluation requires an explicit exact pre-deadline prediction;
+the monitor cannot generate, discover or substitute one. It does not create
+decisions, journals or manager actions. No polling loop or scheduler is installed.
+
 ## Validation evidence and procedure
 
-**Repository-established at this review:** HEAD `946da7d`, branch `main`, 128
+**Repository-established at this review:** HEAD `bec2343`, branch `main`, 132
 tracked files and four frontend tests in source. The CI workflow configures
 Python 3.10, Node 22 and checksum-pinned age 1.3.1 installation.
 
-At this exact commit, [CI run 34238146592](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34238146592)
-passed 469 Python tests, four frontend tests, generated-contract freshness,
+At this exact commit, [CI run 34302529260](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34302529260)
+passed 499 Python tests, four frontend tests, generated-contract freshness,
 TypeScript, production build, browser dependency-boundary and whitespace checks.
-The preceding Task026B follow-up #3 adversarial review independently verified
-the schema transformation, every OpenAPI reference, stale-output rejection,
-component-collision refusal and exact generator lock integrity, and reported
-SAFE. Historical success does not establish future checkout health. The CI run
-also emitted a non-failing
+The preceding Task028B adversarial review independently verified completion
+probing, locking, restart reconciliation, immutable receipt handling, realized
+snapshot validation, explicit prediction binding and fail-closed recovery, and
+reported SAFE. Historical success does not establish future checkout health.
+The CI run also emitted a non-failing
 GitHub-hosted-actions annotation that the Node.js 20 runtime used internally by
 the current checkout/setup actions is deprecated and being forced to Node.js 24;
 review action-version upgrades as maintenance before platform enforcement.
@@ -141,6 +149,10 @@ CI detects changes between the application, checked OpenAPI and generated file;
 these compile-time types do not add browser-side runtime schema validation. See
 the [decision status index](DECISIONS.md#web-rfc-decision-status) and
 [deferred follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups).
+The completion monitor is now implemented as a one-shot command, so the earlier
+Task028A future-tense design wording should be read with its implementation guide
+and current code. Scheduling, live enablement and automatic decision work remain
+unimplemented and unauthorized.
 
 ## Current local public-data evidence
 

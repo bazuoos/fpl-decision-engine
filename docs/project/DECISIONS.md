@@ -25,6 +25,7 @@ architecture; its own status still says proposed.
 | Research/population evidence stays separate from production | RFC sections 14–16 and ADR-026A-09 | Consent-gated export and reviewed release are designs; no runtime feedback path |
 | Private operational evidence stays outside Git and needs independent recovery | Task027C/D/E docs and guards; `2a0f389`, `60d00dd`, `744dd8e` | Inventory and encrypted checkpoints are local mechanisms; exact private values and provider receipts stay owner-private |
 | B2 with 90-day compliance retention is the proposed permanent remote destination | Task027E spec; `a0cf180` | Synthetic drill first; explicit owner acceptance before real upload; retained versions cannot be shortened or deleted during the lock |
+| Official completion control is explicit, stable and one-shot | Task028A/B docs, `completion_monitor.py`; `be7baf6`, `bec2343` | Two exact probes and target locking gate one refresh; optional evaluation needs an exact supplied pre-deadline prediction; no scheduler or decision authority |
 
 ## Historical presentation lesson (human-confirmed context and policy)
 
@@ -47,7 +48,7 @@ all its ADRs are proposed pending independent review. Human confirmation of
 project policy does not automatically accept every RFC design. IMPLEMENTED
 below describes observable code, not blanket acceptance of the entire ADR.
 
-| RFC decision | Status at `946da7d` | Boundary / consequence |
+| RFC decision | Status at `bec2343` | Boundary / consequence |
 |---|---|---|
 | ADR-026A-01: engine artifacts are authority | IMPLEMENTED for decision reads | Public reader delegates existing validation; no second app/browser optimizer |
 | ADR-026A-02: React/TypeScript/Vite | IMPLEMENTED stack | Static client; no chosen UX paradigm; current view omits RFC-envisaged reliability/model caveats |

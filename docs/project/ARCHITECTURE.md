@@ -25,6 +25,12 @@ authorization -> explicit-ID store/index -> read facade -> /api/v1 envelope
 PRESENTATION: web/
 React / TypeScript / Vite -> server-verified payload or fail-closed error
 
+PUBLIC COMPLETION CONTROL (collection orchestration, not decision authority)
+two stable exact public probes -> target lock / restart reconciliation
+    -> at most one coherent refresh -> validated immutable realized receipt
+    -> optional exact pre-deadline prediction -> validated evaluation receipt
+         -X-> no prediction generation, decision, journal or manager action
+
 RESEARCH: historical*.py + separately stored historical/experiment artifacts
 pinned archives -> causal features -> frozen baseline / preregistered experiments
                     -X-> no automatic promotion or runtime feedback to production
@@ -52,7 +58,7 @@ All paths below are under [src/fpl_decision_engine](../../src/fpl_decision_engin
 
 | Concern | Sources / focused tests |
 |---|---|
-| Collection and raw immutability | `pipeline.py`, `official_data.py`, `refresh.py`, `tls.py`; `test_pipeline`, `test_refresh`, `test_gameweek_data` |
+| Collection, completion control and raw immutability | `pipeline.py`, `official_data.py`, `refresh.py`, `completion_monitor.py`, `tls.py`; `test_pipeline`, `test_refresh`, `test_completion_monitor`, `test_gameweek_data` |
 | Typed data, temporal features, predictions | `transform.py`, `gameweek_transform.py`, `features.py`, `predictions.py`; corresponding tests |
 | Supplied projection boundary / legal optimization | `projection_provider.py`, `decision.py`, `transfer_decision.py`; `test_decision`, `test_decision_selection`, `test_transfer_decision` |
 | Locked public vs editable private state | `manager_state.py`, `manager_decision.py`, `editable_manager.py`; manager/editable tests |
@@ -89,6 +95,19 @@ Safe identical reuse and conflict refusal preserve immutability. Outcome
 consumption re-anchors a journal through `_load_completed_evidence`; a
 self-consistent standalone JSON is not enough. DecisionDiff also validates
 preparation directories, ordered sides and same season/GW/deadline.
+
+The [completion monitor](TASK028B_COMPLETION_MONITOR.md) is a one-shot control
+around public official-data collection. It probes bootstrap and fixture status
+twice, accepts only an unchanged exact semantic digest at least 15 minutes apart,
+and then locks the explicit season/GW target. Existing valid receipts are
+reconciled deterministically after interruption; otherwise the monitor performs
+at most one coherent refresh and revalidates the manifest, raw manifests, exact
+history files, hashes, row counts and source coherence before publishing a
+realized receipt. Optional evaluation uses the shared public realized-snapshot
+validator and only an explicitly supplied exact pre-deadline prediction. Receipt
+integrity failures fail closed into scoped review/archive/reset operations.
+There is no polling loop or installed scheduler, and this path has no authority
+to generate predictions or create decisions, journals or manager actions.
 
 ## Application boundary today
 

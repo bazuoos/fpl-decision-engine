@@ -4,15 +4,18 @@
 > artifacts, manifests, frozen decision records and git history win on technical
 > contradiction. Verify current Git state before acting.
 
-- Implementation checkpoint summarized: **2026-09-08**,
-  `946da7d1f99f26ea368dbf9918111589bb402214`. It was on `main`, aligned with
+- Implementation checkpoint summarized: **2026-09-09**,
+  `bec2343acae79033d870364dcf006a394417cf46`. It was on `main`, aligned with
   `origin/main`, with successful CI. Identify this document's own revision and
   any later work from Git history rather than assuming the embedded SHA is HEAD.
-- Latest completed implementation: **Task026B deferred follow-up #3**. The
-  authoritative GameweekDecision JSON Schema now feeds the checked OpenAPI
-  payload components and generated browser types. CI fails on stale generated
-  TypeScript; browser consumers no longer maintain a parallel handwritten
-  payload shape. Independent adversarial review reported SAFE and CI passed.
+- Latest completed implementation: **Task028B official-data completion
+  monitor**. A one-shot explicit season/GW command proves stable public
+  completion with two exact semantic probes at least 15 minutes apart, locks one
+  target, performs at most one coherent refresh, validates realized evidence and
+  optionally evaluates an explicitly supplied exact pre-deadline prediction.
+  Restart reconciliation, immutable receipts and scoped review/reset behavior
+  make retries deterministic. Independent adversarial review reported SAFE and
+  CI passed. No scheduler was installed or enabled.
 - Resilience work: Task027C local safeguards, Task027D encrypted-checkpoint
   tooling and Task027E1 staged sensitive-content guard are committed. Task027E
   owner custody/destination setup is **PAUSED** before production key generation,
@@ -37,6 +40,10 @@
 - This checkpoint refresh authorizes no Task026C, model/optimizer/reliability
   change, operational refresh, journal creation, artifact regeneration, private
   evidence access, sealed-holdout access, credential creation or provider action.
+- Task028B is an inert, one-shot mechanism. It does not authorize scheduling,
+  live polling, automatic decisions, journals, manager actions or prediction
+  generation. Its optional evaluation requires an explicit exact pre-deadline
+  prediction and cannot substitute or generate one.
 - Web skeleton is **localhost-only**: every request receives the same local
   principal, not client authentication. Both `FPL_APP_ARTIFACT_ROOT` and
   `FPL_APP_ARTIFACT_INDEX` are needed for indexed reads. Health can succeed with
@@ -66,12 +73,13 @@ model caveats. This does not authorize frontend work. See
 
 ## Immediate next question
 
-The human selected a bounded official-data completion-monitor design as the next
-proposed task after this documentation-only refresh. The design should consider
-lightweight completion polling, one deduplicated immutable refresh and optional
-leakage-safe evaluation, while excluding automatic decisions, journals and
-manager actions. No monitor implementation, scheduling or network operation has
-started; exact scope and task identity require separate review and approval.
+After this documentation-only refresh, the smallest proposed next planning
+boundary is **Task028C: a synthetic/off-season scheduling drill design** for the
+one-shot monitor. It should test invocation, overlap prevention, retries and
+operator-visible outcomes without enabling a production schedule, making live
+requests or creating decisions, journals or manager actions. This is a roadmap
+proposal, not work started or authorization to schedule anything. Exact scope
+requires separate review and approval.
 
 **REQUIRES HUMAN CONTEXT:** next approved priority; private evidence locations
 and completeness; credential/key custody and private backup receipts; explicit
@@ -89,7 +97,9 @@ to unseal an experiment. Changing football facts need fresh verification.
 3. For recovery work: [Task027C local safeguards](TASK027C_LOCAL_BACKUP_READINESS.md),
    [Task027D checkpoint runbook](TASK027D_ENCRYPTED_CHECKPOINTS.md), and
    [Task027E setup specification](TASK027E_OWNER_KEY_AND_B2_SETUP_SPEC.md).
-4. For web work: [README](../../README.md),
+4. For completion-monitor work: [Task028A specification](TASK028A_OFFICIAL_DATA_COMPLETION_MONITOR_SPEC.md)
+   and [Task028B implementation guide](TASK028B_COMPLETION_MONITOR.md).
+5. For web work: [README](../../README.md),
    [RFC 0026A](../rfcs/0026a-web-product-architecture.md),
    [public reader](../../src/fpl_decision_engine/trusted_artifact_reader.py),
    [app facade](../../src/fpl_decision_app/read_facade.py),
