@@ -5,22 +5,23 @@
 > contradiction. Verify current Git state before acting.
 
 - Implementation checkpoint summarized: **2026-09-09**,
-  `bec2343acae79033d870364dcf006a394417cf46`. It was on `main`, aligned with
+  `e3758e47db008a3bb4d147fe4971b1e2aff7418f`. It was on `main`, aligned with
   `origin/main`, with successful CI. Identify this document's own revision and
   any later work from Git history rather than assuming the embedded SHA is HEAD.
-- Latest completed implementation: **Task028B official-data completion
-  monitor**. A one-shot explicit season/GW command proves stable public
-  completion with two exact semantic probes at least 15 minutes apart, locks one
-  target, performs at most one coherent refresh, validates realized evidence and
-  optionally evaluates an explicitly supplied exact pre-deadline prediction.
-  Restart reconciliation, immutable receipts and scoped review/reset behavior
-  make retries deterministic. Independent adversarial review reported SAFE and
-  CI passed. No scheduler was installed or enabled.
+- Latest completed implementation: **Task028D offline LaunchAgent drill
+  harness**, implementing the reviewed Task028C design. It prepares and validates
+  owner-only synthetic packages, constructs an exact-label temporary lifecycle,
+  checks cleanup and produces sanitized review evidence. Automated tests replace
+  `launchctl` with a fake runner. Independent adversarial review reported SAFE;
+  CI run 34342918533 passed 531 Python and four frontend tests. No real lifecycle
+  command ran and no scheduler was installed or enabled. Task028B remains the
+  implemented one-shot completion monitor beneath this separate harness.
 - Resilience work: Task027C local safeguards, Task027D encrypted-checkpoint
   tooling and Task027E1 staged sensitive-content guard are committed. Task027E
   owner custody/destination setup is **PAUSED** before production key generation,
-  application-key creation or any upload while a dedicated disconnected medium
-  is unavailable. **NO VERIFIED OFFSITE BACKUP.**
+  application-key creation or any upload while a dedicated encrypted removable
+  medium suitable for an independent key-custody copy is unavailable. **NO
+  VERIFIED OFFSITE BACKUP.**
 - **Task026C has not started.** The web UX paradigm remains deliberately
   **UNDECIDED**.
 - Outside this five-file continuity refresh, the only visible working-tree items
@@ -44,6 +45,11 @@
   live polling, automatic decisions, journals, manager actions or prediction
   generation. Its optional evaluation requires an explicit exact pre-deadline
   prediction and cannot substitute or generate one.
+- Task028D is also inert unless its `run` command receives the explicit temporary
+  LaunchAgent execution flag. Preparing, verifying, sanitizing or rendering a
+  plist does not load a service. The real complete/review synthetic scenarios,
+  their independent evidence review and any production-schedule design remain
+  separately gated.
 - Web skeleton is **localhost-only**: every request receives the same local
   principal, not client authentication. Both `FPL_APP_ARTIFACT_ROOT` and
   `FPL_APP_ARTIFACT_INDEX` are needed for indexed reads. Health can succeed with
@@ -73,13 +79,13 @@ model caveats. This does not authorize frontend work. See
 
 ## Immediate next question
 
-After this documentation-only refresh, the smallest proposed next planning
-boundary is **Task028C: a synthetic/off-season scheduling drill design** for the
-one-shot monitor. It should test invocation, overlap prevention, retries and
-operator-visible outcomes without enabling a production schedule, making live
-requests or creating decisions, journals or manager actions. This is a roadmap
-proposal, not work started or authorization to schedule anything. Exact scope
-requires separate review and approval.
+After this documentation-only refresh, the smallest proposed next gate is the
+**actual temporary Task028D synthetic macOS drill** on the exact reviewed commit.
+It requires separate owner authorization, unique labels for both complete and
+review-required scenarios, proved exact-label cleanup, sanitized evidence and
+independent evidence review. This proposal does not authorize execution. It uses
+no live FPL request, production data, decision, journal or manager action, and a
+pass would not authorize a production schedule.
 
 **REQUIRES HUMAN CONTEXT:** next approved priority; private evidence locations
 and completeness; credential/key custody and private backup receipts; explicit
@@ -97,8 +103,10 @@ to unseal an experiment. Changing football facts need fresh verification.
 3. For recovery work: [Task027C local safeguards](TASK027C_LOCAL_BACKUP_READINESS.md),
    [Task027D checkpoint runbook](TASK027D_ENCRYPTED_CHECKPOINTS.md), and
    [Task027E setup specification](TASK027E_OWNER_KEY_AND_B2_SETUP_SPEC.md).
-4. For completion-monitor work: [Task028A specification](TASK028A_OFFICIAL_DATA_COMPLETION_MONITOR_SPEC.md)
-   and [Task028B implementation guide](TASK028B_COMPLETION_MONITOR.md).
+4. For completion-monitor work: [Task028A specification](TASK028A_OFFICIAL_DATA_COMPLETION_MONITOR_SPEC.md),
+   [Task028B implementation guide](TASK028B_COMPLETION_MONITOR.md),
+   [Task028C drill design](TASK028C_SYNTHETIC_SCHEDULING_DRILL_SPEC.md) and
+   [Task028D drill runbook](TASK028D_COMPLETION_MONITOR_SCHEDULING_DRILL.md).
 5. For web work: [README](../../README.md),
    [RFC 0026A](../rfcs/0026a-web-product-architecture.md),
    [public reader](../../src/fpl_decision_engine/trusted_artifact_reader.py),

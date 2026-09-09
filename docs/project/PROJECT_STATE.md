@@ -1,7 +1,7 @@
 # Project state
 
 Implementation checkpoint summarized: 2026-09-09, commit
-`bec2343acae79033d870364dcf006a394417cf46`. Identify this document's own
+`e3758e47db008a3bb4d147fe4971b1e2aff7418f`. Identify this document's own
 revision and any later work from Git history.
 Start with [CURRENT_HANDOFF](CURRENT_HANDOFF.md); this pack is navigation and
 continuity context, not a replacement for code, contracts, or frozen evidence.
@@ -21,7 +21,7 @@ the selected action the objectively best FPL transfer.
 
 | Area | Implemented and trusted for | Important limit |
 |---|---|---|
-| Official data | Immutable raw bytes, typed Parquet, coherent resumable refresh; stable one-shot completion monitoring | Live collection needs network; no scheduler is installed or authorized |
+| Official data | Immutable raw bytes, typed Parquet, coherent resumable refresh; stable one-shot completion monitoring; offline scheduling-drill harness | Live collection needs network; the real scheduling drill and any production schedule remain unexecuted and unauthorized |
 | Features / xFP | Frozen inputs and explicit missingness; xFP v0.1 | Appearance + goals + assists only; unstable early samples |
 | Optimization | Legal deterministic squad/XI/C/VC; zero-or-one-free-transfer comparison | Single GW, no chips/hits/multi-GW or future-transfer valuation |
 | Reliability | Provenance and 11 diagnostic sensitivity views | Not confidence, a veto, or a replacement recommendation |
@@ -88,19 +88,31 @@ receipts. Optional evaluation requires an explicit exact pre-deadline prediction
 the monitor cannot generate, discover or substitute one. It does not create
 decisions, journals or manager actions. No polling loop or scheduler is installed.
 
+Task028C defines a synthetic macOS scheduling drill, and Task028D implements its
+offline LaunchAgent harness outside the engine package. The harness prepares,
+validates and sanitizes synthetic evidence; its automated tests replace the
+service-manager lifecycle with a fake runner. Only an explicitly acknowledged
+`run` command can invoke `launchctl`. No real lifecycle command was executed,
+no scheduler was installed, and the future two-scenario drill still requires
+separate owner authorization and independent evidence review. Rendering a
+candidate production plist neither installs nor authorizes it.
+
 ## Validation evidence and procedure
 
-**Repository-established at this review:** HEAD `bec2343`, branch `main`, 132
+**Repository-established at this review:** HEAD `e3758e4`, branch `main`, 136
 tracked files and four frontend tests in source. The CI workflow configures
 Python 3.10, Node 22 and checksum-pinned age 1.3.1 installation.
 
-At this exact commit, [CI run 34302529260](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34302529260)
-passed 499 Python tests, four frontend tests, generated-contract freshness,
+At this exact commit, [CI run 34342918533](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34342918533)
+passed 531 Python tests, four frontend tests, generated-contract freshness,
 TypeScript, production build, browser dependency-boundary and whitespace checks.
-The preceding Task028B adversarial review independently verified completion
-probing, locking, restart reconciliation, immutable receipt handling, realized
-snapshot validation, explicit prediction binding and fail-closed recovery, and
-reported SAFE. Historical success does not establish future checkout health.
+The Task028D adversarial review independently verified the offline harness,
+synthetic worker, exact-label lifecycle construction, preflight, cleanup,
+evidence validation and sanitization, and reported SAFE. The preceding Task028B
+review separately verified completion probing, locking, restart reconciliation,
+receipt handling, realized-snapshot validation, exact prediction binding and
+fail-closed recovery. Historical success does not establish future checkout
+health or real `launchd` behavior.
 The CI run also emitted a non-failing
 GitHub-hosted-actions annotation that the Node.js 20 runtime used internally by
 the current checkout/setup actions is deprecated and being forced to Node.js 24;
@@ -151,8 +163,9 @@ the [decision status index](DECISIONS.md#web-rfc-decision-status) and
 [deferred follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups).
 The completion monitor is now implemented as a one-shot command, so the earlier
 Task028A future-tense design wording should be read with its implementation guide
-and current code. Scheduling, live enablement and automatic decision work remain
-unimplemented and unauthorized.
+and current code. Task028C/D now supply a reviewed scheduling-drill design and
+offline harness, but the actual temporary `launchd` drill, live scheduling and
+automatic decision work remain unexecuted or unimplemented and unauthorized.
 
 ## Current local public-data evidence
 
@@ -198,7 +211,8 @@ default encryption, Object Lock and 90-day compliance retention have been
 prepared. Label this as external owner-reported state; repository evidence does
 not verify it, and identifiers and credentials do not belong here. Task027E is paused
 before production age-key generation, application-key creation or a synthetic
-upload while a dedicated disconnected medium is unavailable. The owner must
+upload while a dedicated encrypted removable medium suitable for an independent
+key-custody copy is unavailable. The owner must
 explicitly accept the irreversible 90-day lock before Task027F uploads real
 evidence. There is no production checkpoint, exact-version readback,
 disconnected copy or clean-environment real restore drill: **NO VERIFIED OFFSITE

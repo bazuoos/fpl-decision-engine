@@ -31,6 +31,11 @@ two stable exact public probes -> target lock / restart reconciliation
     -> optional exact pre-deadline prediction -> validated evaluation receipt
          -X-> no prediction generation, decision, journal or manager action
 
+OFFLINE SCHEDULER VALIDATION (outside engine and decision authority)
+Task028D synthetic worker -> generated temporary LaunchAgent package
+    -> future owner-authorized exact-label lifecycle -> sanitized drill evidence
+         -X-> no live monitor, FPL/private data, production installation or schedule
+
 RESEARCH: historical*.py + separately stored historical/experiment artifacts
 pinned archives -> causal features -> frozen baseline / preregistered experiments
                     -X-> no automatic promotion or runtime feedback to production
@@ -66,6 +71,10 @@ All paths below are under [src/fpl_decision_engine](../../src/fpl_decision_engin
 | Contracts and execution | `operational_manifest.py`, `operational_runner.py`; `test_operational_manifest`, `test_operational_runner` |
 | Presentation / human record / comparison | `presentation/gameweek_decision.py`, `decision_journal.py`, `decision_diff.py`; corresponding tests |
 | Historical research | `historical.py`, `historical_sources.py`, `historical_backtest.py`, `historical_*_experiment.py`; historical tests |
+
+Operational tooling outside the engine package includes
+[`scripts/completion_monitor_schedule_drill.py`](../../scripts/completion_monitor_schedule_drill.py).
+Its focused offline coverage is `tests/test_completion_monitor_schedule_drill.py`.
 
 ## Operational identity and evidence
 
@@ -108,6 +117,16 @@ validator and only an explicitly supplied exact pre-deadline prediction. Receipt
 integrity failures fail closed into scoped review/archive/reset operations.
 There is no polling loop or installed scheduler, and this path has no authority
 to generate predictions or create decisions, journals or manager actions.
+
+[Task028C](TASK028C_SYNTHETIC_SCHEDULING_DRILL_SPEC.md) separates existing
+monitor proof from scheduler proof. [Task028D](TASK028D_COMPLETION_MONITOR_SCHEDULING_DRILL.md)
+implements an offline standard-library harness that prepares one owner-only
+synthetic package, validates exact committed inputs, drives an exact-label
+temporary LaunchAgent lifecycle only behind an explicit execution flag, and
+verifies/sanitizes the resulting evidence. Automated tests replace `launchctl`
+with a fake runner and use no FPL or private data. No actual lifecycle command,
+scheduler installation or production monitor schedule has run; those remain
+separate authorization and evidence gates.
 
 ## Application boundary today
 
