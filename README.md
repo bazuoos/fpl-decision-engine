@@ -303,6 +303,25 @@ uses Python/platform trust and augments it with `certifi` only when already
 installed. If no usable CA trust is available, refresh fails with an actionable
 error; it never disables TLS verification.
 
+### Finalized-gameweek completion monitor
+
+The one-shot completion monitor can check one explicit season/gameweek and run a
+single accepted official refresh after finalized public status is stable for at
+least 15 minutes:
+
+```bash
+python -m fpl_decision_engine monitor-completion \
+  --season 2026-27 \
+  --target-gameweek 4
+```
+
+It performs no work until invoked and contains no polling loop. No schedule is
+installed by the repository. Optional evaluation requires an explicit frozen
+pre-deadline prediction timestamp; the monitor never generates or substitutes a
+prediction. See the [Task028B runbook](docs/project/TASK028B_COMPLETION_MONITOR.md)
+for outcomes, locking, receipts, reset rules and the uninstalled macOS scheduling
+example.
+
 ## Prediction-ready features
 
 A feature row represents one player, one target gameweek, and one target

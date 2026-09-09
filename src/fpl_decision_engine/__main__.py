@@ -9,6 +9,18 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
+from .completion_monitor import (
+    COMPLETE,
+    REALIZED_COMPLETE,
+    REVIEW_REQUIRED,
+    WAITING,
+    CompletionMonitorError,
+    MonitorLockedError,
+    RetryableProbeError,
+    monitor_completion,
+    reset_completion_monitor,
+    unlock_completion_monitor,
+)
 from .features import build_player_gameweek_features
 from .decision import (
     DECISION_POLICIES,
@@ -126,6 +138,9 @@ COMMANDS = {
     "evaluate-xfp",
     "refresh",
     "refresh-unlock",
+    "monitor-completion",
+    "monitor-completion-reset",
+    "monitor-completion-unlock",
     "build-historical",
     "backtest-xfp-v01",
     "experiment-minutes-v02",
@@ -430,6 +445,60 @@ def build_parser() -> argparse.ArgumentParser:
         help="Exact snapshot whose .refresh.lock should be removed.",
     )
     _add_raw_root(unlock_parser)
+
+    monitor_parser = subparsers.add_parser(
+        "monitor-completion",
+        help="Run one bounded official gameweek-completion reconciliation.",
+    )
+    monitor_parser.add_argument("--season", required=True)
+    monitor_parser.add_argument("--target-gameweek", type=int, required=True)
+    monitor_parser.add_argument("--prediction-snapshot-timestamp")
+    _add_raw_root(monitor_parser)
+    _add_clean_root(monitor_parser)
+    monitor_parser.add_argument(
+        "--feature-data-root", type=Path, default=Path("data/features/fpl")
+    )
+    monitor_parser.add_argument(
+        "--prediction-data-root", type=Path, default=Path("data/predictions/fpl")
+    )
+    monitor_parser.add_argument(
+        "--evaluation-data-root", type=Path, default=Path("data/evaluations/fpl")
+    )
+    monitor_parser.add_argument(
+        "--control-data-root",
+        type=Path,
+        default=Path("data/operations/completion-monitor/fpl"),
+    )
+    monitor_parser.add_argument(
+        "--delay-seconds", type=float, default=DEFAULT_HISTORY_DELAY_SECONDS
+    )
+
+    monitor_reset_parser = subparsers.add_parser(
+        "monitor-completion-reset",
+        help="Archive one REVIEW_REQUIRED state before an explicit retry.",
+    )
+    monitor_reset_parser.add_argument("--season", required=True)
+    monitor_reset_parser.add_argument("--target-gameweek", type=int, required=True)
+    monitor_reset_parser.add_argument("--reason", required=True)
+    _add_raw_root(monitor_reset_parser)
+    _add_clean_root(monitor_reset_parser)
+    monitor_reset_parser.add_argument(
+        "--control-data-root",
+        type=Path,
+        default=Path("data/operations/completion-monitor/fpl"),
+    )
+
+    monitor_unlock_parser = subparsers.add_parser(
+        "monitor-completion-unlock",
+        help="Remove one monitor lock after verifying no invocation is running.",
+    )
+    monitor_unlock_parser.add_argument("--season", required=True)
+    monitor_unlock_parser.add_argument("--target-gameweek", type=int, required=True)
+    monitor_unlock_parser.add_argument(
+        "--control-data-root",
+        type=Path,
+        default=Path("data/operations/completion-monitor/fpl"),
+    )
 
     historical_parser = subparsers.add_parser(
         "build-historical",
@@ -1001,6 +1070,63 @@ def main(argv: Sequence[str] | None = None) -> int:
         except RefreshError as exc:
             logging.error("Refresh unlock failed: %s", exc)
             return 1
+    elif args.command == "monitor-completion":
+        try:
+            outcome = monitor_completion(
+                season=args.season,
+                target_gameweek=args.target_gameweek,
+                prediction_snapshot_timestamp=args.prediction_snapshot_timestamp,
+                raw_data_root=args.raw_data_root,
+                clean_data_root=args.clean_data_root,
+                feature_data_root=args.feature_data_root,
+                prediction_data_root=args.prediction_data_root,
+                evaluation_data_root=args.evaluation_data_root,
+                control_data_root=args.control_data_root,
+                history_delay_seconds=args.delay_seconds,
+            )
+        except RetryableProbeError as exc:
+            logging.warning("Completion probe can be retried later: %s", exc)
+            return 2
+        except MonitorLockedError as exc:
+            logging.warning("Completion monitor is already running or locked: %s", exc)
+            return 2
+        except CompletionMonitorError as exc:
+            logging.error("Completion monitor failed: %s", exc)
+            return 3
+        logging.info("Completion monitor: %s — %s", outcome.status, outcome.detail)
+        if outcome.realized_snapshot_timestamp:
+            logging.info("Realized snapshot: %s", outcome.realized_snapshot_timestamp)
+        if outcome.evaluation_directory:
+            logging.info("Evaluation: %s", outcome.evaluation_directory)
+        if outcome.status == REVIEW_REQUIRED:
+            return 3
+        if outcome.status not in {WAITING, REALIZED_COMPLETE, COMPLETE}:
+            return 3
+    elif args.command == "monitor-completion-reset":
+        try:
+            archive = reset_completion_monitor(
+                control_data_root=args.control_data_root,
+                raw_data_root=args.raw_data_root,
+                clean_data_root=args.clean_data_root,
+                season=args.season,
+                target_gameweek=args.target_gameweek,
+                reason=args.reason,
+            )
+            logging.info("Archived monitor review state: %s", archive)
+        except CompletionMonitorError as exc:
+            logging.error("Completion monitor reset failed: %s", exc)
+            return 3
+    elif args.command == "monitor-completion-unlock":
+        try:
+            result = unlock_completion_monitor(
+                control_data_root=args.control_data_root,
+                season=args.season,
+                target_gameweek=args.target_gameweek,
+            )
+            logging.info("Completion monitor lock removed: %s", result.lock_path)
+        except CompletionMonitorError as exc:
+            logging.error("Completion monitor unlock failed: %s", exc)
+            return 3
     elif args.command in {"rank-players", "optimize-xi", "optimize-squad"}:
         try:
             dataset = _decision_provider(args).load(

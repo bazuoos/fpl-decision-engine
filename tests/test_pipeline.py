@@ -17,12 +17,18 @@ from fpl_decision_engine.pipeline import (
 
 
 class FakeResponse:
-    def __init__(self, body: bytes, status: int = 200) -> None:
+    def __init__(
+        self, body: bytes, status: int = 200, final_url: str | None = None
+    ) -> None:
         self.body = body
         self.status = status
+        self.final_url = final_url
 
     def read(self) -> bytes:
         return self.body
+
+    def geturl(self) -> str:
+        return self.final_url or "https://fantasy.premierleague.com/api/bootstrap-static/"
 
     def __enter__(self) -> "FakeResponse":
         return self
@@ -94,6 +100,21 @@ class PipelineTests(unittest.TestCase):
             fetch_bootstrap_static(
                 data_root=self.data_root,
                 opener=self.opener_for(b'{"error": true}', status=503),
+                now=self.now,
+            )
+        self.assertEqual(list(self.data_root.iterdir()), [])
+
+    def test_rejects_redirected_bootstrap_response(self) -> None:
+        def opener(url: str, *, timeout: float) -> FakeResponse:
+            return FakeResponse(
+                b'{"elements": [{"id": 1}]}',
+                final_url="https://example.invalid/bootstrap-static/",
+            )
+
+        with self.assertRaisesRegex(HTTPStatusError, "redirected"):
+            fetch_bootstrap_static(
+                data_root=self.data_root,
+                opener=opener,
                 now=self.now,
             )
         self.assertEqual(list(self.data_root.iterdir()), [])

@@ -11,6 +11,7 @@ from pathlib import Path
 import duckdb
 
 from fpl_decision_engine.evaluation import (
+    EvaluationError,
     GameweekNotFinalizedError,
     evaluate_xfp_from_paths,
 )
@@ -316,6 +317,18 @@ class EvaluationTests(unittest.TestCase):
         outputs = self.evaluate()
         self.assertEqual(outputs.player_rows, 7)
         self.assertEqual(outputs.evaluated_players, 4)
+        manifest = json.loads(outputs.manifest_path.read_bytes())
+        expected_outputs = {
+            "player": outputs.player_path,
+            "metrics": outputs.metrics_path,
+            "position": outputs.position_metrics_path,
+            "diagnostic": outputs.diagnostic_metrics_path,
+            "ranking": outputs.ranking_path,
+        }
+        self.assertEqual(set(manifest["outputs"]), set(expected_outputs))
+        for key, path in expected_outputs.items():
+            self.assertEqual(manifest["outputs"][key]["path"], path.as_posix())
+            self.assertEqual(manifest["outputs"][key]["sha256"], sha256(path))
         connection = duckdb.connect(":memory:")
         try:
             rows = {
@@ -449,6 +462,13 @@ class EvaluationTests(unittest.TestCase):
         }
         self.realized_bootstrap.write_text(json.dumps({"events": [event]}))
         with self.assertRaisesRegex(GameweekNotFinalizedError, "not finalized"):
+            self.evaluate()
+
+    def test_refuses_duplicate_realized_event_identity(self) -> None:
+        payload = json.loads(self.realized_bootstrap.read_bytes())
+        payload["events"].append(dict(payload["events"][0]))
+        self.realized_bootstrap.write_text(json.dumps(payload))
+        with self.assertRaisesRegex(EvaluationError, "duplicated"):
             self.evaluate()
 
     def test_post_deadline_ep_next_is_not_used(self) -> None:

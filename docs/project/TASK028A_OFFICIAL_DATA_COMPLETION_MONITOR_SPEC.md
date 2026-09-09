@@ -2,9 +2,11 @@
 
 ## Status and authority
 
-This is a proposed design for independent review. It is not an implementation,
-scheduler installation or authorization to make a network request. Repository
-code, tests, schemas, immutable artifacts and manifests remain authoritative.
+This design passed independent review and was committed as `be7baf6`. The later
+Task028B implementation must still pass its own review and CI. This document is
+not a scheduler installation or authorization to make a network request.
+Repository code, tests, schemas, immutable artifacts and manifests remain
+authoritative.
 
 Design base: `9eae70a213ac49761ad57cec2179cf19feaf06e4`.
 
@@ -191,14 +193,15 @@ snapshot and enter `REVIEW_REQUIRED`. Do not automatically launch another full
 refresh. This avoids an unbounded trail of internally complete but historically
 unsuitable snapshots.
 
-A reset is an explicit operator command under the same target lock. It is
-allowed only from `REVIEW_REQUIRED` when no accepted receipt exists, requires an
-operator-supplied reason, and first writes a no-overwrite archive record with the
-prior state, referenced snapshot, hashes, failure and reset time. It then sets
-the mutable control status to waiting and clears the readiness observations for
-another attempt. It never deletes or rewrites the failed snapshot, archive
-history or an accepted receipt. The reset command and archive schema belong to
-the later implementation review.
+A reset is an explicit operator command under the same target lock and is
+allowed only from `REVIEW_REQUIRED`. A realized-capture reset requires that no
+realized receipt exists. An evaluation reset may retain a still-valid realized
+receipt but requires that no evaluation receipt exists. Receipt-integrity
+failures cannot use this reset. Every reset requires an operator-supplied reason
+and first writes a no-overwrite archive record with the prior state, referenced
+snapshot, hashes, failure and reset time. It then returns only the failed scope
+to a retryable control state. It never deletes or rewrites the failed snapshot,
+archive history or any accepted receipt.
 
 A crash at any boundary must be recoverable by reconciliation: a valid refresh
 created before receipt publication is adopted; a receipt is never synthesized

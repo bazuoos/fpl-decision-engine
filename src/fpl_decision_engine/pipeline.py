@@ -74,6 +74,9 @@ def _fetch_response_bytes(
                 raise HTTPStatusError(
                     f"FPL endpoint returned HTTP status {status}"
                 )
+            response_url = getattr(response, "geturl", lambda: endpoint)()
+            if response_url != endpoint:
+                raise HTTPStatusError("FPL endpoint redirected to an unexpected URL")
             return response.read()
     except HTTPStatusError:
         raise

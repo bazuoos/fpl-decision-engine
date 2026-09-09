@@ -4,7 +4,22 @@ from __future__ import annotations
 
 import ssl
 from typing import Any
-from urllib.request import urlopen
+from urllib.request import HTTPRedirectHandler, HTTPSHandler, build_opener, urlopen
+
+
+class RejectRedirectHandler(HTTPRedirectHandler):
+    """Turn every redirect into an HTTP error without following its target."""
+
+    def redirect_request(
+        self,
+        req: Any,
+        fp: Any,
+        code: int,
+        msg: str,
+        headers: Any,
+        newurl: str,
+    ) -> None:
+        return None
 
 
 def create_verified_ssl_context() -> ssl.SSLContext:
@@ -24,6 +39,14 @@ def create_verified_ssl_context() -> ssl.SSLContext:
 def verified_urlopen(url: str, *, timeout: float) -> Any:
     """Open HTTPS using a verified, hostname-checking TLS context."""
     return urlopen(url, timeout=timeout, context=create_verified_ssl_context())
+
+
+def verified_no_redirect_urlopen(url: str, *, timeout: float) -> Any:
+    """Open verified HTTPS while refusing to follow HTTP redirects."""
+    opener = build_opener(
+        HTTPSHandler(context=create_verified_ssl_context()), RejectRedirectHandler()
+    )
+    return opener.open(url, timeout=timeout)
 
 
 def network_error_reason(error: BaseException) -> str:

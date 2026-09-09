@@ -36,6 +36,10 @@ class SourceRequestError(OfficialDataError):
     """Raised when an official FPL response cannot be retrieved or parsed."""
 
 
+class NonRetryableSourceError(SourceRequestError):
+    """Raised when retrying cannot make an unsafe source response acceptable."""
+
+
 class RawOutputExistsError(OfficialDataError):
     """Raised rather than overwriting an existing raw response."""
 
@@ -145,22 +149,44 @@ def _request_json_bytes_with_attempts(
         try:
             with opener(endpoint, timeout=timeout) as response:
                 if not 200 <= response.status < 300:
-                    raise SourceRequestError(
+                    error_type = (
+                        SourceRequestError
+                        if 500 <= response.status < 600
+                        else NonRetryableSourceError
+                    )
+                    raise error_type(
                         f"{endpoint} returned HTTP status {response.status}"
+                    )
+                response_url = getattr(response, "geturl", lambda: endpoint)()
+                if response_url != endpoint:
+                    raise NonRetryableSourceError(
+                        f"{endpoint} redirected to an unexpected URL"
                     )
                 body = response.read()
             json.loads(body)
             return body, attempt
         except HTTPError as exc:
-            last_error = SourceRequestError(
-                f"{endpoint} returned HTTP status {exc.code}"
-            )
+            if 500 <= exc.code < 600:
+                last_error = SourceRequestError(
+                    f"{endpoint} returned HTTP status {exc.code}"
+                )
+            else:
+                raise NonRetryableSourceError(
+                    f"{endpoint} returned HTTP status {exc.code}"
+                ) from exc
         except (URLError, TimeoutError, OSError) as exc:
-            last_error = SourceRequestError(
-                f"could not reach {endpoint}: {network_error_reason(exc)}"
-            )
+            reason = network_error_reason(exc)
+            if reason.startswith("TLS certificate verification failed"):
+                raise NonRetryableSourceError(
+                    f"could not reach {endpoint}: {reason}"
+                ) from exc
+            last_error = SourceRequestError(f"could not reach {endpoint}: {reason}")
         except (json.JSONDecodeError, UnicodeDecodeError) as exc:
-            last_error = SourceRequestError(f"{endpoint} returned invalid JSON")
+            raise NonRetryableSourceError(
+                f"{endpoint} returned invalid JSON"
+            ) from exc
+        except NonRetryableSourceError:
+            raise
         except SourceRequestError as exc:
             last_error = exc
 

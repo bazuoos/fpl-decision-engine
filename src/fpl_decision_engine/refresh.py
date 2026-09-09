@@ -28,6 +28,7 @@ from .official_data import (
     DEFAULT_TIMEOUT_SECONDS,
     FPL_ELEMENT_SUMMARY_URL,
     FPL_FIXTURES_URL,
+    OfficialDataError,
     Opener,
     Sleeper,
     _validate_fixture_payload,
@@ -434,6 +435,175 @@ def _validate_snapshot_coherence(
     finally:
         connection.close()
     return player_count, fixture_count, history_count
+
+
+def validate_completed_refresh_snapshot(
+    *,
+    raw_data_root: Path = Path("data/raw/fpl"),
+    clean_data_root: Path = Path("data/clean/fpl"),
+    season: str,
+    snapshot_timestamp: str,
+) -> RefreshResult:
+    """Revalidate a completed refresh manifest, hashes and coherent outputs."""
+    if not re.fullmatch(r"\d{4}-\d{2}", season):
+        raise RefreshError(f"invalid season directory name: {season}")
+    if not re.fullmatch(r"\d{8}T\d{6}\.\d{6}Z", snapshot_timestamp):
+        raise RefreshError(f"invalid snapshot timestamp: {snapshot_timestamp}")
+
+    raw_directory = raw_data_root / season / snapshot_timestamp
+    clean_directory = clean_data_root / season / snapshot_timestamp
+    manifest_path = raw_directory / "refresh.manifest.json"
+    manifest = _load_json(manifest_path)
+    if not isinstance(manifest, dict):
+        raise RefreshError("refresh manifest is not a JSON object")
+    if (
+        manifest.get("status") != "complete"
+        or manifest.get("stage") != "complete"
+        or manifest.get("season") != season
+        or manifest.get("snapshot_timestamp") != snapshot_timestamp
+        or manifest.get("refresh_completed_at") is None
+    ):
+        raise RefreshError("refresh manifest is not a completed matching snapshot")
+    expected_player_ids = manifest.get("expected_player_ids")
+    if (
+        not isinstance(expected_player_ids, list)
+        or any(
+            not isinstance(player_id, int) or isinstance(player_id, bool)
+            for player_id in expected_player_ids
+        )
+        or len(expected_player_ids) != len(set(expected_player_ids))
+    ):
+        raise RefreshError("refresh manifest has invalid expected player IDs")
+
+    bootstrap_path = raw_directory / "bootstrap-static.json"
+    fixture_path = raw_directory / "fixtures.json"
+    fixture_manifest_path = raw_directory / "fixtures.manifest.json"
+    history_manifest_path = raw_directory / "player_history/manifest.json"
+    players_path = clean_directory / "players.parquet"
+    fixtures_path = clean_directory / "fixtures.parquet"
+    history_path = clean_directory / "player_gameweek_history.parquet"
+    bootstrap_metadata = manifest.get("bootstrap")
+    fixture_metadata = manifest.get("fixtures")
+    history_metadata = manifest.get("player_history")
+    clean_outputs = manifest.get("clean_outputs")
+    if not all(
+        isinstance(item, dict)
+        for item in (
+            bootstrap_metadata,
+            fixture_metadata,
+            history_metadata,
+            clean_outputs,
+        )
+    ):
+        raise RefreshError("refresh manifest artifact metadata is invalid")
+    described = (
+        (bootstrap_metadata, "path", "sha256", bootstrap_path),
+        (fixture_metadata, "path", "sha256", fixture_path),
+        (
+            fixture_metadata,
+            "manifest_path",
+            "manifest_sha256",
+            fixture_manifest_path,
+        ),
+        (
+            history_metadata,
+            "manifest_path",
+            "manifest_sha256",
+            history_manifest_path,
+        ),
+        (clean_outputs.get("players"), "path", "sha256", players_path),
+        (clean_outputs.get("fixtures"), "path", "sha256", fixtures_path),
+        (
+            clean_outputs.get("player_gameweek_history"),
+            "path",
+            "sha256",
+            history_path,
+        ),
+    )
+    initial_hashes: dict[Path, str] = {manifest_path: _sha256(manifest_path)}
+    for metadata, path_field, hash_field, path in described:
+        if (
+            not isinstance(metadata, dict)
+            or metadata.get(path_field) != path.as_posix()
+            or not path.is_file()
+        ):
+            raise RefreshError(f"refresh manifest path mismatch: {path}")
+        digest = _sha256(path)
+        if metadata.get(hash_field) != digest:
+            raise RefreshError(f"refresh artifact hash mismatch: {path}")
+        initial_hashes[path] = digest
+
+    try:
+        _, bootstrap_player_ids = _bootstrap_players(bootstrap_path)
+    except (DataQualityError, OSError) as exc:
+        raise RefreshError("refresh bootstrap failed validation") from exc
+    if (
+        bootstrap_player_ids != expected_player_ids
+        or bootstrap_metadata.get("player_count") != len(expected_player_ids)
+    ):
+        raise RefreshError("refresh bootstrap identity does not match manifest")
+    try:
+        fixtures = _validate_fixture_payload(_load_json(fixture_path), FPL_FIXTURES_URL)
+    except (DataQualityError, OfficialDataError, OSError) as exc:
+        raise RefreshError("refresh fixture response failed validation") from exc
+    fixture_manifest = _load_json(fixture_manifest_path)
+    if (
+        not isinstance(fixture_manifest, dict)
+        or fixture_manifest.get("status") != "complete"
+        or fixture_manifest.get("snapshot_timestamp") != snapshot_timestamp
+        or fixture_manifest.get("bootstrap_sha256") != _sha256(bootstrap_path)
+        or fixture_manifest.get("response_sha256") != _sha256(fixture_path)
+        or fixture_manifest.get("record_count") != len(fixtures)
+    ):
+        raise RefreshError("refresh fixture manifest failed validation")
+
+    history_paths = sorted(
+        path
+        for path in (raw_directory / "player_history").glob("*.json")
+        if path.name != "manifest.json"
+    )
+    if {path.name for path in history_paths} != {
+        f"{player_id}.json" for player_id in expected_player_ids
+    }:
+        raise RefreshError("refresh player-history file set is invalid")
+    for path in history_paths:
+        initial_hashes[path] = _sha256(path)
+    try:
+        player_count, fixture_count, history_count = _validate_snapshot_coherence(
+            raw_directory=raw_directory,
+            clean_directory=clean_directory,
+            snapshot_timestamp=snapshot_timestamp,
+            expected_player_ids=expected_player_ids,
+        )
+    except (DataQualityError, OSError) as exc:
+        raise RefreshError("refresh snapshot coherence validation failed") from exc
+    row_counts = manifest.get("row_counts")
+    if (
+        not isinstance(row_counts, dict)
+        or row_counts
+        != {
+            "players": player_count,
+            "fixtures": fixture_count,
+            "player_gameweek_history": history_count,
+        }
+        or clean_outputs.get("players", {}).get("row_count") != player_count
+        or clean_outputs.get("fixtures", {}).get("row_count") != fixture_count
+        or clean_outputs.get("player_gameweek_history", {}).get("row_count")
+        != history_count
+    ):
+        raise RefreshError("refresh manifest row counts do not match clean outputs")
+    if any(_sha256(path) != digest for path, digest in initial_hashes.items()):
+        raise RefreshError("refresh artifact changed during validation")
+
+    return RefreshResult(
+        snapshot_timestamp=snapshot_timestamp,
+        raw_directory=raw_directory,
+        clean_directory=clean_directory,
+        manifest_path=manifest_path,
+        player_count=player_count,
+        fixture_count=fixture_count,
+        history_row_count=history_count,
+    )
 
 
 def refresh_fpl_data(

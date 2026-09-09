@@ -42,6 +42,14 @@ class EvaluationOutputs:
     evaluated_players: int
 
 
+@dataclass(frozen=True)
+class FinalizedGameweek:
+    """Validated identity returned by the shared realized-data boundary."""
+
+    deadline: datetime
+    event_name: str
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as source_file:
@@ -79,15 +87,20 @@ def _event(bootstrap_path: Path, target_gameweek: int) -> dict[str, Any]:
     bootstrap = _load_json(bootstrap_path)
     if not isinstance(bootstrap, dict) or not isinstance(bootstrap.get("events"), list):
         raise EvaluationError(f"bootstrap has no events list: {bootstrap_path}")
-    event = next(
-        (row for row in bootstrap["events"] if row.get("id") == target_gameweek),
-        None,
-    )
-    if event is None:
+    if any(not isinstance(row, dict) for row in bootstrap["events"]):
+        raise EvaluationError(f"bootstrap has an invalid event: {bootstrap_path}")
+    matching = [
+        row for row in bootstrap["events"] if row.get("id") == target_gameweek
+    ]
+    if not matching:
         raise EvaluationError(
             f"gameweek {target_gameweek} is absent from {bootstrap_path}"
         )
-    return event
+    if len(matching) != 1:
+        raise EvaluationError(
+            f"gameweek {target_gameweek} is duplicated in {bootstrap_path}"
+        )
+    return matching[0]
 
 
 def _require_files(paths: list[Path]) -> None:
@@ -162,7 +175,47 @@ def _validate_finalization(
         raise GameweekNotFinalizedError(
             "player history was not collected after the target deadline"
         )
-    return deadline, event.get("name", f"Gameweek {target_gameweek}")
+    event_name = event.get("name")
+    if not isinstance(event_name, str) or not event_name:
+        event_name = f"Gameweek {target_gameweek}"
+    return deadline, event_name
+
+
+def validate_realized_gameweek_snapshot(
+    *,
+    realized_bootstrap_path: Path,
+    realized_fixtures_path: Path,
+    realized_history_path: Path,
+    target_gameweek: int,
+    realized_snapshot_timestamp: str,
+) -> FinalizedGameweek:
+    """Validate one realized snapshot through the evaluator's finalization gate."""
+    if target_gameweek < 1:
+        raise EvaluationError("target_gameweek must be positive")
+    _require_files(
+        [realized_bootstrap_path, realized_fixtures_path, realized_history_path]
+    )
+    connection = duckdb.connect(":memory:")
+    try:
+        connection.execute(
+            "CREATE TABLE realized_fixtures AS SELECT * FROM read_parquet(?)",
+            [str(realized_fixtures_path)],
+        )
+        connection.execute(
+            "CREATE TABLE realized_history AS SELECT * FROM read_parquet(?)",
+            [str(realized_history_path)],
+        )
+        deadline, event_name = _validate_finalization(
+            connection,
+            realized_bootstrap_path=realized_bootstrap_path,
+            target_gameweek=target_gameweek,
+            realized_snapshot_timestamp=realized_snapshot_timestamp,
+        )
+    except duckdb.Error as exc:
+        raise EvaluationError(f"could not validate realized snapshot: {exc}") from exc
+    finally:
+        connection.close()
+    return FinalizedGameweek(deadline=deadline, event_name=event_name)
 
 
 def _validate_prediction(
@@ -847,6 +900,13 @@ def _write_outputs(
                 f"COPY {table} TO ? (FORMAT PARQUET, COMPRESSION ZSTD)",
                 [str(temporary_directory / outputs[key])],
             )
+        manifest["outputs"] = {
+            key: {
+                "path": (output_directory / outputs[key]).as_posix(),
+                "sha256": _sha256(temporary_directory / outputs[key]),
+            }
+            for key in tables
+        }
         (temporary_directory / outputs["manifest"]).write_text(
             json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
         )
@@ -938,6 +998,14 @@ def evaluate_xfp_from_paths(
             paths_to_hash.append(optional)
     initial_hashes = {path: _sha256(path) for path in paths_to_hash}
 
+    finalized = validate_realized_gameweek_snapshot(
+        realized_bootstrap_path=realized_bootstrap_path,
+        realized_fixtures_path=realized_fixtures_path,
+        realized_history_path=realized_history_path,
+        target_gameweek=target_gameweek,
+        realized_snapshot_timestamp=realized_snapshot_timestamp,
+    )
+
     connection = duckdb.connect(":memory:")
     try:
         connection.execute(
@@ -956,12 +1024,6 @@ def evaluate_xfp_from_paths(
             "CREATE TABLE realized_history AS SELECT * FROM read_parquet(?)",
             [str(realized_history_path)],
         )
-        deadline, event_name = _validate_finalization(
-            connection,
-            realized_bootstrap_path=realized_bootstrap_path,
-            target_gameweek=target_gameweek,
-            realized_snapshot_timestamp=realized_snapshot_timestamp,
-        )
         expected_feature_hash, expected_players_hash, expected_bootstrap_hash = (
             _validate_prediction(
                 connection,
@@ -969,7 +1031,7 @@ def evaluate_xfp_from_paths(
                 target_gameweek=target_gameweek,
                 model_version=model_version,
                 prediction_snapshot_timestamp=prediction_snapshot_timestamp,
-                deadline=deadline,
+                deadline=finalized.deadline,
             )
         )
         _validate_fixture_prediction_grain(
@@ -989,7 +1051,7 @@ def evaluate_xfp_from_paths(
             feature_path=feature_path,
             target_gameweek=target_gameweek,
             prediction_snapshot_timestamp=prediction_snapshot_timestamp,
-            deadline=deadline,
+            deadline=finalized.deadline,
             expected_feature_hash=expected_feature_hash,
             expected_players_hash=expected_players_hash,
             expected_bootstrap_hash=expected_bootstrap_hash,
@@ -1026,7 +1088,7 @@ def evaluate_xfp_from_paths(
             "status": "complete",
             "season": season,
             "target_gameweek": target_gameweek,
-            "event_name": event_name,
+            "event_name": finalized.event_name,
             "model_version": model_version,
             "evaluation_generated_at": generated_at.isoformat().replace("+00:00", "Z"),
             "bias_sign_convention": "prediction - actual; positive means overprediction",
