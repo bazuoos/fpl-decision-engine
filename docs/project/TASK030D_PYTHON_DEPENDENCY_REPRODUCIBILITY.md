@@ -2,9 +2,11 @@
 
 ## Status and authority
 
-This is an uncommitted implementation candidate based on
-`00ad7e1812e6f71112310f329c21344f0fe454ac`, the independently reviewed
-Task030C design.
+The initial implementation was committed as
+`624649e4ff35ecc5c6d8ca3885dc4b52a0183432` after independent review reported
+SAFE. Its Linux CI passed, but the required live Dependabot gate exposed an
+incompatibility between repository uv 0.12.12 and Dependabot's uv 0.12.7
+updater. This is the uncommitted remediation candidate for that finding.
 
 It introduces a Python lock and changes development/CI dependency setup. It
 does not change engine, model, optimizer, reliability, application or frontend
@@ -23,12 +25,12 @@ remains true.
 The candidate adds these repository controls:
 
 - one root `uv.lock` as the sole committed Python environment resolution;
-- exact uv `0.12.12` policy in `pyproject.toml`;
+- exact uv `0.12.7` policy in `pyproject.toml`;
 - `python-downloads = "never"` repository policy;
 - exact setuptools `84.0.0` build constraint;
 - an exact `dev` group containing pip `26.1.1` and setuptools `84.0.0`;
 - full-SHA-pinned `astral-sh/setup-uv` v10.0.1 in CI;
-- an explicit SHA-256 for the uv 0.12.12 Linux x86-64 archive;
+- an explicit SHA-256 for the uv 0.12.7 Linux x86-64 archive;
 - direct GitHub Release download, with persistent setup-uv and uv dependency
   caching disabled in CI;
 - a lock freshness check, exact locked sync and test execution without another
@@ -41,14 +43,14 @@ development tools rather than application runtime requirements.
 
 ## Trust and version provenance
 
-The selected uv release is `0.12.12`, published by `astral-sh/uv` on
-2026-09-09. The official macOS arm64 archive was downloaded to a temporary
+The selected uv release is `0.12.7`, published by `astral-sh/uv` on
+2026-08-27. The official macOS arm64 archive was downloaded to a temporary
 directory and verified before execution:
 
 ```text
 uv-aarch64-apple-darwin.tar.gz
-SHA-256 46740540b63fdee9a6cb2e19baf3f1f475b850c440a33e63455087a6871263f1
-uv 0.12.12 (c4be69153 2026-09-09 aarch64-apple-darwin)
+SHA-256 127ebdda7ad953cdf198e964b570ea5771b85467ea93eb7cb6d6f8e6f55408f3
+uv 0.12.7 (61291a8ca 2026-08-27 aarch64-apple-darwin)
 ```
 
 GitHub's release-asset digest and the separately downloaded official `.sha256`
@@ -66,7 +68,7 @@ checksum table. CI supplies the official Linux x86-64 archive hash:
 
 ```text
 uv-x86_64-unknown-linux-gnu.tar.gz
-SHA-256 ab9b309d4586403f024e100abaceb396616e178a553e2500c36087d180f09509
+SHA-256 788f18abea7c5f55d6216e4f5613fd89d4d59b631efeec117b2b07fe72f1da21
 ```
 
 `download-from-astral-mirror: false` makes the pinned action use the artifact's
@@ -138,7 +140,7 @@ The proposed CI sequence is:
 
 1. Set up the existing Python 3.10 interpreter with the current full-SHA-pinned
    official action.
-2. Install uv 0.12.12 through the full-SHA-pinned setup-uv action and verify the
+2. Install uv 0.12.7 through the full-SHA-pinned setup-uv action and verify the
    downloaded archive checksum before extraction.
 3. Run `uv lock --check --no-python-downloads`.
 4. Run an exact `uv sync --locked --no-python-downloads --no-cache`.
@@ -151,10 +153,9 @@ The repository setting and explicit flags both prohibit uv-managed Python
 downloads. A missing or stale lock and a mismatched required uv version were
 each tested in disposable project copies and failed closed.
 
-The actual Ubuntu x86-64/Python 3.10 sync and test run require GitHub CI. They
-remain a post-commit gate and are not represented as completed local evidence.
-Likewise, GitHub must accept and run the new Dependabot uv entry before the
-project claims that automated parsing works.
+The initial commit's Ubuntu x86-64/Python 3.10 run passed all 582 Python tests
+and four frontend tests in GitHub CI run `34514867297`. The remediation must
+repeat that gate because its uv bootstrap version and checksum changed.
 
 ## Dependency update behavior
 
@@ -162,11 +163,18 @@ The new `uv` Dependabot entry uses the existing Tuesday 09:00 Asia/Bangkok
 schedule and limits open uv update pull requests to three. It does not group,
 approve or merge updates.
 
-GitHub's current documentation lists the `uv` ecosystem with a supported uv
-version floor of 0.11; repository uv 0.12.12 is above that floor. This is a
-time-sensitive external fact. A successful default-branch Dependabot run is
-still required after commit, and future uv tool updates must recheck the current
-floor.
+GitHub's documentation listed the `uv` ecosystem with a supported version floor
+of 0.11, but that public floor did not establish compatibility with every newer
+uv release. The first live run, `34514872002`, accepted the ecosystem entry,
+parsed the project and enumerated its dependencies. When it attempted to update
+pip, it failed closed with `tool_version_not_supported`: the repository required
+`==0.12.12` while the Dependabot updater supported `0.12.7`.
+
+This remediation pins the repository bootstrap and required version to 0.12.7,
+matching the updater actually observed in the required empirical gate. A
+successful second default-branch run is still required after commit. Future uv
+tool updates must confirm the live updater version rather than infer
+compatibility from the documented floor.
 
 An update proposal may change direct or transitive packages, platform branches,
 the uv lock schema, or the tool bootstrap. Each proposal requires ordinary code
@@ -179,7 +187,7 @@ The candidate currently has this local evidence:
 
 | Check | Result |
 |---|---|
-| Verified uv binary | 0.12.12, macOS arm64 archive hash matched |
+| Verified uv binary | 0.12.7, macOS arm64 archive hash matched |
 | Lock freshness | passed |
 | Lock idempotence | second ordinary generation byte-identical |
 | Exact clean sync | passed on macOS 26.5.1 arm64, Python 3.14.5 |
@@ -194,9 +202,10 @@ The candidate currently has this local evidence:
 | Missing lock | rejected |
 | Stale direct dependency set | rejected after resolution, lock not rewritten |
 | Wrong required uv version | rejected before lock use |
-| Patch whitespace | pending final candidate check |
-| Ubuntu x86-64/Python 3.10 | pending GitHub CI |
-| Dependabot uv parsing | pending default-branch run |
+| Dependabot update simulation | uv 0.12.7 upgraded pip in a disposable project copy |
+| Patch whitespace | passed |
+| Ubuntu x86-64/Python 3.10 | initial commit passed; remediation rerun pending |
+| Dependabot uv parsing | project parsed; 0.12.12 update failed; remediation rerun pending |
 
 Tests used offline fakes and temporary files. No operational FPL command or
 private-data read occurred.

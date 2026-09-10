@@ -30,8 +30,8 @@ Existing snapshot directories and files are never overwritten.
 ## Setup
 
 Python 3.10 or newer is required.
-Install the repository-required uv 0.12.12 release from the
-[official uv releases](https://github.com/astral-sh/uv/releases/tag/0.12.12)
+Install the repository-required uv 0.12.7 release from the
+[official uv releases](https://github.com/astral-sh/uv/releases/tag/0.12.7)
 and verify its platform archive against the release's SHA-256 file. Then create
 the exact locked project environment without allowing uv to download a Python
 interpreter:
@@ -43,7 +43,7 @@ uv sync --locked --no-python-downloads
 source .venv/bin/activate
 ```
 
-The version check must report `uv 0.12.12`. `pyproject.toml` declares broad
+The version check must report `uv 0.12.7`. `pyproject.toml` declares broad
 package compatibility; the committed `uv.lock` is the reviewed environment
 resolution. Do not run an unlocked sync or hand-edit the lock. The default
 development group pins pip and setuptools because the packaging tests invoke
