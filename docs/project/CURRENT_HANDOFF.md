@@ -5,20 +5,23 @@
 > contradiction. Verify current Git state before acting.
 
 - Implementation checkpoint summarized: **2026-09-10**,
-  `cb72a78bf2a9ebcad70103fa70ad75abf7e98526`. It was on `main`, aligned with
+  `7484484b7b3daccc814010af786f595608ce3e94`. It was on `main`, aligned with
   `origin/main`, with successful CI. Identify this document's own revision and
   any later work from Git history rather than assuming the embedded SHA is HEAD.
-- Latest completed implementation: **Task029B private source evidence and human
-  strategy context**. It provides content-addressed private source capture,
-  immutable human-context records and an explicitly separated three-layer
-  comparison view. It is outside decision authority and cannot create a journal,
-  change projections or recommend an FPL action. Independent adversarial review
-  reported SAFE; CI run 34442961371 passed 582 Python and four frontend tests.
+- Latest completed repository work: **Task030A/B GitHub Actions maintenance and
+  monitoring**. The CI actions are full-SHA pinned to releases using Node 24
+  runtimes, and Dependabot checks only GitHub Actions weekly at 09:00 Tuesday in
+  `Asia/Bangkok`, opening at most three individual update pull requests. It does
+  not auto-merge. Independent adversarial reviews reported SAFE. CI run
+  34480636762 passed 582 Python and four frontend tests; GitHub's Dependabot
+  update run 34480644733 succeeded against the committed configuration.
 - Production completion scheduling: Task028E design and Task028F controller are
   committed. The controller can prepare, verify, inspect, run, activate,
   deactivate and sanitize one exact immutable schedule plan, while Task028B
-  retains all completion/refresh authority. **No production plan has been
-  prepared, installed or activated. Task028G has not started.**
+  retains all completion/refresh authority. Two GW4 plans were later prepared
+  locally and independently reviewed, but neither was installed or activated.
+  Both are now deliberately stale because their exact expected commits precede
+  Tasks030A/B; the controller therefore fails closed on them.
 - **Local operational evidence, not repository-established:** after Task029B was
   reviewed, committed and green, the owner authorized capture of one current
   manager source. Its bytes matched the source hash already bound by the current
@@ -45,14 +48,15 @@
 
 ## Current restrictions and limits
 
-- This checkpoint refresh authorizes no Task028G, Task026C, model/optimizer/
-  reliability change, operational refresh, journal creation, artifact
-  regeneration, private evidence inspection, sealed-holdout access, credential
-  creation, provider action or schedule activation.
-- Task028F is inert without a prepared plan and explicit owner lifecycle action.
-  It does not infer a target or prediction. A future Task028G may prepare one
-  exact plan for independent review, but preparation is not installation and
-  installation is not activation.
+- This checkpoint refresh authorizes no schedule activation, Task026C,
+  model/optimizer/reliability change, operational refresh, journal creation,
+  artifact regeneration, private evidence inspection, sealed-holdout access,
+  credential creation or provider action.
+- Task028F is inert without a current exact plan and explicit owner lifecycle
+  action. It does not infer a target or prediction. Both existing Task028G plans
+  are immutable, stale and inactive, with zero invocations or lifecycle events.
+  A replacement plan requires a new exact revision and independent review;
+  preparation is not installation and installation is not activation.
 - Human strategy context preserves what was believed and why. It never rewrites
   trusted engine artifacts, creates prospective evidence after a deadline or
   changes xFP, legality, optimization, reliability or model selection.
@@ -87,20 +91,18 @@ model caveats. This does not authorize frontend work. See
 ## Immediate next question
 
 Infrastructure remains the human-stated priority. After this documentation-only
-refresh, the smallest proposed implementation boundary is **Task028G: prepare
-and independently review one exact production completion-monitor schedule
-plan** using the committed Task028F tooling. It must bind a human-approved
-season/gameweek, finite UTC window and optional exact prediction; prove code,
-environment, paths and repository state; and remain uninstalled and inactive.
-Task028G has not started. Activation requires a later explicit owner decision
-after plan review and does not imply continuous operation while the Mac is off.
+refresh is committed and green, the smallest proposed operational boundary is to
+prepare and independently review a **new** GW4 Task028G production
+completion-monitor plan against that final revision. Preserve both earlier plans
+as immutable stale evidence. The replacement must remain uninstalled and
+inactive. Activation requires a later explicit owner decision after plan review
+and does not imply continuous operation while the Mac is off.
 
-**REQUIRES HUMAN CONTEXT:** exact Task028G target/window/prediction choice;
-private evidence completeness; credential/key custody and private backup
-receipts; explicit acceptance of irreversible 90-day compliance retention
-before Task027F; verified live manager state; unrecovered prior review/result
-packages; and any permission to unseal an experiment. Changing football facts
-need fresh verification.
+**REQUIRES HUMAN CONTEXT:** any Task028G activation decision; private evidence
+completeness; credential/key custody and private backup receipts; explicit
+acceptance of irreversible 90-day compliance retention before Task027F; verified
+live manager state; unrecovered prior review/result packages; and any permission
+to unseal an experiment. Changing football facts need fresh verification.
 
 ## Read-next order
 
@@ -119,7 +121,10 @@ need fresh verification.
    [Task029A design](TASK029A_EVIDENCE_PROVENANCE_AND_STRATEGY_CONTEXT_SPEC.md),
    [Task029B tooling](TASK029B_PRIVATE_EVIDENCE_AND_CONTEXT.md) and the sanitized
    [Task029C record](TASK029C_PRIVATE_EVIDENCE_CAPTURE_AND_CONTEXT_POPULATION.md).
-5. For web work: [README](../../README.md),
+5. For CI maintenance: [workflow](../../.github/workflows/ci.yml) and
+   [Dependabot configuration](../../.github/dependabot.yml). Treat automated
+   update pull requests as proposals requiring ordinary review and green CI.
+6. For web work: [README](../../README.md),
    [RFC 0026A](../rfcs/0026a-web-product-architecture.md),
    [public reader](../../src/fpl_decision_engine/trusted_artifact_reader.py),
    [app facade](../../src/fpl_decision_app/read_facade.py),

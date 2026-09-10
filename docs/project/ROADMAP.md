@@ -1,6 +1,6 @@
 # Roadmap
 
-As of `cb72a78` (2026-09-10). This is a planning map, not authorization to
+As of `7484484` (2026-09-10). This is a planning map, not authorization to
 execute. The [RFC phased plan](../rfcs/0026a-web-product-architecture.md#28-phased-implementation-plan)
 is the source for Tasks026B–D. Proposed capabilities are not completed merely
 because they appear in an RFC or this file.
@@ -42,6 +42,10 @@ because they appear in an RFC or this file.
   foundation (`a715d48`, `cb72a78`). Content-addressed source bytes, immutable
   historical/prospective context structures and separated comparison layers are
   implemented outside engine decision authority.
+- Task030A/B: GitHub Actions upgraded to reviewed full-SHA pins using Node 24
+  runtimes, with weekly action-only Dependabot update proposals (`4037102`,
+  `7484484`). CI and GitHub's first Dependabot run passed; updates are not
+  auto-merged.
 
 ## LOCAL OPERATIONAL EVIDENCE — not repository implementation
 
@@ -53,15 +57,19 @@ because they appear in an RFC or this file.
   created and verified. See the sanitized [Task029C record](TASK029C_PRIVATE_EVIDENCE_CAPTURE_AND_CONTEXT_POPULATION.md).
 - These private/ignored artifacts are local only. They are not included in Git
   and have **NO VERIFIED OFFSITE BACKUP**.
+- Two GW4 Task028G completion-monitor plans were prepared and independently
+  reviewed: an earlier realized-only plan bound to `cc30c99`, then an
+  evaluation-enabled replacement bound to `f66fe4b`. Neither was installed or
+  activated; both have zero invocations and lifecycle events. Tasks030A/B made
+  both exact-commit plans stale, so they cannot pass current preflight.
 
 ## NEXT — proposed implementation boundary, not work started
 
-1. Consider **Task028G: prepare and independently review one exact production
-   completion-monitor schedule plan** using the committed Task028F tooling. The
-   human must choose the explicit season/gameweek, finite UTC window and whether
-   to bind an existing exact pre-deadline prediction. Preparation must remain
-   offline, uninstalled and inactive. Review the plan and sanitized evidence
-   before any separate activation decision.
+1. After this continuity refresh is committed and green, prepare and
+   independently review a **new** GW4 Task028G completion-monitor plan against
+   that final exact revision. Preserve the two earlier plans unchanged as stale
+   operational evidence. The replacement must remain uninstalled and inactive
+   until a separate owner activation decision.
 2. Preserve the two remaining
    [Task026B follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups): keep
    the current shell/navigation disposable and the UX paradigm undecided.
@@ -72,13 +80,11 @@ because they appear in an RFC or this file.
 4. Plan Task026C only after human approval: identity/ownership,
    OIDC/session/CSRF, PostgreSQL, private evidence review/storage, explicit engine
    commands/workers, consent/retention/export/deletion and isolation tests.
-5. Review the current GitHub Actions runtime-deprecation annotation before
-   platform enforcement; CI is currently passing.
 
-Task028G is the smallest proposed infrastructure boundary currently unblocked by
-the unavailable key-custody drive. It does not authorize installation,
-activation, a live FPL request or automatic manager action. A local LaunchAgent
-cannot run while the Mac is powered off.
+Replacing the stale Task028G plan is the smallest proposed infrastructure
+boundary currently unblocked by the unavailable key-custody drive. It does not
+authorize installation, activation, a live FPL request or automatic manager
+action. A local LaunchAgent cannot run while the Mac is powered off.
 
 ## PAUSED — recovery owner setup
 

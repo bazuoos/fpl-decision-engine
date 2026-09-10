@@ -197,11 +197,19 @@ at a later login. A terminal marker alone never proves service removal. Status
 does not validate the underlying football evidence; Task028B remains responsible
 for that trust chain.
 
-## Future preparation — Task028G, not performed
+## Later Task028G preparation — inactive and now stale
 
-Only after Task028F is independently reviewed, committed and green in CI may a
-separate Task028G prepare a real plan. The owner must choose the exact target,
-prediction behavior and window. The command shape will be:
+After Task028F was independently reviewed, committed and green in CI, Task028G
+prepared two local GW4 plans in sequence: a realized-only plan bound to
+`cc30c99`, then an evaluation-enabled replacement bound to `f66fe4b`. Both plan
+preparations were independently reviewed. Neither plan was installed or
+activated, and both have zero invocations and lifecycle events. Later repository
+commits make both plans fail the exact-revision preflight; preserve them as
+immutable stale operational evidence.
+
+A fresh replacement still requires an explicit target, prediction behavior and
+window and must bind the final reviewed repository revision. The command shape
+remains:
 
 ```bash
 <ABSOLUTE_REPOSITORY>/.venv/bin/python -I \
@@ -230,7 +238,8 @@ only with one exact immutable pre-deadline prediction. Repeat `--allow-untracked
 only for paths individually verified at preparation time.
 
 Preparation returns `PREPARED_NOT_INSTALLED`. Inspect the complete plan, plist
-and both hashes. Rendering is not activation.
+and both hashes. Rendering is not activation. A replacement plan does not
+inherit authorization from either stale plan.
 
 ## Future activation — separate authorization
 

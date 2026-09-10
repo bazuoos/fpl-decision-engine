@@ -27,8 +27,9 @@ architecture; its own status still says proposed.
 | B2 with 90-day compliance retention is the proposed permanent remote destination | Task027E spec; `a0cf180` | Synthetic drill first; explicit owner acceptance before real upload; retained versions cannot be shortened or deleted during the lock |
 | Official completion control is explicit, stable and one-shot | Task028A/B docs, `completion_monitor.py`; `be7baf6`, `bec2343` | Two exact probes and target locking gate one refresh; optional evaluation needs an exact supplied pre-deadline prediction; no scheduler or decision authority |
 | Scheduler mechanics must be proven synthetically before production scheduling is considered | Task028C/D docs, `completion_monitor_schedule_drill.py`; `de24e14`, `e3758e4`, `2187c40` | Offline harness and owner-authorized two-scenario drill passed; this proves local mechanics only |
-| Production completion scheduling consumes Task028B outcomes without duplicating them | Task028E/F docs, `completion_monitor_production_schedule.py`; `6305f5e`, `cc30c99` | Exact immutable plan, strict preflight, one call per invocation and terminal quiescence; no real plan/install/activation yet |
+| Production completion scheduling consumes Task028B outcomes without duplicating them | Task028E/F docs, `completion_monitor_production_schedule.py`; `6305f5e`, `cc30c99` | Exact immutable plan, strict preflight, one call per invocation and terminal quiescence; two later GW4 plans remained inactive and are now revision-stale |
 | Private source provenance and human reasoning remain separate from engine authority | Task029A/B docs, private schemas, `private_evidence_context.py`; `a715d48`, `cb72a78` | Context may preserve historical beliefs and link exact bytes, but cannot change xFP, legality, optimization, reliability, journals or recommendations |
+| CI actions remain immutable while update discovery is automated | `.github/workflows/ci.yml`, `.github/dependabot.yml`; `4037102`, `7484484` | Actions use reviewed full-SHA pins; Dependabot may propose individual updates weekly but cannot authorize or auto-merge them |
 
 ## Historical presentation lesson (human-confirmed context and policy)
 
@@ -53,7 +54,7 @@ all its ADRs are proposed pending independent review. Human confirmation of
 project policy does not automatically accept every RFC design. IMPLEMENTED
 below describes observable code, not blanket acceptance of the entire ADR.
 
-| RFC decision | Status at `cb72a78` | Boundary / consequence |
+| RFC decision | Status at `7484484` | Boundary / consequence |
 |---|---|---|
 | ADR-026A-01: engine artifacts are authority | IMPLEMENTED for decision reads | Public reader delegates existing validation; no second app/browser optimizer |
 | ADR-026A-02: React/TypeScript/Vite | IMPLEMENTED stack | Static client; no chosen UX paradigm; current view omits RFC-envisaged reliability/model caveats |

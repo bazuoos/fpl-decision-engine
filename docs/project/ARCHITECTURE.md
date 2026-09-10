@@ -42,7 +42,7 @@ exact immutable Task028F plan -> LaunchAgent -> preflighted controller
     -> one typed Task028B call per active invocation -> terminal marker
     -> later invocations quiescent -> explicit owner deactivation
          -X-> no inferred target/prediction, decision, journal or manager action
-         -X-> no real plan prepared, installed or activated yet
+         -X-> two reviewed GW4 plans are stale; neither was installed or activated
 
 RESEARCH: historical*.py + separately stored historical/experiment artifacts
 pinned archives -> causal features -> frozen baseline / preregistered experiments
@@ -59,6 +59,11 @@ explicit source bytes -> content-addressed source + immutable observation
 historical human reasoning -> immutable context + explicit temporal class
     -> separated historical / trusted-engine-reference / current-evidence view
          -X-> no xFP, legality, optimization, reliability, journal or action
+
+REPOSITORY/CI SUPPLY CHAIN
+full-SHA-pinned actions -> CI mechanical gates
+    -> weekly action-only Dependabot update proposals -> ordinary review + CI
+         -X-> no auto-merge, model promotion or application/engine authority
 ```
 
 Validation is not a last-minute UI step: each stage validates its inputs.
@@ -152,9 +157,12 @@ implements the controller and lifecycle tooling outside the engine package. A
 prepared plan binds one exact target, finite window, code revision, interpreter,
 environment, paths and optional prediction. After preflight, each active
 invocation may call Task028B once. A validated immutable terminal marker makes
-later invocations network-inert until exact-label owner deactivation. No real
-plan has been prepared, installed or activated; Task028G has not started. The
-controller operates on one Mac and makes no continuous-availability claim.
+later invocations network-inert until exact-label owner deactivation. Two GW4
+Task028G plans were prepared locally and independently reviewed, but neither was
+installed or activated. Their expected revisions (`cc30c99` and `f66fe4b`) now
+precede current HEAD, so exact-commit preflight rejects both. They remain
+immutable historical operational evidence. The controller operates on one Mac
+and makes no continuous-availability claim.
 
 ## Application boundary today
 
@@ -199,6 +207,22 @@ research export or multi-tenant service yet. Request-scoped snapshots protect
 the current explicit decision-read chain; they do not provide process-wide file
 immutability, an object store, verified-by-hash caching or a general rule for
 unrelated engine reads.
+
+## Repository and CI boundary today
+
+[CI](../../.github/workflows/ci.yml) uses full commit SHA pins for checkout,
+Python setup and Node setup. Their reviewed releases use Node 24 action runtimes;
+the project still tests under Python 3.10 and Node 22. Checkout persistence and
+setup-node's package-manager cache are disabled. The workflow installs the exact
+age 1.3.1 archive only after SHA-256 verification.
+
+[Dependabot](../../.github/dependabot.yml) checks only the `github-actions`
+ecosystem weekly at 09:00 Tuesday in `Asia/Bangkok` and permits at most three
+open version-update pull requests. It proposes individual updates and adds no
+auto-merge mechanism. Every proposal remains untrusted until independently
+reviewed and mechanically verified; this monitoring grants no engine,
+application, research or model-promotion authority. Python and npm dependency
+monitoring remain outside this narrow configuration.
 
 ## Recovery boundary today
 

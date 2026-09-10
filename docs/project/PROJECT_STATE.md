@@ -1,7 +1,7 @@
 # Project state
 
 Implementation checkpoint summarized: 2026-09-10, commit
-`cb72a78bf2a9ebcad70103fa70ad75abf7e98526`. Identify this document's own
+`7484484b7b3daccc814010af786f595608ce3e94`. Identify this document's own
 revision and any later work from Git history.
 Start with [CURRENT_HANDOFF](CURRENT_HANDOFF.md); this pack is navigation and
 continuity context, not a replacement for code, contracts, or frozen evidence.
@@ -21,7 +21,7 @@ the selected action the objectively best FPL transfer.
 
 | Area | Implemented and trusted for | Important limit |
 |---|---|---|
-| Official data | Immutable raw bytes, typed Parquet, coherent resumable refresh; stable one-shot completion monitoring; reviewed local scheduling controller | Live collection needs network; no production schedule plan is prepared, installed or activated |
+| Official data | Immutable raw bytes, typed Parquet, coherent resumable refresh; stable one-shot completion monitoring; reviewed local scheduling controller | Live collection needs network; two reviewed GW4 plans are stale and inactive, so no current plan is installed or activated |
 | Features / xFP | Frozen inputs and explicit missingness; xFP v0.1 | Appearance + goals + assists only; unstable early samples |
 | Optimization | Legal deterministic squad/XI/C/VC; zero-or-one-free-transfer comparison | Single GW, no chips/hits/multi-GW or future-transfer valuation |
 | Reliability | Provenance and 11 diagnostic sensitivity views | Not confidence, a veto, or a replacement recommendation |
@@ -30,6 +30,7 @@ the selected action the objectively best FPL transfer.
 | Web | Authorization seam, explicit-ID verified decision reads, canonical payload rendering | Local single-user mode only; no real auth, uploads, commands, or research service |
 | Recovery tooling | Private-path staging guards, read-only inventory, encrypted checkpoint create/verify/restore | No production key, verified remote/disconnected copy or real restore drill |
 | Private evidence/context | Content-addressed explicit source capture, immutable human-context records, separated comparison layers | Local and outside decision authority; provenance/currentness stay explicit; no offsite copy |
+| Repository CI | Full-SHA-pinned GitHub Actions on Node 24 runtimes; weekly action-only Dependabot proposals | Dependency ranges remain incompletely locked; update PRs still require review and CI |
 
 Primary guide: [README](../../README.md). Implementation map:
 [ARCHITECTURE](ARCHITECTURE.md). Product constraints:
@@ -104,10 +105,12 @@ Task028E defines the production scheduling boundary and Task028F implements the
 standard-library controller outside the engine package. It consumes Task028B's
 typed outcome only after exact plan, code, environment, repository and path
 preflight. One immutable terminal marker makes later invocations network-inert;
-activation and exact-label deactivation remain explicit owner operations. No
-real target has been prepared, installed or activated, and Task028G has not
-started. The controller cannot operate while the Mac is powered off and makes
-no continuous-availability claim.
+activation and exact-label deactivation remain explicit owner operations. Two
+GW4 Task028G plans were later prepared locally and independently reviewed; one
+was realized-only and one bound the exact pre-deadline GW4 prediction. Neither
+was installed or activated, and both now fail exact-commit preflight after later
+repository work. The controller cannot operate while the Mac is powered off and
+makes no continuous-availability claim.
 
 Task029A defines evidence provenance and human-context separation; Task029B
 implements explicit content-addressed private source capture, immutable context
@@ -120,24 +123,24 @@ context records were verified as described in the sanitized
 
 ## Validation evidence and procedure
 
-**Repository-established at this review:** HEAD `cb72a78`, branch `main`, 147
+**Repository-established at this review:** HEAD `7484484`, branch `main`, 149
 tracked files and four frontend tests in source. The CI workflow configures
-Python 3.10, Node 22 and checksum-pinned age 1.3.1 installation.
+Python 3.10, Node 22 and checksum-pinned age 1.3.1 installation. Checkout,
+setup-python and setup-node are pinned by full commit SHA to releases that use
+Node 24 action runtimes.
 
-At this exact commit, [CI run 34442961371](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34442961371)
+At this exact commit, [CI run 34480636762](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34480636762)
 passed 582 Python tests, four frontend tests, generated-contract freshness,
 TypeScript, production build, browser dependency-boundary and whitespace checks.
-The Task029B adversarial review independently verified source immutability,
-provenance limits, context identity/time classification, private-root binding,
-comparison-layer separation and engine isolation, and reported SAFE. Earlier
-reviews separately covered Task028B completion semantics and Task028F scheduler
-preflight, terminal quiescence and lifecycle controls. Historical success does
-not establish future checkout health, private-evidence truth or a real installed
-production schedule.
-The CI run also emitted a non-failing
-GitHub-hosted-actions annotation that the Node.js 20 runtime used internally by
-the current checkout/setup actions is deprecated and being forced to Node.js 24;
-review action-version upgrades as maintenance before platform enforcement.
+Task030A's independent review verified the release provenance and full SHA pins;
+the former Node 20 runtime warning did not recur after the upgrade. Task030B's
+independent review verified the action-only Dependabot scope and reported SAFE.
+[Dependabot run 34480644733](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34480644733)
+then completed successfully and found the pinned actions current. This proves
+GitHub accepted this configuration, not that future update pull requests are
+safe to merge. Historical CI success does not establish future checkout health,
+predictive validity, private-evidence truth or a real installed production
+schedule.
 
 When installation/test execution is authorized, use a virtualenv and run:
 
@@ -188,8 +191,9 @@ and current code. Task028C/D now supply a reviewed scheduling-drill design and
 offline harness. The temporary synthetic `launchd` drill subsequently passed
 local execution and independent sanitized-evidence review. Task028E/F now supply
 the reviewed production-scheduling design and inert controller; older statements
-that production scheduling design is still future work are obsolete. No real
-plan is prepared or installed, and automatic decision work remains unimplemented
+that production scheduling design is still future work are obsolete. Two local
+Task028G plans were prepared and reviewed but never installed or activated; both
+are now stale by exact revision. Automatic decision work remains unimplemented
 and unauthorized. Task029A/B add private provenance/context mechanisms; they do
 not promote human reasoning into trusted engine evidence.
 
