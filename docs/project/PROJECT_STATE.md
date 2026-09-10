@@ -1,7 +1,7 @@
 # Project state
 
-Implementation checkpoint summarized: 2026-09-09, commit
-`33fa48ce690b96f3a090f6298897b9f8ddab38a7`. Identify this document's own
+Implementation checkpoint summarized: 2026-09-10, commit
+`cb72a78bf2a9ebcad70103fa70ad75abf7e98526`. Identify this document's own
 revision and any later work from Git history.
 Start with [CURRENT_HANDOFF](CURRENT_HANDOFF.md); this pack is navigation and
 continuity context, not a replacement for code, contracts, or frozen evidence.
@@ -21,7 +21,7 @@ the selected action the objectively best FPL transfer.
 
 | Area | Implemented and trusted for | Important limit |
 |---|---|---|
-| Official data | Immutable raw bytes, typed Parquet, coherent resumable refresh; stable one-shot completion monitoring; offline scheduling-drill harness | Live collection needs network; the local synthetic drill passed, but no production scheduler is installed or authorized |
+| Official data | Immutable raw bytes, typed Parquet, coherent resumable refresh; stable one-shot completion monitoring; reviewed local scheduling controller | Live collection needs network; no production schedule plan is prepared, installed or activated |
 | Features / xFP | Frozen inputs and explicit missingness; xFP v0.1 | Appearance + goals + assists only; unstable early samples |
 | Optimization | Legal deterministic squad/XI/C/VC; zero-or-one-free-transfer comparison | Single GW, no chips/hits/multi-GW or future-transfer valuation |
 | Reliability | Provenance and 11 diagnostic sensitivity views | Not confidence, a veto, or a replacement recommendation |
@@ -29,6 +29,7 @@ the selected action the objectively best FPL transfer.
 | Journal / Diff | Separate human-action record; trusted same-scope structural comparison | Outcome v1 proves GW completion, not points/counterfactual performance; diff is not causal |
 | Web | Authorization seam, explicit-ID verified decision reads, canonical payload rendering | Local single-user mode only; no real auth, uploads, commands, or research service |
 | Recovery tooling | Private-path staging guards, read-only inventory, encrypted checkpoint create/verify/restore | No production key, verified remote/disconnected copy or real restore drill |
+| Private evidence/context | Content-addressed explicit source capture, immutable human-context records, separated comparison layers | Local and outside decision authority; provenance/currentness stay explicit; no offsite copy |
 
 Primary guide: [README](../../README.md). Implementation map:
 [ARCHITECTURE](ARCHITECTURE.md). Product constraints:
@@ -99,22 +100,40 @@ and the reviewer reported SAFE. This is local operational evidence, not a
 committed scheduler or production proof. No scheduler was installed. Rendering
 a candidate production plist neither installs nor authorizes it.
 
+Task028E defines the production scheduling boundary and Task028F implements the
+standard-library controller outside the engine package. It consumes Task028B's
+typed outcome only after exact plan, code, environment, repository and path
+preflight. One immutable terminal marker makes later invocations network-inert;
+activation and exact-label deactivation remain explicit owner operations. No
+real target has been prepared, installed or activated, and Task028G has not
+started. The controller cannot operate while the Mac is powered off and makes
+no continuous-availability claim.
+
+Task029A defines evidence provenance and human-context separation; Task029B
+implements explicit content-addressed private source capture, immutable context
+records and a comparison view that names historical human context, trusted
+engine references and current evidence separately. These tools live outside the
+engine and have no decision, xFP, optimization, reliability or journal authority.
+One later owner-authorized local source capture and seven historical-backfill
+context records were verified as described in the sanitized
+[Task029C record](TASK029C_PRIVATE_EVIDENCE_CAPTURE_AND_CONTEXT_POPULATION.md).
+
 ## Validation evidence and procedure
 
-**Repository-established at this review:** HEAD `33fa48c`, branch `main`, 136
+**Repository-established at this review:** HEAD `cb72a78`, branch `main`, 147
 tracked files and four frontend tests in source. The CI workflow configures
 Python 3.10, Node 22 and checksum-pinned age 1.3.1 installation.
 
-At this exact commit, [CI run 34346416323](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34346416323)
-passed 531 Python tests, four frontend tests, generated-contract freshness,
+At this exact commit, [CI run 34442961371](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34442961371)
+passed 582 Python tests, four frontend tests, generated-contract freshness,
 TypeScript, production build, browser dependency-boundary and whitespace checks.
-The Task028D adversarial review independently verified the offline harness,
-synthetic worker, exact-label lifecycle construction, preflight, cleanup,
-evidence validation and sanitization, and reported SAFE. The preceding Task028B
-review separately verified completion probing, locking, restart reconciliation,
-receipt handling, realized-snapshot validation, exact prediction binding and
-fail-closed recovery. Historical success does not establish future checkout
-health or real `launchd` behavior.
+The Task029B adversarial review independently verified source immutability,
+provenance limits, context identity/time classification, private-root binding,
+comparison-layer separation and engine isolation, and reported SAFE. Earlier
+reviews separately covered Task028B completion semantics and Task028F scheduler
+preflight, terminal quiescence and lifecycle controls. Historical success does
+not establish future checkout health, private-evidence truth or a real installed
+production schedule.
 The CI run also emitted a non-failing
 GitHub-hosted-actions annotation that the Node.js 20 runtime used internally by
 the current checkout/setup actions is deprecated and being forced to Node.js 24;
@@ -163,12 +182,16 @@ CI detects changes between the application, checked OpenAPI and generated file;
 these compile-time types do not add browser-side runtime schema validation. See
 the [decision status index](DECISIONS.md#web-rfc-decision-status) and
 [deferred follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups).
-The completion monitor is now implemented as a one-shot command, so the earlier
+The completion monitor is implemented as a one-shot command, so the earlier
 Task028A future-tense design wording should be read with its implementation guide
 and current code. Task028C/D now supply a reviewed scheduling-drill design and
 offline harness. The temporary synthetic `launchd` drill subsequently passed
-local execution and independent sanitized-evidence review; live scheduling and
-automatic decision work remain unimplemented and unauthorized.
+local execution and independent sanitized-evidence review. Task028E/F now supply
+the reviewed production-scheduling design and inert controller; older statements
+that production scheduling design is still future work are obsolete. No real
+plan is prepared or installed, and automatic decision work remains unimplemented
+and unauthorized. Task029A/B add private provenance/context mechanisms; they do
+not promote human reasoning into trusted engine evidence.
 
 ## Current local public-data evidence
 
@@ -186,6 +209,15 @@ gameweek is insufficient for tuning or promotion. The ignored local data is not
 included in this continuity diff and has **NO VERIFIED OFFSITE BACKUP**. A
 prospective GW3 journal cannot be recreated honestly after its deadline; none
 was created by the refresh or evaluation.
+
+**Additional local operational state observed on 2026-09-10:** one explicitly
+selected current manager source was captured with Task029B and verified against
+the source hash in the current verified-manager-evidence artifact. Seven
+historical-backfill human-context records were created and verified. This is a
+sanitized operational report, not committed private evidence or proof of source
+time/currentness; see
+[Task029C](TASK029C_PRIVATE_EVIDENCE_CAPTURE_AND_CONTEXT_POPULATION.md). None of
+these records is prospective or an engine input.
 
 ## Reproducibility and current recovery state
 
@@ -209,6 +241,13 @@ owner-supplied exact sensitive values. These controls reduce accidental Git
 publication and make local encrypted recovery testable; they do not upload,
 schedule or attest to a backup.
 
+Task029B adds private source/content manifests and human-context records beneath
+the same ignored, guarded `data/` tree, so a future full-data checkpoint can
+include them without a new backup format. Their own verification proves bytes,
+identity and declared provenance only. It does not prove football truth,
+prospective timing, manager-state currency or semantic validity of a referenced
+engine artifact.
+
 The owner reports that password-manager recovery and a private B2 bucket with
 default encryption, Object Lock and 90-day compliance retention have been
 prepared. Label this as external owner-reported state; repository evidence does
@@ -222,9 +261,10 @@ disconnected copy or clean-environment real restore drill: **NO VERIFIED OFFSITE
 BACKUP**.
 
 Task027B/027C identified original manager-input/source screenshots referenced by
-two operational runs whose matching source bytes were not found under the
-authorized `data/` inventory. They are **NOT LOCATED**, not proven destroyed;
-current data or reconstructed screenshots cannot replace prospective evidence.
+two earlier operational runs whose matching source bytes were not found under
+the authorized `data/` inventory. They remain **NOT LOCATED**, not proven
+destroyed. The newly captured current source does not replace their prospective
+evidence, and reconstructed screenshots cannot do so.
 
 ### Recovery boundaries and safe sequence
 

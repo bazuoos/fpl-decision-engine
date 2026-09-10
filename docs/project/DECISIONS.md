@@ -26,7 +26,9 @@ architecture; its own status still says proposed.
 | Private operational evidence stays outside Git and needs independent recovery | Task027C/D/E docs and guards; `2a0f389`, `60d00dd`, `744dd8e` | Inventory and encrypted checkpoints are local mechanisms; exact private values and provider receipts stay owner-private |
 | B2 with 90-day compliance retention is the proposed permanent remote destination | Task027E spec; `a0cf180` | Synthetic drill first; explicit owner acceptance before real upload; retained versions cannot be shortened or deleted during the lock |
 | Official completion control is explicit, stable and one-shot | Task028A/B docs, `completion_monitor.py`; `be7baf6`, `bec2343` | Two exact probes and target locking gate one refresh; optional evaluation needs an exact supplied pre-deadline prediction; no scheduler or decision authority |
-| Scheduler mechanics must be proven synthetically before production scheduling is considered | Task028C/D docs, `completion_monitor_schedule_drill.py`; `de24e14`, `e3758e4` | Offline harness exists; owner-authorized 2026-09-09 local two-scenario evidence was independently reviewed and reported SAFE; production-schedule design remains a separate gate |
+| Scheduler mechanics must be proven synthetically before production scheduling is considered | Task028C/D docs, `completion_monitor_schedule_drill.py`; `de24e14`, `e3758e4`, `2187c40` | Offline harness and owner-authorized two-scenario drill passed; this proves local mechanics only |
+| Production completion scheduling consumes Task028B outcomes without duplicating them | Task028E/F docs, `completion_monitor_production_schedule.py`; `6305f5e`, `cc30c99` | Exact immutable plan, strict preflight, one call per invocation and terminal quiescence; no real plan/install/activation yet |
+| Private source provenance and human reasoning remain separate from engine authority | Task029A/B docs, private schemas, `private_evidence_context.py`; `a715d48`, `cb72a78` | Context may preserve historical beliefs and link exact bytes, but cannot change xFP, legality, optimization, reliability, journals or recommendations |
 
 ## Historical presentation lesson (human-confirmed context and policy)
 
@@ -41,6 +43,8 @@ construct them. The repository-grounded response is the
 [persisted-selection validator](../../src/fpl_decision_engine/decision.py) and
 [GameweekDecision builder](../../src/fpl_decision_engine/presentation/gameweek_decision.py);
 these establish current mechanisms, not the incident's historical attribution.
+Task029B now provides an immutable private place to preserve the historical
+context without converting it into prospective or trusted engine evidence.
 
 ## Web RFC decision status
 
@@ -49,7 +53,7 @@ all its ADRs are proposed pending independent review. Human confirmation of
 project policy does not automatically accept every RFC design. IMPLEMENTED
 below describes observable code, not blanket acceptance of the entire ADR.
 
-| RFC decision | Status at `33fa48c` | Boundary / consequence |
+| RFC decision | Status at `cb72a78` | Boundary / consequence |
 |---|---|---|
 | ADR-026A-01: engine artifacts are authority | IMPLEMENTED for decision reads | Public reader delegates existing validation; no second app/browser optimizer |
 | ADR-026A-02: React/TypeScript/Vite | IMPLEMENTED stack | Static client; no chosen UX paradigm; current view omits RFC-envisaged reliability/model caveats |

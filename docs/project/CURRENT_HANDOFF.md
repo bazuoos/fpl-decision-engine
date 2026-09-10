@@ -1,74 +1,76 @@
 # Current handoff
 
 > **CHECKPOINT / NAVIGATION, NOT AUTHORITY.** Code, schemas, tests, immutable
-> artifacts, manifests, frozen decision records and git history win on technical
+> artifacts, manifests, frozen decision records and Git history win on technical
 > contradiction. Verify current Git state before acting.
 
-- Implementation checkpoint summarized: **2026-09-09**,
-  `33fa48ce690b96f3a090f6298897b9f8ddab38a7`. It was on `main`, aligned with
+- Implementation checkpoint summarized: **2026-09-10**,
+  `cb72a78bf2a9ebcad70103fa70ad75abf7e98526`. It was on `main`, aligned with
   `origin/main`, with successful CI. Identify this document's own revision and
   any later work from Git history rather than assuming the embedded SHA is HEAD.
-- Latest completed implementation: **Task028D offline LaunchAgent drill
-  harness**, implementing the reviewed Task028C design. It prepares and validates
-  owner-only synthetic packages, constructs an exact-label temporary lifecycle,
-  checks cleanup and produces sanitized review evidence. Automated tests replace
-  `launchctl` with a fake runner. Independent adversarial review reported SAFE;
-  CI run 34346416323 passed 531 Python and four frontend tests. Task028B remains
-  the implemented one-shot completion monitor beneath this separate harness.
-- **Local operational evidence, not a production installation:** on 2026-09-09,
-  the owner authorized distinct complete and review-required Task028D scenarios
-  on `33fa48c`. Both temporary exact-label lifecycles passed local manifest,
-  sequence, non-overlap, cleanup and quiet-window checks; both labels are absent.
-  Independent sanitized-evidence review reported SAFE and sufficient to record
-  the drill as passed. No production FPL operation ran or service remains loaded.
+- Latest completed implementation: **Task029B private source evidence and human
+  strategy context**. It provides content-addressed private source capture,
+  immutable human-context records and an explicitly separated three-layer
+  comparison view. It is outside decision authority and cannot create a journal,
+  change projections or recommend an FPL action. Independent adversarial review
+  reported SAFE; CI run 34442961371 passed 582 Python and four frontend tests.
+- Production completion scheduling: Task028E design and Task028F controller are
+  committed. The controller can prepare, verify, inspect, run, activate,
+  deactivate and sanitize one exact immutable schedule plan, while Task028B
+  retains all completion/refresh authority. **No production plan has been
+  prepared, installed or activated. Task028G has not started.**
+- **Local operational evidence, not repository-established:** after Task029B was
+  reviewed, committed and green, the owner authorized capture of one current
+  manager source. Its bytes matched the source hash already bound by the current
+  verified manager evidence; both the source record and binding verified. Seven
+  immutable historical-backfill human-context records were also created and
+  verified. They preserve historical reasoning and an open personalization
+  hypothesis as human context only; none is prospective or an engine input. See
+  [Task029C local-operation record](TASK029C_PRIVATE_EVIDENCE_CAPTURE_AND_CONTEXT_POPULATION.md).
 - Resilience work: Task027C local safeguards, Task027D encrypted-checkpoint
   tooling and Task027E1 staged sensitive-content guard are committed. Task027E
-  owner custody/destination setup is **PAUSED** before production key generation,
-  application-key creation or any upload while a dedicated encrypted removable
-  medium suitable for an independent key-custody copy is unavailable. **NO
-  VERIFIED OFFSITE BACKUP.**
+  owner custody/destination setup is **PAUSED** while a dedicated encrypted
+  removable medium suitable for an independent key-custody copy is unavailable.
+  **NO VERIFIED OFFSITE BACKUP.**
 - **Task026C has not started.** The web UX paradigm remains deliberately
   **UNDECIDED**.
-- Outside this six-file continuity refresh, the only visible working-tree items
-  are unrelated untracked `task025_claude_review_bundle.txt` and
+- The only visible working-tree items before this documentation refresh were
+  unrelated untracked `task025_claude_review_bundle.txt` and
   `task025_review.patch`. Preserve them. Root `data/`, `.private-recovery/` and
   `.DS_Store` paths are ignored and guarded against staging.
-- **Local operational state, not repository-established:** an authorized refresh
-  captured finalized, data-checked Gameweek 3 public data at
-  `20260908T120547.189577Z`, and a leakage-safe xFP v0.1 evaluation used the
-  pre-deadline prediction snapshot `20260903T061943.538960Z`. The complete local
-  evaluation covers 626 of 654 player rows. These ignored artifacts are not part
-  of this documentation change and have **NO VERIFIED OFFSITE BACKUP**. No
+- Earlier authorized local public-data evidence includes finalized Gameweek 3
+  data and a leakage-safe xFP v0.1 evaluation against an exact pre-deadline
+  prediction. Those ignored artifacts have **NO VERIFIED OFFSITE BACKUP**. No
   prospective GW3 journal or outcome was created or retrospectively invented.
 
 ## Current restrictions and limits
 
-- This checkpoint refresh authorizes no Task026C, model/optimizer/reliability
-  change, operational refresh, journal creation, artifact regeneration, private
-  evidence access, sealed-holdout access, credential creation or provider action.
-- Task028B is an inert, one-shot mechanism. It does not authorize scheduling,
-  live polling, automatic decisions, journals, manager actions or prediction
-  generation. Its optional evaluation requires an explicit exact pre-deadline
-  prediction and cannot substitute or generate one.
-- Task028D is also inert unless its `run` command receives the explicit temporary
-  LaunchAgent execution flag. The authorized two-scenario drill has passed;
-  preparing, verifying, sanitizing or rendering a plist still does not load a
-  service. Any production-schedule design and installation remain separately
-  gated and unauthorized.
+- This checkpoint refresh authorizes no Task028G, Task026C, model/optimizer/
+  reliability change, operational refresh, journal creation, artifact
+  regeneration, private evidence inspection, sealed-holdout access, credential
+  creation, provider action or schedule activation.
+- Task028F is inert without a prepared plan and explicit owner lifecycle action.
+  It does not infer a target or prediction. A future Task028G may prepare one
+  exact plan for independent review, but preparation is not installation and
+  installation is not activation.
+- Human strategy context preserves what was believed and why. It never rewrites
+  trusted engine artifacts, creates prospective evidence after a deadline or
+  changes xFP, legality, optimization, reliability or model selection.
+- Task028B remains bounded and one-shot. Its optional evaluation requires an
+  explicit exact pre-deadline prediction and cannot generate or substitute one.
 - Web skeleton is **localhost-only**: every request receives the same local
   principal, not client authentication. Both `FPL_APP_ARTIFACT_ROOT` and
   `FPL_APP_ARTIFACT_INDEX` are needed for indexed reads. Health can succeed with
   an empty store. Only health/decision routes exist; server verification is not
   independently reproduced by the browser.
 - Operational transfer evaluation explicitly uses `appearance_only_allowed` and
-  requires >=1 free transfer with zero transfer cost. It is not a general
-  no-free-transfer ROLL fallback. No silent correction of questionable minutes
-  projections is permitted; improvements need the model-promotion process.
+  requires at least one free transfer with zero transfer cost. It is not a
+  general no-free-transfer ROLL fallback. Engine v1 optimizes one gameweek and
+  does not value future free-transfer flexibility.
 - GitHub protects committed source and documentation, not local private evidence.
-  Task027 tooling can inventory and create/verify/restore encrypted checkpoints,
-  but there is no production recovery identity, verified remote copy,
-  disconnected copy or real restore drill. Original source screenshots referenced
-  by two earlier operational runs remain **NOT LOCATED**.
+  There is no production recovery identity, verified remote copy, disconnected
+  copy or real restore drill. Original source screenshots referenced by two
+  earlier operational runs remain **NOT LOCATED**.
 
 ## Unresolved Task026B follow-ups
 
@@ -84,19 +86,21 @@ model caveats. This does not authorize frontend work. See
 
 ## Immediate next question
 
-After this documentation-only refresh, the smallest proposed planning boundary
-is **Task028E: production completion-monitor scheduling and terminal-stop
-design**. It must resolve how automation distinguishes Task028B waiting from
-terminal success, handles sleep/missed intervals and review-required outcomes,
-binds one explicit target, preserves operator-visible evidence and owns exact
-installation/rollback. This proposal has not started and authorizes no service
-installation, live request or production schedule.
+Infrastructure remains the human-stated priority. After this documentation-only
+refresh, the smallest proposed implementation boundary is **Task028G: prepare
+and independently review one exact production completion-monitor schedule
+plan** using the committed Task028F tooling. It must bind a human-approved
+season/gameweek, finite UTC window and optional exact prediction; prove code,
+environment, paths and repository state; and remain uninstalled and inactive.
+Task028G has not started. Activation requires a later explicit owner decision
+after plan review and does not imply continuous operation while the Mac is off.
 
-**REQUIRES HUMAN CONTEXT:** next approved priority; private evidence locations
-and completeness; credential/key custody and private backup receipts; explicit
-acceptance of irreversible 90-day compliance retention before Task027F; verified
-live manager state; unrecovered prior review/result packages; and any permission
-to unseal an experiment. Changing football facts need fresh verification.
+**REQUIRES HUMAN CONTEXT:** exact Task028G target/window/prediction choice;
+private evidence completeness; credential/key custody and private backup
+receipts; explicit acceptance of irreversible 90-day compliance retention
+before Task027F; verified live manager state; unrecovered prior review/result
+packages; and any permission to unseal an experiment. Changing football facts
+need fresh verification.
 
 ## Read-next order
 
@@ -105,28 +109,29 @@ to unseal an experiment. Changing football facts need fresh verification.
    [AI_WORKFLOW](AI_WORKFLOW.md).
 2. [ARCHITECTURE](ARCHITECTURE.md), [DECISIONS](DECISIONS.md),
    [FPL_PRODUCT_PHILOSOPHY](FPL_PRODUCT_PHILOSOPHY.md), [ROADMAP](ROADMAP.md).
-3. For recovery work: [Task027C local safeguards](TASK027C_LOCAL_BACKUP_READINESS.md),
-   [Task027D checkpoint runbook](TASK027D_ENCRYPTED_CHECKPOINTS.md), and
-   [Task027E setup specification](TASK027E_OWNER_KEY_AND_B2_SETUP_SPEC.md).
-4. For completion-monitor work: [Task028A specification](TASK028A_OFFICIAL_DATA_COMPLETION_MONITOR_SPEC.md),
-   [Task028B implementation guide](TASK028B_COMPLETION_MONITOR.md),
-   [Task028C drill design](TASK028C_SYNTHETIC_SCHEDULING_DRILL_SPEC.md) and
-   [Task028D drill runbook](TASK028D_COMPLETION_MONITOR_SCHEDULING_DRILL.md).
+3. For completion control: [Task028B implementation](TASK028B_COMPLETION_MONITOR.md),
+   [Task028D drill](TASK028D_COMPLETION_MONITOR_SCHEDULING_DRILL.md),
+   [Task028E design](TASK028E_PRODUCTION_COMPLETION_MONITOR_SCHEDULING_SPEC.md)
+   and [Task028F controller](TASK028F_PRODUCTION_COMPLETION_MONITOR_SCHEDULING.md).
+4. For private evidence/recovery: [Task027C safeguards](TASK027C_LOCAL_BACKUP_READINESS.md),
+   [Task027D checkpoints](TASK027D_ENCRYPTED_CHECKPOINTS.md),
+   [Task027E setup](TASK027E_OWNER_KEY_AND_B2_SETUP_SPEC.md),
+   [Task029A design](TASK029A_EVIDENCE_PROVENANCE_AND_STRATEGY_CONTEXT_SPEC.md),
+   [Task029B tooling](TASK029B_PRIVATE_EVIDENCE_AND_CONTEXT.md) and the sanitized
+   [Task029C record](TASK029C_PRIVATE_EVIDENCE_CAPTURE_AND_CONTEXT_POPULATION.md).
 5. For web work: [README](../../README.md),
    [RFC 0026A](../rfcs/0026a-web-product-architecture.md),
    [public reader](../../src/fpl_decision_engine/trusted_artifact_reader.py),
    [app facade](../../src/fpl_decision_app/read_facade.py),
    [boundary tests](../../tests/test_web_application.py), and
-   [OpenAPI](../../contracts/api/v1/openapi.json), plus the
-   [generated browser types](../../web/src/api/generated-contracts.ts). Read
+   [OpenAPI](../../contracts/api/v1/openapi.json). Read
    [fixture provenance](../../tests/fixtures/README.md) before interpreting hashes.
 
 ## Fresh AI session bootstrap
 
 Read this handoff, PROJECT_STATE and AI_WORKFLOW; inspect Git status/log/HEAD.
 Distinguish repository facts, human-approved policy, owner-reported external
-state, historical context, reported validation and missing evidence. Report
-contradictions and dirty/untracked work; preserve it. Do not infer task
-authorization from a roadmap. Do not access private evidence, credentials,
-sealed holdouts or regenerate artifacts during onboarding. Make no modifications
-until the human authorizes the continuation's scope.
+state, historical context, reported validation and missing evidence. Preserve
+dirty/untracked work. Do not infer authorization from a roadmap. Do not inspect
+private evidence, credentials or sealed holdouts during onboarding. Make no
+modifications until the human authorizes the continuation's scope.

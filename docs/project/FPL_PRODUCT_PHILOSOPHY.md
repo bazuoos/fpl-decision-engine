@@ -15,6 +15,11 @@ certifies implemented features or statistically validated predictive advantage.
   player from being sold.
 - Human overrides must be explicit and evaluable, pass the same trusted legality
   boundary, and never silently rewrite model outputs.
+- Personalization may tailor explanations and explicit, reviewed practical
+  constraints. It must not make the engine agree with a manager, protect liked
+  players or silently change projections, optimizer scores, reliability, model
+  selection or recommendation ranking. Inferred preferences remain research
+  hypotheses until consent, validation and formal promotion establish otherwise.
 - Engine = authority; agents/LLMs = assistants. LLMs may explain validated
   decisions, not construct squad legality, transfers, XI, bench, captain or vice.
 - Improve decisions rather than optimize for engagement.
@@ -33,6 +38,11 @@ certifies implemented features or statistically validated predictive advantage.
   silently flow into xFP, optimization or production decision authority. Future
   product-user records are not automatic training data; research use requires
   explicit consent and a privacy architecture.
+- Keep historical human thesis, trusted engine artifacts and refreshed current
+  evidence as separate layers. Later observations may overturn a current view,
+  but they must not rewrite what was genuinely believed before a deadline.
+  Historical BUY/HOLD/SELL/WATCH or funding labels are provisional snapshots,
+  not durable player ratings.
 - Failed experiments remain negative. Only a new preregistered experiment that
   independently earns promotion may introduce an improvement; it does not
   rewrite the old result.

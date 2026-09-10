@@ -1,17 +1,17 @@
 # Roadmap
 
-As of `33fa48c` (2026-09-09). This is a planning map, not authorization to
+As of `cb72a78` (2026-09-10). This is a planning map, not authorization to
 execute. The [RFC phased plan](../rfcs/0026a-web-product-architecture.md#28-phased-implementation-plan)
 is the source for Tasks026B–D. Proposed capabilities are not completed merely
-because they appear in that RFC.
+because they appear in an RFC or this file.
 
 ## DONE — repository-established implementation
 
 - Official raw/clean pipeline; fixtures/history; coherent resumable refresh;
   explicit pre-deadline features and xFP v0.1.
 - Frozen evaluation, restricted historical ingestion through historical-v3.1,
-  baseline backtest and isolated preregistered experiment implementations.
-  See [result-evidence limits](DECISIONS.md#experiment-status-preserve-the-distinction-between-rules-and-results).
+  baseline backtest and isolated preregistered experiment implementations. See
+  [result-evidence limits](DECISIONS.md#experiment-status-preserve-the-distinction-between-rules-and-results).
 - Deterministic squad/XI optimization, public locked and manual editable state,
   legal zero-or-one-free-transfer decisions, separate reliability diagnostics.
 - Persisted selection validator and GameweekDecision v1.
@@ -23,54 +23,62 @@ because they appear in that RFC.
 - Project Continuity Foundation committed at `407ff74`.
 - Task027C private-path safeguards/inventory; Task027D local age-encrypted
   checkpoint create/verify/restore tooling; Task027E1 staged sensitive-content
-  guard and Task027E 90-day B2 compliance-retention design.
-- Task026B follow-up #1: application forbidden-import coverage now includes
-  `decision_journal` and package-member import syntax (`824b504`).
-- Task026B follow-up #2: the current explicit decision-read chain captures
-  original artifact paths once per request, then validates stable private
-  snapshots with fail-closed filesystem checks (`76c10f2`).
-- Task026B follow-up #3: authoritative GameweekDecision schema components feed
-  the checked OpenAPI and exact-pinned generated browser types; CI rejects stale
-  generated output (`946da7d`).
+  guard; and Task027E B2 compliance-retention **design documentation**.
+- Task026B follow-ups #1–#3: application import-boundary coverage, request-scoped
+  stable artifact snapshots, and authoritative schema-to-browser contract drift
+  detection (`824b504`, `76c10f2`, `946da7d`).
 - Task028A/B: reviewed completion-monitor design and one-shot implementation.
-  Stable exact public probes, deterministic target locking/reconciliation,
-  one coherent refresh, validated immutable receipts and optional explicitly
-  pinned leakage-safe evaluation are implemented (`be7baf6`, `bec2343`). No
-  scheduler was installed or enabled.
-- Task028C/D: reviewed synthetic scheduling-drill design and offline LaunchAgent
-  harness (`de24e14`, `e3758e4`). The harness has strict preflight, an isolated
-  synthetic worker, exact-label lifecycle/cleanup construction and sanitized
-  evidence tooling. Automated tests use a fake service manager; no real
-  `launchctl` lifecycle or scheduler installation occurred during implementation.
-- Task028D actual synthetic macOS drill: the owner separately authorized complete
-  and review-required scenarios on `33fa48c`. Both exact-label lifecycles passed
-  manifest verification and cleanup/quiet-window checks; sanitized evidence was
-  independently reviewed SAFE. This proves local scheduler mechanics only. No
-  service remains installed and no production schedule is authorized.
+  Stable exact public probes, deterministic target reconciliation, one coherent
+  refresh, validated immutable receipts and optional exact-prediction evaluation
+  are implemented (`be7baf6`, `bec2343`).
+- Task028C/D and the separately authorized local drill: reviewed offline
+  LaunchAgent harness plus successful complete/review-required synthetic
+  lifecycles and cleanup (`de24e14`, `e3758e4`, `2187c40`).
+- Task028E/F: reviewed production scheduling design and inert controller with an
+  exact immutable plan, code/environment/repository preflight, typed Task028B
+  outcome handling, terminal quiescence and explicit owner lifecycle controls
+  (`6305f5e`, `cc30c99`). No real plan was prepared or installed.
+- Task029A/B: reviewed evidence-provenance design and private source/context
+  foundation (`a715d48`, `cb72a78`). Content-addressed source bytes, immutable
+  historical/prospective context structures and separated comparison layers are
+  implemented outside engine decision authority.
 
-## NEXT — proposed planning boundary, not work started
+## LOCAL OPERATIONAL EVIDENCE — not repository implementation
 
-1. Consider **Task028E: production completion-monitor scheduling and terminal
-   stop design**. It must address Task028B's shared exit-0 waiting/success states,
-   explicit season/GW binding, missed intervals during sleep, retry/review stops,
-   operator-visible evidence, log retention, exact install/uninstall ownership
-   and rollback. Design and review come before any production installation.
+- The Task028D complete and review-required synthetic scenarios passed locally;
+  both exact labels were absent after cleanup. Sanitized evidence was reviewed.
+- After Task029B was reviewed, committed and green, one owner-selected current
+  manager source was captured and verified against the source hash in current
+  verified manager evidence. Seven historical-backfill context records were
+  created and verified. See the sanitized [Task029C record](TASK029C_PRIVATE_EVIDENCE_CAPTURE_AND_CONTEXT_POPULATION.md).
+- These private/ignored artifacts are local only. They are not included in Git
+  and have **NO VERIFIED OFFSITE BACKUP**.
+
+## NEXT — proposed implementation boundary, not work started
+
+1. Consider **Task028G: prepare and independently review one exact production
+   completion-monitor schedule plan** using the committed Task028F tooling. The
+   human must choose the explicit season/gameweek, finite UTC window and whether
+   to bind an existing exact pre-deadline prediction. Preparation must remain
+   offline, uninstalled and inactive. Review the plan and sanitized evidence
+   before any separate activation decision.
 2. Preserve the two remaining
    [Task026B follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups): keep
    the current shell/navigation disposable and the UX paradigm undecided.
 3. Reconcile RFC scope with the delivered narrower read slice. Decide whether
-   additional artifact read routes are needed; they are not implemented now.
-   Also record the missing reliability/model-caveat rendering envisaged by the
-   RFC. Neither delivery gap authorizes implementation.
+   additional artifact read routes are needed. Also record the missing
+   reliability/model-caveat rendering envisaged by the RFC. Neither delivery gap
+   authorizes implementation.
 4. Plan Task026C only after human approval: identity/ownership,
    OIDC/session/CSRF, PostgreSQL, private evidence review/storage, explicit engine
    commands/workers, consent/retention/export/deletion and isolation tests.
-5. Review the current GitHub Actions version-deprecation annotation as a small
-   maintenance task before platform enforcement; CI is currently passing.
+5. Review the current GitHub Actions runtime-deprecation annotation before
+   platform enforcement; CI is currently passing.
 
-Task028E is the smallest proposed next planning boundary; it has not started.
-Task026B presentation boundaries and Task027E remain available later. The engine
-remains the sole decision authority. No production schedule is authorized.
+Task028G is the smallest proposed infrastructure boundary currently unblocked by
+the unavailable key-custody drive. It does not authorize installation,
+activation, a live FPL request or automatic manager action. A local LaunchAgent
+cannot run while the Mac is powered off.
 
 ## PAUSED — recovery owner setup
 
@@ -92,19 +100,28 @@ Task027E. Before Task027F, the owner must explicitly accept the irreversible
   research export. Validate service capacity before claiming support for
   100,000 users. No runtime research-to-production feedback.
 - Operational outcome extensions need independently verified score sources and
-  a new contract; outcome v1 does not measure human vs engine performance.
+  a new contract; outcome v1 does not measure human versus engine performance.
 
 ## RESEARCH IDEAS — unapproved experiments
 
 Longer-history priors, alternative attacking-rate stabilization, richer minutes
 evidence and additional scoring scope may be hypotheses, not defaults. The
-existing experiments do not authorize new runs, holdout access, tuning, or live
-promotion. Clean-sheet/GK expansion needs its own evidence/specification; a
-complete Task013 research report is not in tracked docs (**REQUIRES HUMAN
-CONTEXT**).
+existing experiments do not authorize new runs, holdout access, tuning or live
+promotion. Clean-sheet/goalkeeper expansion needs its own evidence and
+specification; a complete Task013 research report is not in tracked docs
+(**REQUIRES HUMAN CONTEXT**).
 
-Population/behavior insights may inform separately preregistered research only
-after consent and privacy infrastructure. They are not personalization inputs.
+A future opt-in personalization study may test whether explicit questionnaire
+answers or observed choice patterns improve explanations, practical constraint
+handling or selection among numerically close options. Maximizing expected FPL
+points remains fixed. Inferred style must be confidence-aware and cannot alter
+xFP, legality, optimizer scores, reliability, model selection or recommendation
+ranking unless a separately consented, preregistered and validated mechanism
+earns formal promotion. Historical player labels are time-bound judgments, not
+permanent ratings.
+
+Population/behavior insights require consent and privacy infrastructure before
+research use. They are not current personalization or production inputs.
 
 ## Deliberately undecided / excluded
 

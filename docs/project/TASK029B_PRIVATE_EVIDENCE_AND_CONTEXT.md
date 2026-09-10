@@ -2,19 +2,20 @@
 
 ## Status and authority
 
-This document describes the uncommitted implementation candidate based on
-`a715d488ed8afbb2df754db5c0f6f6dc820b728c` and the independently reviewed
+This document describes the implementation committed at
+`cb72a78bf2a9ebcad70103fa70ad75abf7e98526`, based on the independently reviewed
 [Task029A design](TASK029A_EVIDENCE_PROVENANCE_AND_STRATEGY_CONTEXT_SPEC.md).
 
 The tooling is local operational support. It does not become part of the
 trusted decision path, create a journal entry, validate football truth or
 authorize an FPL action. It does not scan for evidence or upload anything.
 
-Tests use synthetic bytes only. No real screenshot, manager evidence, strategy
-record, credential, cloud destination or recovery key was accessed by Task029B.
-The currently available temporary screenshot remains uncaptured and may be
-removed by normal operating-system cleanup before a separately authorized real
-capture. **NO VERIFIED OFFSITE BACKUP** remains true.
+Implementation and automated tests used synthetic bytes only. After independent
+review, commit and successful CI, the owner separately authorized one real local
+source capture and historical-context population. The sanitized outcome is
+recorded in [Task029C](TASK029C_PRIVATE_EVIDENCE_CAPTURE_AND_CONTEXT_POPULATION.md).
+That later operation did not change this implementation or establish an offsite
+copy. **NO VERIFIED OFFSITE BACKUP** remains true.
 
 ## Delivered boundary
 
@@ -283,5 +284,5 @@ bytes, hash corruption, owner-reported timing, strict prospective deadlines,
 historical backfill, immutable relations, verified references, layer labels,
 CLI privacy, schema validation and the engine import boundary.
 
-Independent review must precede commit. Real evidence capture requires a later
-explicit owner authorization after that review.
+Independent review preceded commit. Any further real evidence capture still
+requires explicit owner authorization and the provenance rules above.

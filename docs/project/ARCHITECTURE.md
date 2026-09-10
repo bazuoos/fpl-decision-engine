@@ -37,6 +37,13 @@ Task028D synthetic worker -> generated temporary LaunchAgent package
     -> 2026-09-09 local two-scenario pass; no installed service remains
          -X-> no live monitor, FPL/private data, production installation or schedule
 
+PRODUCTION SCHEDULING CONTROL (outside engine and decision authority)
+exact immutable Task028F plan -> LaunchAgent -> preflighted controller
+    -> one typed Task028B call per active invocation -> terminal marker
+    -> later invocations quiescent -> explicit owner deactivation
+         -X-> no inferred target/prediction, decision, journal or manager action
+         -X-> no real plan prepared, installed or activated yet
+
 RESEARCH: historical*.py + separately stored historical/experiment artifacts
 pinned archives -> causal features -> frozen baseline / preregistered experiments
                     -X-> no automatic promotion or runtime feedback to production
@@ -46,6 +53,12 @@ authorized quiescent data + recorded clean Git revision
     -> read-only inventory -> age-encrypted immutable checkpoint + Git bundle
     -> local verify/restore -> future exact-version B2 + disconnected copy
          -X-> restore success alone does not validate prospective or semantic truth
+
+PRIVATE EVIDENCE/CONTEXT (outside decision authority and outside Git)
+explicit source bytes -> content-addressed source + immutable observation
+historical human reasoning -> immutable context + explicit temporal class
+    -> separated historical / trusted-engine-reference / current-evidence view
+         -X-> no xFP, legality, optimization, reliability, journal or action
 ```
 
 Validation is not a last-minute UI step: each stage validates its inputs.
@@ -74,8 +87,10 @@ All paths below are under [src/fpl_decision_engine](../../src/fpl_decision_engin
 | Historical research | `historical.py`, `historical_sources.py`, `historical_backtest.py`, `historical_*_experiment.py`; historical tests |
 
 Operational tooling outside the engine package includes
-[`scripts/completion_monitor_schedule_drill.py`](../../scripts/completion_monitor_schedule_drill.py).
-Its focused offline coverage is `tests/test_completion_monitor_schedule_drill.py`.
+[`scripts/completion_monitor_schedule_drill.py`](../../scripts/completion_monitor_schedule_drill.py),
+[`scripts/completion_monitor_production_schedule.py`](../../scripts/completion_monitor_production_schedule.py)
+and [`scripts/private_evidence_context.py`](../../scripts/private_evidence_context.py).
+Their focused coverage is in the correspondingly named test modules.
 
 ## Operational identity and evidence
 
@@ -129,7 +144,17 @@ with a fake runner and use no FPL or private data. A separately authorized local
 run on 2026-09-09 passed both synthetic scenarios and independent sanitized
 evidence review, including exact-label absence after cleanup. It proves local
 scheduler mechanics only. No scheduler installation or production monitor
-schedule has run; production design and authorization remain separate gates.
+schedule ran during the drill.
+
+[Task028E](TASK028E_PRODUCTION_COMPLETION_MONITOR_SCHEDULING_SPEC.md) specifies
+production terminal-stop behavior. [Task028F](TASK028F_PRODUCTION_COMPLETION_MONITOR_SCHEDULING.md)
+implements the controller and lifecycle tooling outside the engine package. A
+prepared plan binds one exact target, finite window, code revision, interpreter,
+environment, paths and optional prediction. After preflight, each active
+invocation may call Task028B once. A validated immutable terminal marker makes
+later invocations network-inert until exact-label owner deactivation. No real
+plan has been prepared, installed or activated; Task028G has not started. The
+controller operates on one Mac and makes no continuous-availability claim.
 
 ## Application boundary today
 
@@ -187,9 +212,19 @@ a clean recorded-revision Git bundle, then provides explicit verify and restore
 operations. The Task027E1 staged-content guard scans the complete Git index for
 age identities and owner-supplied exact private values before commit.
 
+[Task029A](TASK029A_EVIDENCE_PROVENANCE_AND_STRATEGY_CONTEXT_SPEC.md) specifies
+the provenance boundary and [Task029B](TASK029B_PRIVATE_EVIDENCE_AND_CONTEXT.md)
+implements explicit source capture and immutable human-context records beneath
+the same ignored private tree. The comparison view keeps historical human
+context, trusted engine references and current evidence as named layers. Hash
+binding does not promote human context or validate engine semantics. A sanitized
+record of the first owner-authorized local population is in
+[Task029C](TASK029C_PRIVATE_EVIDENCE_CAPTURE_AND_CONTEXT_POPULATION.md).
+
 These controls do not establish that the selected evidence is complete or true.
 A restored digest proves byte identity only; trusted readers must still validate
 the restored engine chain, and missing pre-deadline evidence remains missing.
 No provider upload, production recovery identity, disconnected copy or real
-restore drill has passed. Provider identifiers, credentials, private manifests,
-object receipts and custody locations remain outside the repository.
+restore drill has passed. The Task029 private records remain local and inherit
+that exposure. Provider identifiers, credentials, private manifests, object
+receipts and custody locations remain outside the repository.

@@ -319,8 +319,15 @@ It performs no work until invoked and contains no polling loop. No schedule is
 installed by the repository. Optional evaluation requires an explicit frozen
 pre-deadline prediction timestamp; the monitor never generates or substitutes a
 prediction. See the [Task028B runbook](docs/project/TASK028B_COMPLETION_MONITOR.md)
-for outcomes, locking, receipts, reset rules and the uninstalled macOS scheduling
-example.
+for outcomes, locking, receipts and reset rules.
+
+The separately reviewed
+[Task028F scheduling controller](docs/project/TASK028F_PRODUCTION_COMPLETION_MONITOR_SCHEDULING.md)
+can bind one exact target to an immutable, finite local LaunchAgent plan and
+consume the monitor's typed outcome after strict preflight. It remains inert
+unless the owner prepares, reviews and explicitly activates a plan. No
+production plan is currently prepared, installed or active, and local scheduling
+cannot run while the Mac is powered off.
 
 ## Prediction-ready features
 
