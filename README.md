@@ -30,12 +30,26 @@ Existing snapshot directories and files are never overwritten.
 ## Setup
 
 Python 3.10 or newer is required.
+Install the repository-required uv 0.12.12 release from the
+[official uv releases](https://github.com/astral-sh/uv/releases/tag/0.12.12)
+and verify its platform archive against the release's SHA-256 file. Then create
+the exact locked project environment without allowing uv to download a Python
+interpreter:
 
 ```bash
-python3 -m venv .venv
+uv --version
+uv lock --check --no-python-downloads
+uv sync --locked --no-python-downloads
 source .venv/bin/activate
-python -m pip install --editable .
 ```
+
+The version check must report `uv 0.12.12`. `pyproject.toml` declares broad
+package compatibility; the committed `uv.lock` is the reviewed environment
+resolution. Do not run an unlocked sync or hand-edit the lock. The default
+development group pins pip and setuptools because the packaging tests invoke
+them explicitly; they are not application runtime dependencies.
+See the [Task030D implementation record](docs/project/TASK030D_PYTHON_DEPENDENCY_REPRODUCIBILITY.md)
+for bootstrap provenance, update rules and recovery limits.
 
 DuckDB provides typed analytical validation and Parquet output without pandas
 or PyArrow. The lightweight HiGHS mixed-integer solver is used only by the
@@ -105,7 +119,7 @@ live manager data, screenshots, ignored `data/`, or sealed experiment inputs.
 Run all application checks with:
 
 ```bash
-python -m unittest discover -s tests
+uv run --locked --no-sync --no-python-downloads python -m unittest discover -s tests
 cd web
 npm run check:contracts
 npm test

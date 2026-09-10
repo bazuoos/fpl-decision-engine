@@ -19,8 +19,19 @@ dependencies = [
     "uvicorn>=0.35,<1",
 ]
 
+[dependency-groups]
+dev = [
+    "pip==26.1.1",
+    "setuptools==84.0.0",
+]
+
 [project.scripts]
 fpl-fetch = "fpl_decision_engine.__main__:main"
+
+[tool.uv]
+required-version = "==0.12.12"
+python-downloads = "never"
+build-constraint-dependencies = ["setuptools==84.0.0"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

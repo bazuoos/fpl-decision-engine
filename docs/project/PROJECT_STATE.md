@@ -30,7 +30,7 @@ the selected action the objectively best FPL transfer.
 | Web | Authorization seam, explicit-ID verified decision reads, canonical payload rendering | Local single-user mode only; no real auth, uploads, commands, or research service |
 | Recovery tooling | Private-path staging guards, read-only inventory, encrypted checkpoint create/verify/restore | No production key, verified remote/disconnected copy or real restore drill |
 | Private evidence/context | Content-addressed explicit source capture, immutable human-context records, separated comparison layers | Local and outside decision authority; provenance/currentness stay explicit; no offsite copy |
-| Repository CI | Full-SHA-pinned GitHub Actions on Node 24 runtimes; weekly action-only Dependabot proposals | Dependency ranges remain incompletely locked; update PRs still require review and CI |
+| Repository CI | Full-SHA-pinned GitHub Actions on Node 24 runtimes; exact uv-managed Python dependency and npm resolutions; weekly action and uv Dependabot proposals | Package artifacts are not vendored; update PRs still require review and CI |
 
 Primary guide: [README](../../README.md). Implementation map:
 [ARCHITECTURE](ARCHITECTURE.md). Product constraints:
@@ -147,8 +147,10 @@ When installation/test execution is authorized, use a virtualenv and run:
 ```bash
 git status --short
 git log -5 --oneline
-python -m pip install --editable .
-python -m unittest discover -s tests
+uv --version
+uv lock --check --no-python-downloads
+uv sync --locked --no-python-downloads
+uv run --locked --no-sync --no-python-downloads python -m unittest discover -s tests
 git diff --check
 cd web
 npm ci
@@ -172,7 +174,9 @@ The RFC remains proposed and its original no-web/API findings predate Task026B.
 Only health and decision read routes exist; do not infer diff/journal routes
 from the RFC or CLI. README's Task023A “future runner” and older transfer
 exclusions describe earlier task scopes; later modules implement both paths.
-Python dependency locking remains undelivered. The current explicit application
+Older revisions installed Python dependency ranges directly. The current
+repository uses one committed universal `uv.lock`, an exact uv tool release and
+an exact setuptools build constraint. The explicit application
 decision-read chain now captures original artifact paths once per request and
 validates private snapshot copies; this is not process-wide file immutability,
 object storage or a general replacement for every path read elsewhere. The
@@ -230,11 +234,13 @@ they do not require a developer's generated datasets. See
 [fixture provenance](../../tests/fixtures/README.md). Fixed fixture hashes prove
 those copies, not the current health of private production artifact stores.
 
-CI installs Python dependencies from declared ranges, not a Python lockfile.
-JavaScript has `web/package-lock.json` and `npm ci`. A reproducible validation
-procedure therefore exists, but identical future Python dependency resolution
-is not guaranteed. File-fsync plus atomic publication is not a full power-loss
-durability or backup guarantee; see README refresh durability wording.
+CI validates and exactly syncs the committed universal `uv.lock`; JavaScript
+uses `web/package-lock.json` and `npm ci`. The Python tool version, setup action,
+downloaded Linux archive and setuptools build selection are pinned. This does
+not vendor package artifacts, guarantee permanent index availability or make
+native behavior byte-identical across platforms. File-fsync plus atomic
+publication is not a full power-loss durability or backup guarantee; see README
+refresh durability wording.
 
 Task027C committed root ignore rules for `data/` and `.private-recovery/`, a
 full-index private-path guard, and a read-only inventory tool. Task027D committed
