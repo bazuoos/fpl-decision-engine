@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "private-source-content-v1.schema.json",
+  "title": "Private source content v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "content_id",
+    "content_sha256",
+    "byte_length",
+    "stored_name"
+  ],
+  "properties": {
+    "format_version": {"const": "private-source-content-v1"},
+    "content_id": {"type": "string", "pattern": "^source_[0-9a-f]{64}$"},
+    "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "byte_length": {"type": "integer", "minimum": 0, "maximum": 67108864},
+    "stored_name": {"const": "source.bin"}
+  }
+}

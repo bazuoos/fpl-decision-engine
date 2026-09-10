@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "private-source-evidence-v1.schema.json",
+  "title": "Private source evidence observation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "evidence_record_id",
+    "content_id",
+    "content_sha256",
+    "byte_length",
+    "media_type",
+    "source_class",
+    "sensitivity",
+    "ingested_at",
+    "observed_at",
+    "observation_basis",
+    "owner_reported_observed_at",
+    "season",
+    "target_gameweek",
+    "official_deadline",
+    "temporal_status",
+    "provenance_description",
+    "authority",
+    "writer_version"
+  ],
+  "properties": {
+    "schema_version": {"const": "private-source-evidence-v1"},
+    "record_type": {"const": "SOURCE_EVIDENCE_OBSERVATION"},
+    "evidence_record_id": {"type": "string", "pattern": "^evidence_[0-9a-f]{64}$"},
+    "content_id": {"type": "string", "pattern": "^source_[0-9a-f]{64}$"},
+    "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "byte_length": {"type": "integer", "minimum": 0, "maximum": 67108864},
+    "media_type": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.+-]{0,62}/[a-z0-9][a-z0-9.+-]{0,62}$"},
+    "source_class": {
+      "enum": [
+        "OWNER_SUPPLIED_MANAGER_SCREEN",
+        "OWNER_SUPPLIED_DOCUMENT",
+        "PUBLIC_RESEARCH_CAPTURE"
+      ]
+    },
+    "sensitivity": {"enum": ["MANAGER_PRIVATE", "PERSONAL_CONTEXT", "PUBLIC_SOURCE"]},
+    "ingested_at": {"type": "string", "format": "date-time"},
+    "observed_at": {"type": "null"},
+    "observation_basis": {"const": "NOT_SYSTEM_PROVEN"},
+    "owner_reported_observed_at": {
+      "anyOf": [{"type": "null"}, {"type": "string", "format": "date-time"}]
+    },
+    "season": {"anyOf": [{"type": "null"}, {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"}]},
+    "target_gameweek": {"anyOf": [{"type": "null"}, {"type": "integer", "minimum": 1, "maximum": 38}]},
+    "official_deadline": {"anyOf": [{"type": "null"}, {"type": "string", "format": "date-time"}]},
+    "temporal_status": {"const": "UNKNOWN"},
+    "provenance_description": {"type": "string", "minLength": 1, "maxLength": 2000},
+    "authority": {"const": "SOURCE_BYTES_AND_PROVENANCE_ONLY_NOT_ENGINE_INPUT_OR_FPL_ACTION"},
+    "writer_version": {"const": "task029b-v1"}
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "season": {"type": "null"},
+        "target_gameweek": {"type": "null"},
+        "official_deadline": {"type": "null"}
+      }
+    },
+    {
+      "properties": {
+        "season": {"type": "string"},
+        "target_gameweek": {"type": "integer"},
+        "official_deadline": {"type": "string"}
+      }
+    }
+  ]
+}

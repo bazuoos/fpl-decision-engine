@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "human-strategy-context-v1.schema.json",
+  "title": "Human strategy context v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "record_type",
+    "context_id",
+    "temporal_classification",
+    "context_created_at",
+    "season",
+    "target_gameweek",
+    "official_deadline",
+    "context_kind",
+    "reasoning",
+    "assumptions",
+    "change_conditions",
+    "provisional_posture",
+    "evidence_references",
+    "engine_references",
+    "relations",
+    "authority",
+    "writer_version"
+  ],
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "evidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_record_id", "evidence_record_sha256", "content_sha256"],
+      "properties": {
+        "evidence_record_id": {"type": "string", "pattern": "^evidence_[0-9a-f]{64}$"},
+        "evidence_record_sha256": {"$ref": "#/$defs/sha256"},
+        "content_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "engineReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_type", "artifact_schema_version", "semantic_id", "sha256"],
+      "properties": {
+        "artifact_type": {"type": "string", "minLength": 1, "maxLength": 200},
+        "artifact_schema_version": {"type": "string", "minLength": 1, "maxLength": 200},
+        "semantic_id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_.:-]{0,199}$"},
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["relation", "context_id", "context_sha256"],
+      "properties": {
+        "relation": {"enum": ["SUPPORTS", "CHALLENGES", "SUPERSEDES"]},
+        "context_id": {"type": "string", "pattern": "^context_[0-9a-f]{64}$"},
+        "context_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  },
+  "properties": {
+    "schema_version": {"const": "human-strategy-context-v1"},
+    "record_type": {"const": "HUMAN_STRATEGY_CONTEXT"},
+    "context_id": {"type": "string", "pattern": "^context_[0-9a-f]{64}$"},
+    "temporal_classification": {"enum": ["PROSPECTIVE", "HISTORICAL_BACKFILL"]},
+    "context_created_at": {"type": "string", "format": "date-time"},
+    "season": {"anyOf": [{"type": "null"}, {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$"}]},
+    "target_gameweek": {"anyOf": [{"type": "null"}, {"type": "integer", "minimum": 1, "maximum": 38}]},
+    "official_deadline": {"anyOf": [{"type": "null"}, {"type": "string", "format": "date-time"}]},
+    "context_kind": {
+      "enum": [
+        "DURABLE_STRATEGY",
+        "SQUAD_CONSTRUCTION_THESIS",
+        "PLAYER_THESIS_SNAPSHOT",
+        "DECISION_RATIONALE_CONTEXT",
+        "KNOWN_MODEL_LIMITATION",
+        "OPEN_HYPOTHESIS"
+      ]
+    },
+    "reasoning": {"type": "string", "minLength": 1, "maxLength": 20000},
+    "assumptions": {"type": "array", "maxItems": 64, "items": {"type": "string", "minLength": 1, "maxLength": 2000}},
+    "change_conditions": {"type": "array", "maxItems": 64, "items": {"type": "string", "minLength": 1, "maxLength": 2000}},
+    "provisional_posture": {"enum": [null, "BUY", "HOLD", "SELL", "WATCH", "FUNDING_CANDIDATE"]},
+    "evidence_references": {"type": "array", "maxItems": 64, "items": {"$ref": "#/$defs/evidenceReference"}},
+    "engine_references": {"type": "array", "maxItems": 64, "items": {"$ref": "#/$defs/engineReference"}},
+    "relations": {"type": "array", "maxItems": 64, "items": {"$ref": "#/$defs/relation"}},
+    "authority": {"const": "HUMAN_CONTEXT_ONLY_NOT_ENGINE_INPUT_OR_FPL_ACTION"},
+    "writer_version": {"const": "task029b-v1"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"temporal_classification": {"const": "PROSPECTIVE"}}},
+      "then": {
+        "properties": {
+          "season": {"type": "string"},
+          "target_gameweek": {"type": "integer"},
+          "official_deadline": {"type": "string"}
+        }
+      }
+    },
+    {
+      "oneOf": [
+        {
+          "properties": {
+            "season": {"type": "null"},
+            "target_gameweek": {"type": "null"},
+            "official_deadline": {"type": "null"}
+          }
+        },
+        {
+          "properties": {
+            "season": {"type": "string"},
+            "target_gameweek": {"type": "integer"},
+            "official_deadline": {"type": "string"}
+          }
+        }
+      ]
+    }
+  ]
+}
