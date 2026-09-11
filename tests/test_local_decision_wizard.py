@@ -162,6 +162,33 @@ class LocalDecisionWizardTests(unittest.TestCase):
         self.assertTrue(result.evidence_path.is_file())
         self.assertIsNone(result.final_manifest_path)
 
+    def test_safety_failure_before_publication_preserves_only_draft(self) -> None:
+        io = ScriptedIO(self.manager)
+        check = Mock(side_effect=RuntimeError("synthetic block"))
+        result = self.run_wizard(io, safety_check=check)
+        self.assertEqual(result.state, WizardState.SAFETY_CHECK_FAILED)
+        self.assertIsNone(result.evidence_path)
+        self.assertEqual(list(self.evidence_root.rglob("*.json")), [])
+        self.assertNotIn(PUBLISH_PHRASE, io.confirmed)
+        check.assert_called_once_with()
+
+    def test_safety_failure_after_publication_preserves_evidence_without_result(self) -> None:
+        io = ScriptedIO(self.manager)
+        check = Mock(side_effect=[None, RuntimeError("synthetic block")])
+        run = Mock(side_effect=AssertionError("engine must not run"))
+        result = self.run_wizard(
+            io,
+            safety_check=check,
+            ports=replace(WizardPorts(), run=run),
+        )
+        self.assertEqual(result.state, WizardState.SAFETY_CHECK_FAILED)
+        self.assertTrue(result.evidence_path.is_file())
+        self.assertIsNone(result.final_manifest_path)
+        self.assertNotIn(RUN_PHRASE, io.confirmed)
+        self.assertNotIn("VERIFIED ENGINE DECISION", "\n".join(io.private))
+        self.assertEqual(check.call_count, 2)
+        run.assert_not_called()
+
     def test_deadline_stops_before_any_private_prompt(self) -> None:
         io = ScriptedIO(self.manager)
         result = self.run_wizard(io, clock=SequenceClock(DEADLINE))

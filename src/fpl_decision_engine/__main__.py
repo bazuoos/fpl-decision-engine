@@ -114,6 +114,12 @@ from .local_decision_wizard import (
     WizardState,
     run_guided_manager_decision,
 )
+from .isolated_live_run import (
+    IsolatedLiveRunError,
+    PreflightRequest,
+    run_preflight as run_isolated_live_run_preflight,
+    safety_check as isolated_live_run_safety_check,
+)
 from .official_data import (
     DEFAULT_HISTORY_DELAY_SECONDS,
     OfficialDataError,
@@ -174,11 +180,50 @@ COMMANDS = {
     "inspect-manager-preparation",
     "publish-manager-evidence",
     "guided-manager-decision",
+    "preflight-isolated-live-run",
+    "guided-isolated-manager-decision",
     "resume-gameweek",
     "record-decision-journal",
     "record-decision-outcome",
     "diff-decisions",
 }
+
+
+def _add_isolated_preflight_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--primary-repository", type=Path, required=True)
+    parser.add_argument("--expected-primary-commit", required=True)
+    parser.add_argument(
+        "--acknowledged-primary-untracked",
+        action="append",
+        default=[],
+        help="Repeat for each already-reviewed primary-checkout untracked path.",
+    )
+    parser.add_argument("--code-repository", type=Path, required=True)
+    parser.add_argument("--expected-code-commit", required=True)
+    parser.add_argument("--sandbox-root", type=Path, required=True)
+    parser.add_argument("--schedule-plan", type=Path, required=True)
+    parser.add_argument("--schedule-plan-sha256-file", type=Path, required=True)
+    parser.add_argument("--expected-schedule-plan-sha256", required=True)
+    parser.add_argument("--official-deadline", required=True)
+    parser.add_argument(
+        "--required-free-bytes", type=int, default=1024 * 1024 * 1024
+    )
+
+
+def _isolated_preflight_request(args: argparse.Namespace) -> PreflightRequest:
+    return PreflightRequest(
+        primary_repository=args.primary_repository,
+        expected_primary_commit=args.expected_primary_commit,
+        acknowledged_primary_untracked=tuple(args.acknowledged_primary_untracked),
+        code_repository=args.code_repository,
+        expected_code_commit=args.expected_code_commit,
+        sandbox_root=args.sandbox_root,
+        schedule_plan=args.schedule_plan,
+        schedule_plan_sha256_file=args.schedule_plan_sha256_file,
+        expected_schedule_plan_sha256=args.expected_schedule_plan_sha256,
+        official_deadline=args.official_deadline,
+        required_free_bytes=args.required_free_bytes,
+    )
 
 
 def _add_snapshot_arguments(parser: argparse.ArgumentParser) -> None:
@@ -948,6 +993,32 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="Explicit private mutable-draft path (default uses preparation ID).",
     )
+    guided_manager_parser.add_argument(
+        "--evidence-root",
+        type=Path,
+        default=DEFAULT_EVIDENCE_ROOT,
+        help="Explicit private immutable-evidence root.",
+    )
+
+    isolated_preflight_parser = subparsers.add_parser(
+        "preflight-isolated-live-run",
+        help="Verify one explicit local sandbox against one exact active monitor.",
+    )
+    _add_isolated_preflight_arguments(isolated_preflight_parser)
+    isolated_preflight_parser.add_argument("--json", action="store_true")
+
+    isolated_guided_parser = subparsers.add_parser(
+        "guided-isolated-manager-decision",
+        help="Preflight an isolated sandbox, then run the guided manager workflow.",
+    )
+    isolated_guided_parser.add_argument(
+        "--preparation-manifest", type=Path, required=True
+    )
+    isolated_guided_parser.add_argument("--draft", type=Path, required=True)
+    isolated_guided_parser.add_argument(
+        "--evidence-root", type=Path, required=True
+    )
+    _add_isolated_preflight_arguments(isolated_guided_parser)
 
     resume_parser = subparsers.add_parser(
         "resume-gameweek",
@@ -1712,6 +1783,47 @@ def main(argv: Sequence[str] | None = None) -> int:
             args.preparation_manifest,
             io=TerminalPromptIO(),
             draft_path=args.draft,
+            evidence_root=args.evidence_root,
+        )
+        return (
+            0
+            if result.state
+            in {
+                WizardState.CANCELLED,
+                WizardState.VERIFIED_EVIDENCE_PUBLISHED,
+                WizardState.VERIFIED_DECISION_AVAILABLE,
+            }
+            else 1
+        )
+    elif args.command == "preflight-isolated-live-run":
+        try:
+            result = run_isolated_live_run_preflight(
+                _isolated_preflight_request(args)
+            )
+        except IsolatedLiveRunError:
+            logging.error("Isolated live-run preflight failed closed")
+            return 1
+        payload = result.public_payload()
+        if args.json:
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(payload["status"])
+            print(f"Monitor: {payload['monitor_state']}")
+            print(f"Schedule: {payload['schedule_plan_sha256']}")
+        return 0
+    elif args.command == "guided-isolated-manager-decision":
+        request = _isolated_preflight_request(args)
+        try:
+            run_isolated_live_run_preflight(request)
+        except IsolatedLiveRunError:
+            logging.error("Isolated live-run preflight failed before manager prompts")
+            return 1
+        result = run_guided_manager_decision(
+            args.preparation_manifest,
+            io=TerminalPromptIO(),
+            draft_path=args.draft,
+            evidence_root=args.evidence_root,
+            safety_check=isolated_live_run_safety_check(request),
         )
         return (
             0

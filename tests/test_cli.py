@@ -26,11 +26,27 @@ from fpl_decision_engine.historical_previous_season_prior_experiment import (
     HistoricalPreviousSeasonPriorExperimentResult,
 )
 from fpl_decision_engine.local_decision_wizard import WizardResult, WizardState
+from fpl_decision_engine.isolated_live_run import IsolatedLiveRunError
 from fpl_decision_engine.predictions import PredictionOutputs
 from fpl_decision_engine.refresh import RefreshResult, RefreshUnlockResult
 
 
 class CLITests(unittest.TestCase):
+    @staticmethod
+    def isolated_arguments(command: str) -> list[str]:
+        return [
+            command,
+            "--primary-repository", "/primary",
+            "--expected-primary-commit", "1" * 40,
+            "--code-repository", "/code",
+            "--expected-code-commit", "2" * 40,
+            "--sandbox-root", "/primary/data/sandbox",
+            "--schedule-plan", "/schedule/schedule-plan.json",
+            "--schedule-plan-sha256-file", "/schedule/schedule-plan.json.sha256",
+            "--expected-schedule-plan-sha256", "3" * 64,
+            "--official-deadline", "2099-09-12T12:30:00.000000Z",
+        ]
+
     def test_publish_manager_help_warns_about_private_process_arguments(self) -> None:
         output = io.StringIO()
         with self.assertRaises(SystemExit) as raised, redirect_stdout(output):
@@ -56,6 +72,8 @@ class CLITests(unittest.TestCase):
                     "exact/preparation_manifest.json",
                     "--draft",
                     "private/current.json",
+                    "--evidence-root",
+                    "private/evidence",
                 ]
             ),
             0,
@@ -64,7 +82,60 @@ class CLITests(unittest.TestCase):
             Path("exact/preparation_manifest.json"),
             io=terminal_io.return_value,
             draft_path=Path("private/current.json"),
+            evidence_root=Path("private/evidence"),
         )
+
+    @patch("fpl_decision_engine.__main__.TerminalPromptIO")
+    @patch("fpl_decision_engine.__main__.run_isolated_live_run_preflight")
+    def test_isolated_preflight_failure_occurs_before_prompt_adapter(
+        self, preflight, terminal_io
+    ) -> None:
+        preflight.side_effect = IsolatedLiveRunError("synthetic block")
+        arguments = self.isolated_arguments("guided-isolated-manager-decision")
+        arguments.extend([
+            "--preparation-manifest", "/sandbox/preparation_manifest.json",
+            "--draft", "/sandbox/draft.json",
+            "--evidence-root", "/sandbox/evidence",
+        ])
+        self.assertEqual(main(arguments), 1)
+        terminal_io.assert_not_called()
+
+    def test_isolated_preflight_never_treats_omitted_plan_as_no_monitor(self) -> None:
+        with self.assertRaises(SystemExit) as raised:
+            main(["preflight-isolated-live-run"])
+        self.assertEqual(raised.exception.code, 2)
+
+    @patch("fpl_decision_engine.__main__.run_guided_manager_decision")
+    @patch("fpl_decision_engine.__main__.isolated_live_run_safety_check")
+    @patch("fpl_decision_engine.__main__.TerminalPromptIO")
+    @patch("fpl_decision_engine.__main__.run_isolated_live_run_preflight")
+    def test_isolated_guided_dispatch_uses_paths_and_block_only_callback(
+        self, preflight, terminal_io, build_check, run_guided
+    ) -> None:
+        run_guided.return_value = WizardResult(WizardState.CANCELLED)
+        sentinel_check = object()
+        build_check.return_value = sentinel_check
+        arguments = self.isolated_arguments("guided-isolated-manager-decision")
+        arguments.extend([
+            "--preparation-manifest", "/sandbox/preparation_manifest.json",
+            "--draft", "/sandbox/draft.json",
+            "--evidence-root", "/sandbox/evidence",
+        ])
+        self.assertEqual(main(arguments), 0)
+        request = preflight.call_args.args[0]
+        self.assertEqual(request.schedule_plan, Path("/schedule/schedule-plan.json"))
+        self.assertEqual(
+            request.schedule_plan_sha256_file,
+            Path("/schedule/schedule-plan.json.sha256"),
+        )
+        run_guided.assert_called_once_with(
+            Path("/sandbox/preparation_manifest.json"),
+            io=terminal_io.return_value,
+            draft_path=Path("/sandbox/draft.json"),
+            evidence_root=Path("/sandbox/evidence"),
+            safety_check=sentinel_check,
+        )
+        build_check.assert_called_once_with(request)
 
     @patch("fpl_decision_engine.__main__.load_preparation_for_authoring")
     def test_inspect_manager_preparation_uses_one_explicit_manifest(self, load) -> None:
