@@ -28,6 +28,84 @@ from fpl_decision_engine.refresh import RefreshResult, RefreshUnlockResult
 
 
 class CLITests(unittest.TestCase):
+    @patch("fpl_decision_engine.__main__.load_preparation_for_authoring")
+    def test_inspect_manager_preparation_uses_one_explicit_manifest(self, load) -> None:
+        load.return_value = SimpleNamespace(
+            catalogue=(
+                SimpleNamespace(
+                    element_id=1,
+                    display_name="Synthetic Player",
+                    position="GK",
+                    team_id=1,
+                    team_name="Synthetic Club",
+                    market_price_m="4.5",
+                ),
+            ),
+            observed_at="2026-08-25T07:35:32.450889Z",
+            season="2026-27",
+            manifest=SimpleNamespace(
+                preparation_id="prep_" + "1" * 64,
+                official_deadline="2026-08-28T17:30:00Z",
+                target_gameweek=2,
+            ),
+        )
+        self.assertEqual(
+            main(
+                [
+                    "inspect-manager-preparation",
+                    "--preparation-manifest",
+                    "exact/preparation_manifest.json",
+                    "--json",
+                ]
+            ),
+            0,
+        )
+        load.assert_called_once_with(Path("exact/preparation_manifest.json"))
+
+    @patch("fpl_decision_engine.__main__.publish_verified_evidence")
+    @patch("fpl_decision_engine.__main__.load_preparation_for_authoring")
+    def test_publish_manager_evidence_resolves_cli_picks_without_running_engine(
+        self, load, publish
+    ) -> None:
+        load.return_value = SimpleNamespace(
+            manifest=SimpleNamespace(
+                sha256="1" * 64,
+                preparation_id="prep_" + "2" * 64,
+            )
+        )
+        publish.return_value = SimpleNamespace(
+            path=Path("private/verified_manager_evidence.json"),
+            sha256="3" * 64,
+            reused=False,
+        )
+        picks = [item for value in range(1, 16) for item in ("--pick", f"{value}:4.5")]
+        self.assertEqual(
+            main(
+                [
+                    "publish-manager-evidence",
+                    "--preparation-manifest",
+                    "exact/preparation_manifest.json",
+                    "--entry-id",
+                    "123",
+                    "--bank",
+                    "1.0",
+                    "--free-transfers",
+                    "2",
+                    "--confirm-current-selection",
+                    *picks,
+                    "--output-root",
+                    "private",
+                    "--json",
+                ]
+            ),
+            0,
+        )
+        draft = publish.call_args.args[0]
+        self.assertEqual(draft.selected_element_ids, list(range(1, 16)))
+        self.assertEqual(draft.selling_price_m_by_element_id[1], "4.5")
+        self.assertTrue(draft.current_selection_confirmed)
+        self.assertEqual(publish.call_args.kwargs["output_root"], Path("private"))
+
     @patch("fpl_decision_engine.__main__.write_decision_diff")
     def test_diff_decisions_dispatches_two_explicit_trusted_runs(self, write) -> None:
         write.return_value = SimpleNamespace(

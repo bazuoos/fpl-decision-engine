@@ -324,7 +324,7 @@ does not infer success from file presence, HTTP success or a process exit alone.
 | Chip selected | Preserve the input and report the exact unsupported chip code; no recommendation |
 | No free transfer or a request needing multiple transfers/hits | Report the unsupported transfer state; never reinterpret the one-transfer result |
 | Deadline reached during input | Reject evidence publication or finalization through the trusted clock |
-| Existing identical evidence/decision | Validate and return the immutable existing result |
+| Existing identical evidence/decision before deadline | Validate and return the immutable existing result; at or after the deadline, the deadline gate takes precedence over reuse |
 | Existing conflicting bytes | Stop with immutable conflict; never repair by overwrite |
 | Trust-chain validation fails | Return no recommendation payload |
 | Display closes or crashes | Resume from explicit preparation/evidence identities; never use “latest” as authority |

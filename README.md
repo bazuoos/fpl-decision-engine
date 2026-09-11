@@ -1308,6 +1308,37 @@ from its UTC clock, never infers selling prices from current prices, and derives
 the modeled transfer cost as zero. Engine v1 accepts only `NO_CHIP`; wildcard,
 free hit, bench boost, and triple captain each fail closed with a distinct code.
 
+The local authoring boundary removes the need to hand-write that JSON. First,
+inspect one exact preparation and its frozen public player catalogue:
+
+```bash
+python -m fpl_decision_engine inspect-manager-preparation \
+  --preparation-manifest data/operations/fpl/2026-27/gameweek=2/<preparation_id>/preparation_manifest.json
+```
+
+Then publish the private manager evidence by repeating `--pick` exactly 15
+times with the element ID and the manager-specific selling price shown on the
+official Transfers screen:
+
+```bash
+python -m fpl_decision_engine publish-manager-evidence \
+  --preparation-manifest data/operations/fpl/2026-27/gameweek=2/<preparation_id>/preparation_manifest.json \
+  --entry-id <entry_id> \
+  --bank <bank_m> \
+  --free-transfers <count> \
+  --pick <element_id>:<selling_price_m> \
+  --confirm-current-selection
+```
+
+The command resolves names, positions and clubs only from the hash-pinned
+preparation, validates the complete squad, and writes canonical evidence below
+the ignored `data/manager/evidence/fpl/` tree with owner-only permissions. Add
+`--run` to hand the published file directly to the existing trusted
+`resume-gameweek` path. It does not log in to FPL, fetch new data, calculate a
+recommendation, or record a human action. The recommendation remains limited
+to xFP v0.1's modeled appearance, goal and assist components and Engine v1's
+zero-or-one-transfer scope.
+
 Operational outputs use this identity-addressed layout:
 
 ```text
