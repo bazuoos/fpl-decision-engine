@@ -31,6 +31,7 @@ python -m fpl_decision_engine preflight-isolated-live-run \
   --acknowledged-primary-untracked <REVIEWED_UNTRACKED_PATH> \
   --code-repository <TASK032_WORKTREE> \
   --expected-code-commit <TASK032_COMMIT> \
+  --acknowledged-code-untracked <REVIEWED_CODE_UNTRACKED_PATH> \
   --sandbox-root <ABSOLUTE_SANDBOX_ROOT> \
   --schedule-plan <ABSOLUTE_SCHEDULE_PLAN> \
   --schedule-plan-sha256-file <ABSOLUTE_SCHEDULE_DIGEST> \
@@ -40,7 +41,10 @@ python -m fpl_decision_engine preflight-isolated-live-run \
 ```
 
 Repeat `--acknowledged-primary-untracked` exactly once for every previously
-reviewed untracked path in the primary checkout. It never authorizes new paths.
+reviewed untracked path in the primary checkout. Repeat
+`--acknowledged-code-untracked` for any reviewed local tool metadata in the
+Task032 worktree. Each list must match its checkout exactly; it never authorizes
+new paths, parent traversal, absolute paths or duplicate entries.
 Successful output contains only status, paths, commits, the schedule hash,
 monitor state and free-byte count.
 

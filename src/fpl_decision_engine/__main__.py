@@ -200,6 +200,12 @@ def _add_isolated_preflight_arguments(parser: argparse.ArgumentParser) -> None:
     )
     parser.add_argument("--code-repository", type=Path, required=True)
     parser.add_argument("--expected-code-commit", required=True)
+    parser.add_argument(
+        "--acknowledged-code-untracked",
+        action="append",
+        default=[],
+        help="Repeat for each reviewed code-worktree untracked path.",
+    )
     parser.add_argument("--sandbox-root", type=Path, required=True)
     parser.add_argument("--schedule-plan", type=Path, required=True)
     parser.add_argument("--schedule-plan-sha256-file", type=Path, required=True)
@@ -217,6 +223,7 @@ def _isolated_preflight_request(args: argparse.Namespace) -> PreflightRequest:
         acknowledged_primary_untracked=tuple(args.acknowledged_primary_untracked),
         code_repository=args.code_repository,
         expected_code_commit=args.expected_code_commit,
+        acknowledged_code_untracked=tuple(args.acknowledged_code_untracked),
         sandbox_root=args.sandbox_root,
         schedule_plan=args.schedule_plan,
         schedule_plan_sha256_file=args.schedule_plan_sha256_file,

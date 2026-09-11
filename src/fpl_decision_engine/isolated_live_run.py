@@ -91,6 +91,7 @@ class PreflightRequest:
     acknowledged_primary_untracked: tuple[str, ...]
     code_repository: Path
     expected_code_commit: str
+    acknowledged_code_untracked: tuple[str, ...]
     sandbox_root: Path
     schedule_plan: Path
     schedule_plan_sha256_file: Path
@@ -274,7 +275,19 @@ def _validate_repository(
     )
     untracked, tracked_change = _status_paths(raw)
     _require(not tracked_change, "tracked or staged repository change")
-    _require(untracked == tuple(sorted(set(expected_untracked))), "unexpected untracked path")
+    normalized: list[str] = []
+    for value in expected_untracked:
+        _require(isinstance(value, str) and bool(value), "invalid acknowledged path")
+        path = Path(value)
+        _require(
+            not path.is_absolute()
+            and ".." not in path.parts
+            and value == path.as_posix(),
+            "invalid acknowledged untracked path",
+        )
+        normalized.append(value)
+    _require(len(normalized) == len(set(normalized)), "duplicate acknowledged path")
+    _require(untracked == tuple(sorted(normalized)), "unexpected untracked path")
     return commit
 
 
@@ -473,7 +486,10 @@ def run_preflight(
         request.acknowledged_primary_untracked,
     )
     code_commit = _validate_repository(
-        runner, request.code_repository, request.expected_code_commit, ()
+        runner,
+        request.code_repository,
+        request.expected_code_commit,
+        request.acknowledged_code_untracked,
     )
     protected = [Path(str(plan[field])) for field in PROTECTED_ROOT_FIELDS]
     sandbox = validate_sandbox_isolation(request.sandbox_root, protected)

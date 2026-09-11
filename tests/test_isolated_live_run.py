@@ -63,6 +63,7 @@ class SyntheticPreflight:
         self.launch_arguments = list(self.expected_arguments)
         self.launch_returncode = 0
         self.primary_untracked = ("task025_claude_review_bundle.txt", "task025_review.patch")
+        self.code_untracked = (".claude/settings.local.json",)
 
     @property
     def expected_arguments(self) -> list[str]:
@@ -142,6 +143,7 @@ class SyntheticPreflight:
             acknowledged_primary_untracked=self.primary_untracked,
             code_repository=self.code,
             expected_code_commit=CODE_COMMIT,
+            acknowledged_code_untracked=self.code_untracked,
             sandbox_root=self.sandbox,
             schedule_plan=self.plan_path,
             schedule_plan_sha256_file=self.digest_path,
@@ -163,6 +165,11 @@ class SyntheticPreflight:
             if "status" in command:
                 if repository == self.primary and "--" not in command:
                     body = b"".join(f"?? {item}\0".encode() for item in self.primary_untracked)
+                    return CommandResult(0, body)
+                if repository == self.code and "--" not in command:
+                    body = b"".join(
+                        f"?? {item}\0".encode() for item in self.code_untracked
+                    )
                     return CommandResult(0, body)
                 return CommandResult(0)
             if command[:2] == ["check-ignore", "--quiet"]:
@@ -271,6 +278,31 @@ class IsolatedLiveRunTests(unittest.TestCase):
             self.execute(self.synthetic.request(expected_primary_commit="0" * 40))
         with self.assertRaises(IsolatedLiveRunError):
             self.execute(self.synthetic.request(expected_code_commit="0" * 40))
+
+    def test_each_checkout_requires_an_exact_safe_untracked_allowlist(self) -> None:
+        with self.assertRaises(IsolatedLiveRunError):
+            self.execute(self.synthetic.request(acknowledged_code_untracked=()))
+        with self.assertRaises(IsolatedLiveRunError):
+            self.execute(
+                self.synthetic.request(
+                    acknowledged_code_untracked=("../unsafe",)
+                )
+            )
+        with self.assertRaises(IsolatedLiveRunError):
+            self.execute(
+                self.synthetic.request(
+                    acknowledged_code_untracked=("/absolute/unsafe",)
+                )
+            )
+        with self.assertRaises(IsolatedLiveRunError):
+            self.execute(
+                self.synthetic.request(
+                    acknowledged_code_untracked=(
+                        ".claude/settings.local.json",
+                        ".claude/settings.local.json",
+                    )
+                )
+            )
 
     def test_deadline_and_disk_fail_closed(self) -> None:
         with self.assertRaises(IsolatedLiveRunError):

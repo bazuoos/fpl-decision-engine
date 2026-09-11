@@ -40,6 +40,7 @@ class CLITests(unittest.TestCase):
             "--expected-primary-commit", "1" * 40,
             "--code-repository", "/code",
             "--expected-code-commit", "2" * 40,
+            "--acknowledged-code-untracked", ".claude/settings.local.json",
             "--sandbox-root", "/primary/data/sandbox",
             "--schedule-plan", "/schedule/schedule-plan.json",
             "--schedule-plan-sha256-file", "/schedule/schedule-plan.json.sha256",
