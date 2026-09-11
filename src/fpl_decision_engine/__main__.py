@@ -109,6 +109,11 @@ from .manager_evidence_authoring import (
     publish_verified_evidence,
     run_existing_resume,
 )
+from .local_decision_wizard import (
+    TerminalPromptIO,
+    WizardState,
+    run_guided_manager_decision,
+)
 from .official_data import (
     DEFAULT_HISTORY_DELAY_SECONDS,
     OfficialDataError,
@@ -168,6 +173,7 @@ COMMANDS = {
     "prepare-gameweek",
     "inspect-manager-preparation",
     "publish-manager-evidence",
+    "guided-manager-decision",
     "resume-gameweek",
     "record-decision-journal",
     "record-decision-outcome",
@@ -880,7 +886,17 @@ def build_parser() -> argparse.ArgumentParser:
 
     publish_manager_parser = subparsers.add_parser(
         "publish-manager-evidence",
-        help="Validate manual Transfers-screen facts and publish verified evidence.",
+        help=(
+            "Validate manual Transfers-screen facts and publish verified evidence. "
+            "Privacy: --bank and --pick values may be retained in shell history and "
+            "process lists; prefer guided-manager-decision for normal owner use."
+        ),
+        description=(
+            "Validate manual Transfers-screen facts and publish verified evidence. "
+            "Privacy warning: --bank and --pick contain manager-specific values that "
+            "may be retained in shell history and process argument lists. Prefer "
+            "guided-manager-decision for normal owner use."
+        ),
     )
     publish_manager_parser.add_argument(
         "--preparation-manifest", type=Path, required=True
@@ -919,6 +935,19 @@ def build_parser() -> argparse.ArgumentParser:
         help="Immediately invoke the existing trusted resume step.",
     )
     publish_manager_parser.add_argument("--json", action="store_true")
+
+    guided_manager_parser = subparsers.add_parser(
+        "guided-manager-decision",
+        help="Interactively create verified manager evidence and run Engine v1.",
+    )
+    guided_manager_parser.add_argument(
+        "--preparation-manifest", type=Path, required=True
+    )
+    guided_manager_parser.add_argument(
+        "--draft",
+        type=Path,
+        help="Explicit private mutable-draft path (default uses preparation ID).",
+    )
 
     resume_parser = subparsers.add_parser(
         "resume-gameweek",
@@ -1678,6 +1707,22 @@ def main(argv: Sequence[str] | None = None) -> int:
         except OperationalRunnerError as exc:
             logging.error("Trusted operational resume failed [%s]", exc.code.value)
             return 1
+    elif args.command == "guided-manager-decision":
+        result = run_guided_manager_decision(
+            args.preparation_manifest,
+            io=TerminalPromptIO(),
+            draft_path=args.draft,
+        )
+        return (
+            0
+            if result.state
+            in {
+                WizardState.CANCELLED,
+                WizardState.VERIFIED_EVIDENCE_PUBLISHED,
+                WizardState.VERIFIED_DECISION_AVAILABLE,
+            }
+            else 1
+        )
     elif args.command == "resume-gameweek":
         try:
             result = resume_gameweek(

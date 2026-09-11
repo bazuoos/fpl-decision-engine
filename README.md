@@ -1316,9 +1316,26 @@ python -m fpl_decision_engine inspect-manager-preparation \
   --preparation-manifest data/operations/fpl/2026-27/gameweek=2/<preparation_id>/preparation_manifest.json
 ```
 
-Then publish the private manager evidence by repeating `--pick` exactly 15
-times with the element ID and the manager-specific selling price shown on the
-official Transfers screen:
+For normal owner use, start the guided local interface. It asks for private
+manager facts after the process starts, autosaves an ignored owner-only draft,
+shows a private review, and requires separate exact confirmations before
+publishing evidence and running the engine:
+
+```bash
+python -m fpl_decision_engine guided-manager-decision \
+  --preparation-manifest data/operations/fpl/2026-27/gameweek=2/<preparation_id>/preparation_manifest.json
+```
+
+Terminal recording, screen sharing, copied transcripts, scrollback, and
+`tmux`/`screen` logging can retain the private review. The interface does not
+log in to FPL, fetch new data, execute an FPL action, or journal a human
+decision. It supports only Engine v1's current `NO_CHIP`, at-least-one-free-
+transfer workflow.
+
+The lower-level flag-based command remains available for controlled use. Its
+`--bank` and repeated `--pick` arguments contain manager-specific bank and
+selling-price values. Shell history and process argument lists may retain those
+values, so prefer `guided-manager-decision` for normal owner use:
 
 ```bash
 python -m fpl_decision_engine publish-manager-evidence \

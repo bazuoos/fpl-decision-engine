@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import io
 import unittest
+from contextlib import redirect_stdout
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -23,11 +25,47 @@ from fpl_decision_engine.historical_opponent_strength_experiment import (
 from fpl_decision_engine.historical_previous_season_prior_experiment import (
     HistoricalPreviousSeasonPriorExperimentResult,
 )
+from fpl_decision_engine.local_decision_wizard import WizardResult, WizardState
 from fpl_decision_engine.predictions import PredictionOutputs
 from fpl_decision_engine.refresh import RefreshResult, RefreshUnlockResult
 
 
 class CLITests(unittest.TestCase):
+    def test_publish_manager_help_warns_about_private_process_arguments(self) -> None:
+        output = io.StringIO()
+        with self.assertRaises(SystemExit) as raised, redirect_stdout(output):
+            main(["publish-manager-evidence", "--help"])
+        self.assertEqual(raised.exception.code, 0)
+        rendered = output.getvalue()
+        self.assertIn("shell history", rendered)
+        self.assertIn("process argument lists", rendered)
+        self.assertIn("guided-manager-", rendered)
+        self.assertIn("decision for normal owner use", rendered)
+
+    @patch("fpl_decision_engine.__main__.run_guided_manager_decision")
+    @patch("fpl_decision_engine.__main__.TerminalPromptIO")
+    def test_guided_manager_dispatch_has_only_public_paths_in_arguments(
+        self, terminal_io, run_guided
+    ) -> None:
+        run_guided.return_value = WizardResult(WizardState.CANCELLED)
+        self.assertEqual(
+            main(
+                [
+                    "guided-manager-decision",
+                    "--preparation-manifest",
+                    "exact/preparation_manifest.json",
+                    "--draft",
+                    "private/current.json",
+                ]
+            ),
+            0,
+        )
+        run_guided.assert_called_once_with(
+            Path("exact/preparation_manifest.json"),
+            io=terminal_io.return_value,
+            draft_path=Path("private/current.json"),
+        )
+
     @patch("fpl_decision_engine.__main__.load_preparation_for_authoring")
     def test_inspect_manager_preparation_uses_one_explicit_manifest(self, load) -> None:
         load.return_value = SimpleNamespace(
