@@ -62,7 +62,8 @@ historical human reasoning -> immutable context + explicit temporal class
 
 REPOSITORY/CI SUPPLY CHAIN
 full-SHA-pinned actions -> CI mechanical gates
-    -> weekly action-only Dependabot update proposals -> ordinary review + CI
+exact uv bootstrap -> universal Python lock -> fail-closed sync/test
+    -> weekly GitHub Actions + uv Dependabot proposals -> ordinary review + CI
          -X-> no auto-merge, model promotion or application/engine authority
 ```
 
@@ -216,13 +217,15 @@ the project still tests under Python 3.10 and Node 22. Checkout persistence and
 setup-node's package-manager cache are disabled. The workflow installs the exact
 age 1.3.1 archive only after SHA-256 verification.
 
-[Dependabot](../../.github/dependabot.yml) checks only the `github-actions`
-ecosystem weekly at 09:00 Tuesday in `Asia/Bangkok` and permits at most three
-open version-update pull requests. It proposes individual updates and adds no
-auto-merge mechanism. Every proposal remains untrusted until independently
-reviewed and mechanically verified; this monitoring grants no engine,
-application, research or model-promotion authority. Python and npm dependency
-monitoring remain outside this narrow configuration.
+[Dependabot](../../.github/dependabot.yml) checks the `github-actions` and `uv`
+ecosystems weekly at 09:00 Tuesday in `Asia/Bangkok` and permits at most three
+open version-update pull requests per ecosystem. It proposes individual updates
+and adds no auto-merge mechanism. Python resolution uses exact uv 0.12.7 and the
+committed universal `uv.lock`; CI rejects stale lock state and test execution
+cannot resynchronize it. Every proposal remains untrusted until reviewed and
+mechanically verified; this monitoring grants no engine, application, research
+or model-promotion authority. npm dependency monitoring remains outside this
+configuration.
 
 ## Recovery boundary today
 

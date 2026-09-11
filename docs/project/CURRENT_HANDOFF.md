@@ -4,24 +4,28 @@
 > artifacts, manifests, frozen decision records and Git history win on technical
 > contradiction. Verify current Git state before acting.
 
-- Implementation checkpoint summarized: **2026-09-10**,
-  `7484484b7b3daccc814010af786f595608ce3e94`. It was on `main`, aligned with
+- Implementation checkpoint summarized: **2026-09-11**,
+  `274e5bba4479f8a9637f27df0657420d02f4da1e`. It was on `main`, aligned with
   `origin/main`, with successful CI. Identify this document's own revision and
   any later work from Git history rather than assuming the embedded SHA is HEAD.
-- Latest completed repository work: **Task030A/B GitHub Actions maintenance and
-  monitoring**. The CI actions are full-SHA pinned to releases using Node 24
-  runtimes, and Dependabot checks only GitHub Actions weekly at 09:00 Tuesday in
-  `Asia/Bangkok`, opening at most three individual update pull requests. It does
-  not auto-merge. Independent adversarial reviews reported SAFE. CI run
-  34480636762 passed 582 Python and four frontend tests; GitHub's Dependabot
-  update run 34480644733 succeeded against the committed configuration.
+- Latest completed repository work: **Task030A–D dependency reproducibility and
+  update monitoring**. CI actions are full-SHA pinned to releases using Node 24
+  runtimes. Python uses one universal `uv.lock`, exact uv 0.12.7, prohibited uv
+  interpreter downloads, an exact build constraint and a checksum-verified CI
+  bootstrap. Dependabot checks GitHub Actions and uv weekly at 09:00 Tuesday in
+  `Asia/Bangkok`, with at most three individual proposals per ecosystem and no
+  auto-merge. Independent adversarial reviews reported SAFE. Exact-commit CI run
+  34518385310 passed 582 Python and four frontend tests. The required uv update
+  run 34519957982 succeeded after remediation, and created unreviewed
+  [PR #1](https://github.com/bazuoos/fpl-decision-engine/pull/1) for pip
+  26.1.1 -> 26.2.1; its CI passed, but it remains an untrusted open proposal.
 - Production completion scheduling: Task028E design and Task028F controller are
   committed. The controller can prepare, verify, inspect, run, activate,
   deactivate and sanitize one exact immutable schedule plan, while Task028B
   retains all completion/refresh authority. Two GW4 plans were later prepared
   locally and independently reviewed, but neither was installed or activated.
   Both are now deliberately stale because their exact expected commits precede
-  Tasks030A/B; the controller therefore fails closed on them.
+  Tasks030A–D; the controller therefore fails closed on them.
 - **Local operational evidence, not repository-established:** after Task029B was
   reviewed, committed and green, the owner authorized capture of one current
   manager source. Its bytes matched the source hash already bound by the current
@@ -60,6 +64,8 @@
 - Human strategy context preserves what was believed and why. It never rewrites
   trusted engine artifacts, creates prospective evidence after a deadline or
   changes xFP, legality, optimization, reliability or model selection.
+- Dependabot pull requests are discovery artifacts, not approved maintenance.
+  Open PR #1 must not be merged merely because its mechanical CI passed.
 - Task028B remains bounded and one-shot. Its optional evaluation requires an
   explicit exact pre-deadline prediction and cannot generate or substitute one.
 - Web skeleton is **localhost-only**: every request receives the same local
@@ -121,9 +127,12 @@ to unseal an experiment. Changing football facts need fresh verification.
    [Task029A design](TASK029A_EVIDENCE_PROVENANCE_AND_STRATEGY_CONTEXT_SPEC.md),
    [Task029B tooling](TASK029B_PRIVATE_EVIDENCE_AND_CONTEXT.md) and the sanitized
    [Task029C record](TASK029C_PRIVATE_EVIDENCE_CAPTURE_AND_CONTEXT_POPULATION.md).
-5. For CI maintenance: [workflow](../../.github/workflows/ci.yml) and
-   [Dependabot configuration](../../.github/dependabot.yml). Treat automated
-   update pull requests as proposals requiring ordinary review and green CI.
+5. For dependency and CI maintenance: [workflow](../../.github/workflows/ci.yml),
+   [Dependabot configuration](../../.github/dependabot.yml),
+   [Task030C design](TASK030C_PYTHON_DEPENDENCY_REPRODUCIBILITY_SPEC.md) and
+   [Task030D implementation](TASK030D_PYTHON_DEPENDENCY_REPRODUCIBILITY.md).
+   Treat automated update pull requests as proposals requiring ordinary review
+   and green CI.
 6. For web work: [README](../../README.md),
    [RFC 0026A](../rfcs/0026a-web-product-architecture.md),
    [public reader](../../src/fpl_decision_engine/trusted_artifact_reader.py),

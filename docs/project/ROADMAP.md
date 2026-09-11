@@ -1,6 +1,6 @@
 # Roadmap
 
-As of `7484484` (2026-09-10). This is a planning map, not authorization to
+As of `274e5bb` (2026-09-11). This is a planning map, not authorization to
 execute. The [RFC phased plan](../rfcs/0026a-web-product-architecture.md#28-phased-implementation-plan)
 is the source for Tasks026B–D. Proposed capabilities are not completed merely
 because they appear in an RFC or this file.
@@ -37,15 +37,18 @@ because they appear in an RFC or this file.
 - Task028E/F: reviewed production scheduling design and inert controller with an
   exact immutable plan, code/environment/repository preflight, typed Task028B
   outcome handling, terminal quiescence and explicit owner lifecycle controls
-  (`6305f5e`, `cc30c99`). No real plan was prepared or installed.
+  (`6305f5e`, `cc30c99`). Two later plans were prepared but became stale;
+  neither was installed or activated.
 - Task029A/B: reviewed evidence-provenance design and private source/context
   foundation (`a715d48`, `cb72a78`). Content-addressed source bytes, immutable
   historical/prospective context structures and separated comparison layers are
   implemented outside engine decision authority.
-- Task030A/B: GitHub Actions upgraded to reviewed full-SHA pins using Node 24
-  runtimes, with weekly action-only Dependabot update proposals (`4037102`,
-  `7484484`). CI and GitHub's first Dependabot run passed; updates are not
-  auto-merged.
+- Task030A–D: GitHub Actions use reviewed full-SHA pins and Node 24 runtimes;
+  Python uses exact uv 0.12.7, a universal lock and fail-closed CI sync/test
+  controls (`4037102`, `7484484`, `00ad7e1`, `624649e`, `274e5bb`). Weekly
+  GitHub Actions and uv Dependabot proposals are bounded and never auto-merged.
+  Exact-commit CI and the remediated live uv update run passed. Open pip-update
+  PR #1 remains an unreviewed proposal despite green CI.
 
 ## LOCAL OPERATIONAL EVIDENCE — not repository implementation
 
@@ -60,8 +63,9 @@ because they appear in an RFC or this file.
 - Two GW4 Task028G completion-monitor plans were prepared and independently
   reviewed: an earlier realized-only plan bound to `cc30c99`, then an
   evaluation-enabled replacement bound to `f66fe4b`. Neither was installed or
-  activated; both have zero invocations and lifecycle events. Tasks030A/B made
-  both exact-commit plans stale, so they cannot pass current preflight.
+  activated; both have zero invocations and lifecycle events. Subsequent
+  repository work made both exact-commit plans stale, so they cannot pass
+  current preflight.
 
 ## NEXT — proposed implementation boundary, not work started
 

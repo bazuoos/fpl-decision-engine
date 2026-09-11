@@ -2,11 +2,14 @@
 
 ## Status and authority
 
-The initial implementation was committed as
-`624649e4ff35ecc5c6d8ca3885dc4b52a0183432` after independent review reported
-SAFE. Its Linux CI passed, but the required live Dependabot gate exposed an
-incompatibility between repository uv 0.12.12 and Dependabot's uv 0.12.7
-updater. This is the uncommitted remediation candidate for that finding.
+Task030D is complete through initial implementation commit
+`624649e4ff35ecc5c6d8ca3885dc4b52a0183432` and remediation commit
+`274e5bba4479f8a9637f27df0657420d02f4da1e`. Independent review reported SAFE
+for both candidates. The initial Linux CI passed, but its required live
+Dependabot gate exposed an incompatibility between repository uv 0.12.12 and
+Dependabot's uv 0.12.7 updater. The remediation aligned the verified bootstrap
+without changing `uv.lock`; exact-commit CI and the second live updater run
+then passed.
 
 It introduces a Python lock and changes development/CI dependency setup. It
 does not change engine, model, optimizer, reliability, application or frontend
@@ -15,14 +18,13 @@ not activate Task028G and does not start Task026C. Repository code, tests,
 contracts, immutable artifacts, manifests and frozen decision records remain
 authoritative.
 
-The candidate is being built and tested in the isolated worktree
-`/private/tmp/fpl-task030c-python-reproducibility`. The active `main` checkout
-and its Task028G-bound `.venv` remain unchanged. **NO VERIFIED OFFSITE BACKUP**
-remains true.
+Implementation and remediation were built and tested in an isolated worktree,
+without changing the Task028G-bound primary checkout environment.
+**NO VERIFIED OFFSITE BACKUP** remains true.
 
 ## Delivered controls
 
-The candidate adds these repository controls:
+Task030D adds these repository controls:
 
 - one root `uv.lock` as the sole committed Python environment resolution;
 - exact uv `0.12.7` policy in `pyproject.toml`;
@@ -127,7 +129,7 @@ The old environment happened to contain pip and setuptools, but the project did
 not declare either as a test requirement. This was an environment leak rather
 than an engine failure.
 
-The candidate adds exact pip and setuptools versions to the default development
+Task030D adds exact pip and setuptools versions to the default development
 group. They are present for tests and local development while remaining outside
 the application's published runtime dependency list. The exact setuptools
 version also agrees with the isolated build constraint. The previously failing
@@ -154,8 +156,9 @@ downloads. A missing or stale lock and a mismatched required uv version were
 each tested in disposable project copies and failed closed.
 
 The initial commit's Ubuntu x86-64/Python 3.10 run passed all 582 Python tests
-and four frontend tests in GitHub CI run `34514867297`. The remediation must
-repeat that gate because its uv bootstrap version and checksum changed.
+and four frontend tests in GitHub CI run `34514867297`. After the uv bootstrap
+version and checksum changed, remediation CI run `34518385310` repeated and
+passed the same suite on Python 3.10.21 x64.
 
 ## Dependency update behavior
 
@@ -170,11 +173,15 @@ parsed the project and enumerated its dependencies. When it attempted to update
 pip, it failed closed with `tool_version_not_supported`: the repository required
 `==0.12.12` while the Dependabot updater supported `0.12.7`.
 
-This remediation pins the repository bootstrap and required version to 0.12.7,
-matching the updater actually observed in the required empirical gate. A
-successful second default-branch run is still required after commit. Future uv
-tool updates must confirm the live updater version rather than infer
-compatibility from the documented floor.
+Remediation commit `274e5bb` pins the repository bootstrap and required version
+to 0.12.7, matching the updater observed in the required empirical gate. The
+second default-branch update run, `34519957982`, completed the previously
+failing pip update command and opened
+[PR #1](https://github.com/bazuoos/fpl-decision-engine/pull/1) for pip
+26.1.1 -> 26.2.1. PR CI run `34520058478` passed, but the PR remains an open,
+unreviewed proposal and is not part of Task030D. Future uv tool updates must
+confirm the live updater version rather than infer compatibility from the
+documented floor.
 
 An update proposal may change direct or transitive packages, platform branches,
 the uv lock schema, or the tool bootstrap. Each proposal requires ordinary code
@@ -183,7 +190,7 @@ native or decision dependency. Nothing is auto-merged.
 
 ## Local validation evidence
 
-The candidate currently has this local evidence:
+Task030D has this validation evidence:
 
 | Check | Result |
 |---|---|
@@ -204,8 +211,9 @@ The candidate currently has this local evidence:
 | Wrong required uv version | rejected before lock use |
 | Dependabot update simulation | uv 0.12.7 upgraded pip in a disposable project copy |
 | Patch whitespace | passed |
-| Ubuntu x86-64/Python 3.10 | initial commit passed; remediation rerun pending |
-| Dependabot uv parsing | project parsed; 0.12.12 update failed; remediation rerun pending |
+| Ubuntu x86-64/Python 3.10 | remediation CI passed 582 Python and 4 frontend tests |
+| Dependabot uv parsing/update | second live run completed the previously failing command |
+| Generated update proposal | PR #1 opened; its CI passed; review/merge not authorized |
 
 Tests used offline fakes and temporary files. No operational FPL command or
 private-data read occurred.
@@ -238,28 +246,21 @@ The exact setuptools constraint controls selection for current uv builds but
 does not require hashed, byte-reproducible wheel construction. A future built
 deployment artifact needs a separate build-chain design.
 
-## Remaining gates
+## Completion evidence and future gates
 
-Before commit authorization:
+Task030D's implementation and remediation received independent SAFE verdicts.
+The final exact commit passed Linux CI, setup-uv installed the expected version,
+the Python/frontend suite and existing gates passed, and the live uv updater
+parsed and updated the committed resolution successfully.
 
-1. Recheck the final diff, lock identity, installed inventory, links and
-   whitespace.
-2. Independently review the complete candidate, bootstrap provenance, hidden
-   dev dependency, marker forks, CI failure behavior and remaining claims.
+Each future dependency proposal remains a new change. Review its manifest and
+lock diff, run the complete suite, and obtain independent review when it affects
+a critical native or decision dependency. Do not treat Dependabot authorship or
+green CI as merge authorization. Recheck the live Dependabot updater version
+before changing the repository's required uv version. If an update job fails,
+remediate through the same review workflow rather than weakening the lock or
+bypassing a gate.
 
-After an independently reviewed commit is explicitly authorized:
-
-1. Push `main` and require the exact commit's GitHub CI to pass on Ubuntu
-   x86-64/Python 3.10.
-2. Confirm setup-uv reports the expected uv version and accepts the supplied
-   archive checksum.
-3. Confirm the Python suite, frontend suite and all existing gates pass.
-4. Confirm GitHub Dependabot accepts the `uv` ecosystem entry and parses the
-   committed lock.
-5. Refresh continuity documents with exact commit/run evidence. If CI or
-   Dependabot fails, remediate through the same review workflow rather than
-   weakening the lock or bypassing a gate.
-
-Passing local macOS tests does not establish the Linux result. Passing CI does
+Local macOS tests alone do not establish the Linux result. Passing CI does
 not establish permanent artifact availability or make a future dependency
 update safe to merge.

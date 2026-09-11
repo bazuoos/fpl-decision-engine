@@ -1,7 +1,7 @@
 # Project state
 
-Implementation checkpoint summarized: 2026-09-10, commit
-`7484484b7b3daccc814010af786f595608ce3e94`. Identify this document's own
+Implementation checkpoint summarized: 2026-09-11, commit
+`274e5bba4479f8a9637f27df0657420d02f4da1e`. Identify this document's own
 revision and any later work from Git history.
 Start with [CURRENT_HANDOFF](CURRENT_HANDOFF.md); this pack is navigation and
 continuity context, not a replacement for code, contracts, or frozen evidence.
@@ -123,24 +123,30 @@ context records were verified as described in the sanitized
 
 ## Validation evidence and procedure
 
-**Repository-established at this review:** HEAD `7484484`, branch `main`, 149
+**Repository-established at this review:** HEAD `274e5bb`, branch `main`, 152
 tracked files and four frontend tests in source. The CI workflow configures
 Python 3.10, Node 22 and checksum-pinned age 1.3.1 installation. Checkout,
-setup-python and setup-node are pinned by full commit SHA to releases that use
-Node 24 action runtimes.
+setup-python, setup-node and setup-uv are pinned by full commit SHA. The first
+three use Node 24 action runtimes; setup-uv installs exact uv 0.12.7 from its
+official GitHub release after checking the supplied Linux archive SHA-256.
 
-At this exact commit, [CI run 34480636762](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34480636762)
+At this exact commit, [CI run 34518385310](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34518385310)
 passed 582 Python tests, four frontend tests, generated-contract freshness,
 TypeScript, production build, browser dependency-boundary and whitespace checks.
 Task030A's independent review verified the release provenance and full SHA pins;
-the former Node 20 runtime warning did not recur after the upgrade. Task030B's
-independent review verified the action-only Dependabot scope and reported SAFE.
-[Dependabot run 34480644733](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34480644733)
-then completed successfully and found the pinned actions current. This proves
-GitHub accepted this configuration, not that future update pull requests are
-safe to merge. Historical CI success does not establish future checkout health,
-predictive validity, private-evidence truth or a real installed production
-schedule.
+the former Node 20 runtime warning did not recur after the upgrade. Task030B
+established bounded GitHub Actions update proposals. Task030C's reviewed design
+and Task030D's reviewed implementation added the exact universal Python lock and
+uv monitoring. The first live uv updater rejected repository uv 0.12.12 because
+its updater supported 0.12.7; remediation commit `274e5bb` aligned the verified
+bootstrap without changing the lock. [Dependabot run 34519957982](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34519957982)
+then completed the previously failing update command and opened unreviewed
+[PR #1](https://github.com/bazuoos/fpl-decision-engine/pull/1) for pip
+26.1.1 -> 26.2.1. Its [CI run 34520058478](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34520058478)
+passed, but the proposal remains open and untrusted. These runs prove the
+configured mechanisms execute, not that an update is safe to merge. Historical
+CI success does not establish future checkout health, predictive validity,
+private-evidence truth or a real installed production schedule.
 
 When installation/test execution is authorized, use a virtualenv and run:
 
