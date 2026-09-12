@@ -10,6 +10,21 @@ Task033A and Task033B remain the governing research boundary. Repository source
 establishes the expected Task009/010 manifest shapes and identities, but only an
 authorized, hash-verified local manifest can establish the result of a real run.
 
+## Completed provenance checkpoint (2026-09-12)
+
+Task033B1A is implemented at `251a4c484b745346fdb1a46c674a13add0c7744c`.
+The owner separately authorized one capture and one verification, followed by
+independent sanitized-result review reported SAFE. The hash-verified sanitized
+report records `LOCALLY_COHERENT_LEGACY_RESULTS`, no development winner and no
+holdout evaluation in either slot. Present local coherence does not prove
+historical generator identity, immutability at creation, backup or promotion.
+
+See the [Task033B1B amendment](TASK033B1B_CANDIDATE_FREEZE_AMENDMENT.md) for the
+verified public hashes, exact recorded decisions and proposed candidate freeze.
+The procedure below remains the historical contract, not an instruction to
+repeat Gate 0. The numerical amendment still needs review and owner approval;
+no experiment or confirmation access is authorized by this status correction.
+
 ## Decision
 
 Split Task033B1 into two ordered gates:

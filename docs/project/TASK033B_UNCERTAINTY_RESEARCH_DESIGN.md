@@ -17,6 +17,21 @@ reports described negative outcomes, while the exact Task009 and Task010 result
 packages are not recovered. Those outcomes are therefore **REQUIRES HUMAN
 CONTEXT**, not a blank slate that permits rerunning or relabelling candidates.
 
+## Task033B1B checkpoint and proposed numerical completion
+
+The original pending-Gate-0/unknown-result wording above and the future sequence
+below are historical. The separately authorized, hash-verified sanitized Gate 0
+report now records `LOCALLY_COHERENT_LEGACY_RESULTS`: both legacy experiments
+have no development winner, no holdout evaluation and DO NOT PROMOTE decisions.
+This is local coherence, not proof of historical execution identity or backup.
+
+The [Task033B1B amendment](TASK033B1B_CANDIDATE_FREEZE_AMENDMENT.md) supplies the
+proposed literal UM1/UA1 formulas, scores, gates and confirmation boundaries.
+It explicitly proposes deferring the synthetic decision corpus and narrowing
+resulting eligibility to component diagnostics. Those amendments need independent
+Claude review and owner approval; neither this link nor completed Gate 0
+constitutes implementation, experiment or confirmation permission.
+
 ## Research question
 
 Can pre-deadline uncertainty in expected minutes and small-sample attacking

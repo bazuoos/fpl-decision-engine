@@ -6,6 +6,20 @@ revision and any later work from Git history.
 Start with [CURRENT_HANDOFF](CURRENT_HANDOFF.md); this pack is navigation and
 continuity context, not a replacement for code, contracts, or frozen evidence.
 
+## Task033B1B scoped update (2026-09-12)
+
+This older implementation checkpoint does not describe the isolated Task033
+branch. The [candidate-freeze amendment](TASK033B1B_CANDIDATE_FREEZE_AMENDMENT.md)
+records the hash-verified sanitized Gate 0 result: both legacy experiments have
+no development winner, unevaluated holdouts and recorded DO NOT PROMOTE decisions.
+The assurance is present local coherence only, not historical generator identity,
+backup or production eligibility. Its numerical protocol remains proposed for
+independent review and owner approval; xFP v0.1 is unchanged.
+
+Schedule statements below describe two earlier stale plans, not a current
+inventory. A later owner-identified GW4 schedule was outside this task's lifecycle
+inspection; no current active/inactive/terminal state is asserted here.
+
 ## Purpose and maturity
 
 Improve FPL decision-making through explainable projections, legal optimization,
