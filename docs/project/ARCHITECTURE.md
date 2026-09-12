@@ -73,6 +73,15 @@ the browser presentation layer is not. GameweekDecision validates persisted
 selection using `decision.validate_decision_selection`, not `optimize_xi`.
 Transfer proof uses existing trusted mechanisms/candidates separately.
 
+## Checkpoint qualification for Task033B1B
+
+The two stale GW4 plans mentioned in this older map are historical plans, not
+proof that no later schedule exists. The current owner-identified schedule was
+not inspected or changed by the Task033B1B documentation task. The
+[candidate-freeze amendment](TASK033B1B_CANDIDATE_FREEZE_AMENDMENT.md) records the
+sanitized Gate 0 outcome and proposes research formulas only; it changes none of
+the production, scheduler or trust boundaries in this map.
+
 ## Code navigation
 
 Package location does not establish production authority: `historical*.py` and

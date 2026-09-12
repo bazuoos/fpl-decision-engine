@@ -1308,6 +1308,54 @@ from its UTC clock, never infers selling prices from current prices, and derives
 the modeled transfer cost as zero. Engine v1 accepts only `NO_CHIP`; wildcard,
 free hit, bench boost, and triple captain each fail closed with a distinct code.
 
+The local authoring boundary removes the need to hand-write that JSON. First,
+inspect one exact preparation and its frozen public player catalogue:
+
+```bash
+python -m fpl_decision_engine inspect-manager-preparation \
+  --preparation-manifest data/operations/fpl/2026-27/gameweek=2/<preparation_id>/preparation_manifest.json
+```
+
+For normal owner use, start the guided local interface. It asks for private
+manager facts after the process starts, autosaves an ignored owner-only draft,
+shows a private review, and requires separate exact confirmations before
+publishing evidence and running the engine:
+
+```bash
+python -m fpl_decision_engine guided-manager-decision \
+  --preparation-manifest data/operations/fpl/2026-27/gameweek=2/<preparation_id>/preparation_manifest.json
+```
+
+Terminal recording, screen sharing, copied transcripts, scrollback, and
+`tmux`/`screen` logging can retain the private review. The interface does not
+log in to FPL, fetch new data, execute an FPL action, or journal a human
+decision. It supports only Engine v1's current `NO_CHIP`, at-least-one-free-
+transfer workflow.
+
+The lower-level flag-based command remains available for controlled use. Its
+`--bank` and repeated `--pick` arguments contain manager-specific bank and
+selling-price values. Shell history and process argument lists may retain those
+values, so prefer `guided-manager-decision` for normal owner use:
+
+```bash
+python -m fpl_decision_engine publish-manager-evidence \
+  --preparation-manifest data/operations/fpl/2026-27/gameweek=2/<preparation_id>/preparation_manifest.json \
+  --entry-id <entry_id> \
+  --bank <bank_m> \
+  --free-transfers <count> \
+  --pick <element_id>:<selling_price_m> \
+  --confirm-current-selection
+```
+
+The command resolves names, positions and clubs only from the hash-pinned
+preparation, validates the complete squad, and writes canonical evidence below
+the ignored `data/manager/evidence/fpl/` tree with owner-only permissions. Add
+`--run` to hand the published file directly to the existing trusted
+`resume-gameweek` path. It does not log in to FPL, fetch new data, calculate a
+recommendation, or record a human action. The recommendation remains limited
+to xFP v0.1's modeled appearance, goal and assist components and Engine v1's
+zero-or-one-transfer scope.
+
 Operational outputs use this identity-addressed layout:
 
 ```text
@@ -1430,6 +1478,14 @@ Outputs are stored below
 Repeating the same comparison safely reuses byte-identical output; conflicting
 bytes at the same identity fail closed. Reverse order has a distinct identity
 and reversed before/after semantics.
+
+## Isolated live-run safeguards
+
+The first-live-run boundary is documented in
+[`docs/project/TASK032B_ISOLATED_LIVE_RUN_RUNBOOK.md`](docs/project/TASK032B_ISOLATED_LIVE_RUN_RUNBOOK.md).
+It verifies a durable ignored sandbox against one explicit active-monitor plan
+before private prompts, evidence publication and engine execution. It does not
+authorize a live refresh or claim that local evidence has an offsite backup.
 
 ## Run tests
 

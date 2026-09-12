@@ -50,6 +50,23 @@
   prediction. Those ignored artifacts have **NO VERIFIED OFFSITE BACKUP**. No
   prospective GW3 journal or outcome was created or retrospectively invented.
 
+## Task033B1B scoped update (2026-09-12)
+
+The checkpoint above predates the isolated Task033 work. At base
+`251a4c484b745346fdb1a46c674a13add0c7744c`, the Task033B1A verifier is committed;
+the separately authorized Gate 0 sanitized report establishes
+`LOCALLY_COHERENT_LEGACY_RESULTS`, with no development winner and no holdout
+evaluation for either legacy component. See the
+[candidate-freeze amendment](TASK033B1B_CANDIDATE_FREEZE_AMENDMENT.md) for verified
+public hashes, assurance limits and the proposed numerical protocol. The amendment
+is awaiting independent review/owner approval; implementation and execution are
+not authorized. Earlier unknown-result statements are historical checkpoints.
+
+The two stale-plan descriptions below refer to earlier plans only. The owner
+has identified a later GW4 schedule; this documentation task did not inspect its
+current lifecycle. Do not infer that it is active, inactive or terminal from
+these older paragraphs or elapsed time. Preserve its isolation.
+
 ## Current restrictions and limits
 
 - This checkpoint refresh authorizes no schedule activation, Task026C,
