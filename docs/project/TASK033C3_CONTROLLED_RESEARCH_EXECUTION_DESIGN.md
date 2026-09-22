@@ -2,18 +2,23 @@
 
 ## 1. Status, objective and stop decision
 
-**DESIGN ONLY — BLOCKED BEFORE IMPLEMENTATION.** Prepared against
-`5ab1c393fb36c73e2e2cf559dbe4ffd242a88ca6` on
+**DESIGN ONLY — BLOCKED BEFORE IMPLEMENTATION.** The original design was
+prepared against `5ab1c393fb36c73e2e2cf559dbe4ffd242a88ca6`; this owner-decision
+amendment is prepared against reviewed design commit
+`2da9d7d63b6ac74626c957a7ec8e5be9f17ab21b` on
 `codex/task033a-decision-robustness-design`. This document is a constrained
 architecture and precise blocker report, not an executable authorization or an
 approved extension of C1/C2. No real or synthetic experiment ran for this task.
 
 Design-only remediation: the owner reports that Claude Sonnet 5 High reviewed
 the preceding draft as SAFE / IMPLEMENTATION READY: NO and explicitly supplied
-three mandatory design findings. This revision addresses those findings; it does
-not claim that the revised text has been independently re-reviewed. All seven
-blockers remain open. Recommendations below are not owner-approved decisions.
-The owner authorized document remediation and local review packaging only.
+three mandatory design findings. The remediated revision was then independently
+re-reviewed SAFE / IMPLEMENTATION READY: NO with no remaining mandatory design
+finding. On 2026-09-22 the owner approved the recommended policy directions for
+B01–B07 recorded in section 3.2. The seven blockers remain open as implementation
+and evidence gates because their concrete contracts, parameters and validation
+do not yet exist. This approval authorizes this documentation amendment only; it
+does not authorize implementation, protected reads or research execution.
 
 The objective is a future boundary connecting the pure research kernels to
 explicitly authorized, attributable sources, with prediction/outcome separation,
@@ -28,8 +33,9 @@ material execution choices. Section 3 identifies them and the exact evidence or
 reviewed decisions required. No implementer may fill these gaps with convenient
 defaults. Sections 4–16 specify preserved rules and proposed requirements for
 review; where a contract is blocked, it is deliberately not a runnable schema.
-The next permissible proposal is C3.0, a separately authorized documentation
-resolution. This task creates no C3 implementation, source registration or grant.
+The next permissible proposal is the remaining C3.0 contract-resolution work,
+separately scoped and reviewed. This task creates no C3 implementation, source
+registration or grant.
 
 ## 2. Repository-established foundation
 
@@ -126,8 +132,8 @@ be frozen and independently reviewed before dependent code or data access.
 | ID | Material gap and precise blocker | Required resolution; until then |
 |---|---|---|
 | B01 — causal source contract | historical-v3.1 permits restricted pseudo-backtests but cannot prove first availability of each performance value, completion time, or correction. Logical kickoff filtering cannot prevent corrected-future leakage. The requested causal boundary cannot be claimed from those tables alone. | Separately review an immutable as-of research-source contract and source evidence/custody plan. Decide whether exact v3.1-compatible values can be supported by attributable pre-cutoff evidence. Any relaxation of causal claims or changed values is a protocol amendment, not a C3 default. No historical fallback; SOURCE_PROVENANCE_INVALID. |
-| B02 — authority and time | Existing single-operator human/ownership/CLI controls do not establish cryptographic research grants, independent custody or rollback-resistant authority. Requiring an unspecified independent service is not an achievable deployment definition. | Owner chooses A2-independent, A2-single-operator or continued synthetic-only A2-procedural in section 6.1, with explicit trust/clock/key/ledger decisions. Recommendation is A2-single-operator for development only after review; confirmation still needs the frozen independent-custodian prerequisite. The worker may never issue its own grant; all profiles remain unapproved and real access remains UNAUTHORIZED. |
-| B03 — C1/C2 contract bridge | Closed C2 authority literals exclude real execution; C1 header cannot assert authorized confirmation. evaluate() has no external combination control point and automatically scores UM1UA1 after both components pass. | Owner must explicitly choose EVAL_AUTH or PUBLICATION_ONLY (section 6.3), then approve the required versioned API/schema proposal. Recommend EVAL_AUTH to prevent unauthorized computation. PUBLICATION_ONLY requires computation permission upfront and cannot be presented as evaluation-time authorization. No real-source call through current C2, synthetic relabel, unchecked model or private _Pair bypass. |
+| B02 — authority and time | Existing single-operator human/ownership/CLI controls do not establish cryptographic research grants, independent custody or rollback-resistant authority. Requiring an unspecified independent service is not an achievable deployment definition. | The owner selected A2-single-operator for development only, subject to the still-open trust/clock/key/ledger contract and proof in section 6.1. Confirmation still needs the frozen independent-custodian prerequisite. The worker may never issue its own grant; real access remains UNAUTHORIZED until the concrete profile is reviewed and implemented. |
+| B03 — C1/C2 contract bridge | Closed C2 authority literals exclude real execution; C1 header cannot assert authorized confirmation. evaluate() has no external combination control point and automatically scores UM1UA1 after both components pass. | The owner selected EVAL_AUTH (section 6.3): authorization must precede combination computation. A separately reviewed versioned API/schema proposal is required before code work. No real-source call through current C2, synthetic relabel, unchecked model or private _Pair bypass. |
 | B04 — final resource evidence | C2 needs PASS evidence before selection/combination; frozen budget includes I/O and publication that have not finished. Neither an evaluation seam nor suppressing publication resolves this timing cycle. | Owner/reviewer must approve which completed resource intervals permit component admission and conditional dispatch, which final intervals gate result completion, and an acyclic receipt graph preserving frozen ceilings. If that changes the meaning of a frozen resource gate, amend the protocol before implementation. No prospective PASS; both alternative combination policies remain OUTCOME_ACCESS_BLOCKED until resolved. |
 | B05 — enforceable resource profile | No reviewed backend continuously enforces RSS, numerical threads, descendants, scratch bytes and publication bounds on both platforms. Scratch/output caps and accounting of trusted parent/broker overhead are unspecified. | Freeze numeric byte/inode/output/controller budgets, phase accounting and OS enforcement with synthetic evidence. macOS and Linux need separately accepted profiles. No environmental-variable or sampling-only PASS; OUTCOME_ACCESS_BLOCKED. |
 | B06 — bridge serialization | Historical code is an integer while C2 serial ordering uses UTF-8 text; canonical integer-to-code representation and admissible historical reconciliation are not frozen by a complete adapter. | Review one explicit mapping/encoding contract with independent test vectors and verified season-specific bridges, including blank-only codes. Suggested decimal encoding below is only a proposal. No name matching or guessed bridge; SOURCE_PROVENANCE_INVALID. |
@@ -145,87 +151,132 @@ A custodian's untouchedness evidence must precede confirmation authorization.
 
 ### 3.1. B01–B07 decision ledger
 
-All entries are **OPEN / FAIL CLOSED**. The owner decides product scope and
-accepted trust boundaries; independent review checks the resulting technical and
-statistical contracts. Recommendations are design proposals, not grants. Naming a
-module below is a design choice within this remediation, not approval to create it.
+All entries remain **OPEN / FAIL CLOSED** as implementation and evidence gates.
+The owner-approved policy directions are recorded in section 3.2; independent
+review must still accept the resulting technical and statistical contracts.
+Policy approval is not a research grant. Naming a module below is a design choice,
+not approval to create or execute it.
 
 | B01 field | Decision record |
 |---|---|
 | Decision owner | Product owner for allowable causal claims/source scope; independent source/protocol reviewer for consistency |
 | Alternatives | Immutable attributable as-of evidence compatible with v3.1; an explicit protocol amendment accepting weaker historical claims; remain synthetic-only if neither is supportable |
-| Recommendation | Keep the causal gate closed until the first option is evidenced. Exclude the v2 backtester; use the separately reviewed adapter in section 5.1. No silent weaker-claim fallback. |
+| Owner-approved direction | Keep the causal gate closed until the first option is evidenced. Exclude the v2 backtester; use the separately reviewed adapter in section 5.1. No silent weaker-claim fallback. |
 | Repository evidence | Freeze section 2 requires corrected historical-v3.1; historical_sources declares v3.1, legacy backtester accepts only v2; historical.py records incomplete historical availability proof. |
 | Security/statistical consequence | Archive identity alone cannot prevent corrected-future leakage; changing source values or causal classification may change the estimand and requires protocol review. |
 | Exact contract changes | New immutable as-of source/view registration and lineage contract; explicit v3.1-to-C1/C2 mapping contract. No change to EXPECTED_HISTORICAL_VERSION or legacy input gate. |
 | Validation required | Independent cutoff/correction timelines, strict version rejection, field/identity/missingness/U0 parity and prediction/outcome separation tests, then separately authorized source evidence review |
-| Current status / unauthorized | OPEN. Proposed routing decision is documented; causality/compatibility is unproved. No source registration, acquisition, protected read, adapter implementation or development run authorized. |
+| Current status / unauthorized | POLICY DIRECTION APPROVED; EVIDENCE GATE OPEN. Attributable pre-cutoff evidence is required; otherwise the affected scope remains synthetic-only. Causality/compatibility is unproved. No source registration, acquisition, protected read, adapter implementation or development run authorized. |
 
 | B02 field | Decision record |
 |---|---|
 | Decision owner | Product owner chooses deployment/threat boundary, key and recovery custody; independent reviewer assesses enforcement; a genuinely separate custodian is needed for frozen confirmation requirements |
 | Alternatives | A2-independent owner/custodian/verifier separation; A2-single-operator with an offline owner signer and isolated verifier/broker/workers; A2-procedural human/CLI controls with no hostile-worker assurance and continued synthetic-only operation |
-| Recommendation | A2-single-operator is the realistic proposed development target. Do not claim independent custody. Keep confirmation closed without the separately required independent custodian. |
+| Owner-approved direction | A2-single-operator is the development-only target. Do not claim independent custody. Keep confirmation closed without the separately required independent custodian. |
 | Repository evidence | Human workflow, filesystem-owner checks, explicit activation flag, shared local web principal; no existing research key issuer, revocation or nonreplay ledger |
 | Security/statistical consequence | Can constrain a compromised worker if OS/key/ledger separation is effective; cannot prevent the owner/root forging history, prove the owner's ignorance of outcomes or recover lost custody proof. Same-UID unrestricted workers defeat the proposed boundary. |
 | Exact contract changes | Grant/receipt profile and assurance literals, owner trust-anchor enrollment/rotation, verifier-only key distribution, bounded expiry/time policy, nonce ledger/revocation epoch/high-water recovery records. Exact algorithms/providers/clock tolerances remain owner-reviewed choices, not defaults. |
 | Validation required | Worker cannot access issuer key/ledger/source roots; signature/scope/expiry/replay/revocation race tests; missing-anchor, clock rollback, restored-spent-grant and offline-key recovery failures; report no independent-custody claim |
-| Current status / unauthorized | OPEN. Owner must choose the profile and explicit minimum controls in section 6.1. No key generation, credentials, new account/service installation, grant issuance, confirmation access or real execution authorized. |
+| Current status / unauthorized | POLICY DIRECTION APPROVED; CONTRACT GATE OPEN. A2-single-operator is selected for development only; independent custody remains mandatory for confirmation. Concrete custody, isolation, clock, nonce, revocation and recovery controls remain unapproved. No key generation, credentials, new account/service installation, grant issuance, confirmation access or real execution authorized. |
 
 | B03 field | Decision record |
 |---|---|
 | Decision owner | Product owner chooses the meaning of combination authorization; independent C2 contract/protocol review before any API work |
 | Alternatives | EVAL_AUTH: authorize at a new computation boundary; PUBLICATION_ONLY: authorize full conditional computation beforehand, then gate exposure/publication; keep C2 synthetic-only |
-| Recommendation | EVAL_AUTH with versioned public pure component/combination interfaces and a controller authorization checkpoint; do not compute and discard to simulate denial |
+| Owner-approved direction | EVAL_AUTH with versioned public pure component/combination interfaces and a controller authorization checkpoint; do not compute and discard to simulate denial |
 | Repository evidence | evaluate() directly calls run('UM1UA1') when components pass; EvaluationResult rejects a NOT_EVALUATED combination in that case; current authority/resource literals are synthetic-only |
 | Security/statistical consequence | EVAL_AUTH limits approved-code computation before permission. PUBLICATION_ONLY consumes outcomes/resources and creates exposure even when output is suppressed; it cannot honestly be called NOT_EVALUATED. Neither changes fixed selection priorities. |
 | Exact contract changes | New versioned authority/header/result contracts; public component result and grant-bound combination request types; separate incomplete authorization-stop record; stage-specific input views bound to the full freeze; pure final selection API. Preserve existing v1 synthetic schemas and statistics. PUBLICATION_ONLY instead needs explicit compute-versus-expose grants and computed-but-withheld execution receipts. |
 | Validation required | Prove zero combination membership/score/resample calls before a valid checkpoint, malformed/missing/revoked permit rejection, preserved all-draw statistics/selection and schema compatibility; publication-only tests if that alternative is selected |
-| Current status / unauthorized | OPEN. Owner must explicitly select a policy and authorize a later reviewed contract proposal. No C2 changes, direct private calls, real evidence conversion or combination computation authorized. |
+| Current status / unauthorized | POLICY DIRECTION APPROVED; CONTRACT GATE OPEN. EVAL_AUTH is selected and a later design-only versioned contract proposal is permitted. No C2 code changes, direct private calls, real evidence conversion or combination computation authorized. |
 
 | B04 field | Decision record |
 |---|---|
 | Decision owner | Product owner plus protocol/resource reviewer define when the frozen resource gate is satisfied |
 | Alternatives | Acyclic measured stage receipts and separately finalized result resource gate after explicit review; full-computation publication gating with upfront scope (still needs timing resolution); remain blocked |
-| Recommendation | Design the first option with EVAL_AUTH, but do not claim it satisfies the existing gate until its phase/publication coverage is approved. No provisional PASS or fabricated measurement. |
+| Owner-approved direction | Design the first option with EVAL_AUTH, but do not claim it satisfies the existing gate until its phase/publication coverage is approved. No provisional PASS or fabricated measurement. |
 | Repository evidence | ResourceGate is supplied to evaluate before work; PackageResult PASS requires it; combination uses that PASS; freeze section 10 includes I/O and publication. |
 | Security/statistical consequence | A future publication cost cannot justify present gate admission. Changing which resource phase counts can change combination admission/selection and cannot be hidden as orchestration. |
 | Exact contract changes | Versioned component-statistic, completed-stage resource, conditional-permit and final-selection/result contracts; explicit measured interval definitions, final commit boundary and acyclic upstream edges. Any changed frozen resource-gate meaning needs an explicit protocol clarification/amendment. |
 | Validation required | Last-write/fsync/commit breach, revoked permit at dispatch, interrupted stage, identical numerical core across measured attempts, and independent proof no resource receipt attests future work |
-| Current status / unauthorized | OPEN. B03 policy choice alone does not close B04. No outcome access, resource PASS, conditional dispatch or eligible publication authorized. |
+| Current status / unauthorized | POLICY DIRECTION APPROVED; CONTRACT GATE OPEN. Staged completed-resource receipts plus a final all-inclusive gate are selected, but exact intervals, retry accounting, commit boundary and any protocol amendment remain unapproved. No outcome access, resource PASS, conditional dispatch or eligible publication authorized. |
 
 | B05 field | Decision record |
 |---|---|
 | Decision owner | Product owner selects supported platforms and literal budgets; independent systems reviewer accepts backend enforcement |
 | Alternatives | Proven native profiles on macOS and Linux; a separately approved contained runtime with explicitly narrowed platform claims; synthetic-only unsupported-host refusal |
-| Recommendation | Qualify supported profiles with measured synthetic enforcement; reject unsupported profiles before outcomes. Do not imply native macOS enforcement from Linux or from sampled observations. |
+| Owner-approved direction | Qualify supported profiles with measured synthetic enforcement; reject unsupported profiles before outcomes. Prioritize contained Linux/Python 3.10 and do not imply native macOS enforcement from Linux or sampled observations. |
 | Repository evidence | C1/C2 benchmark reporting is not a controller; frozen ceilings exist but no C3 OS backend or scratch/output/controller budget does. |
 | Security/statistical consequence | Unbounded parent/descendant/spill work or missed RSS/thread bursts invalidates resource PASS; changing budgets after results is impermissible. |
 | Exact contract changes | Resource-profile and receipt schema with approved numeric scratch/output/inode/controller limits, process/thread/RSS accounting, watchdog/retry/cleanup policy and supported backend identity |
 | Validation required | Real backend denial/termination for brief spikes, children, threads, timeout, output/disk overflow; end-to-end 700-player and conditional-combination measurements on declared profiles |
-| Current status / unauthorized | OPEN. No budgets or host privileges invented; no runtime installation, benchmark, experiment or real protected access authorized. |
+| Current status / unauthorized | POLICY DIRECTION APPROVED; CONTRACT GATE OPEN. A proved contained Linux/Python 3.10 profile is the first target; native macOS remains development/synthetic-only until separately proved. Additional numeric budgets and enforcement details remain unapproved. No runtime installation, benchmark, experiment or real protected access authorized. |
 
 | B06 field | Decision record |
 |---|---|
 | Decision owner | Product owner approves a frozen encoding/identity specification after source and statistical reviewer checks |
 | Alternatives | Minimal ASCII decimal verified official integer code; another explicitly frozen bijective representation with independent ordering vectors; reject unresolved bridges |
-| Recommendation | Minimal decimal is the proposed representation, with UTF-8 lexical sorting unchanged, pending approval. Reject missing/ambiguous mappings including blank-only players. |
+| Owner-approved direction | Minimal ASCII decimal with UTF-8 lexical sorting unchanged. Reject missing/ambiguous mappings including blank-only players. |
 | Repository evidence | Historical code is integer; C2 player_code is text and serial union sorts UTF-8 bytes; blank-only codes participate. Existing compatibility examples are incomplete. |
 | Security/statistical consequence | Representation changes RNG-to-player assignment; inferred/name-based mappings can merge distinct players or falsely split dependence. |
 | Exact contract changes | Versioned bridge encoding/evidence schema and complete adapter mapping specification; separate provenance hashes; no expansion of existing membership digest scope |
 | Validation required | Literal integer/text/ordering vectors, collisions/renames/transfers/blank-only identities, full distribution/null/blank parity, unchanged seeded serial stream under approved mapping |
-| Current status / unauthorized | OPEN. No bridge conversion accepted, source opened, kernel/schema changed or real evaluation authorized. |
+| Current status / unauthorized | POLICY DIRECTION APPROVED; CONTRACT GATE OPEN. Minimal ASCII decimal with existing UTF-8 lexical ordering is selected; independent vectors and complete bridge/parity proof remain required. No source is opened, and no kernel/schema change or real evaluation is authorized. |
 
 | B07 field | Decision record |
 |---|---|
 | Decision owner | Product owner approves identity/adoption/durability claims; independent publication/recovery reviewer validates filesystem protocol |
 | Alternatives | Versioned deterministic core plus distinct attempt/resource/publication receipts; attempt-specific complete results with equality assessed only on an explicitly defined core; no completed publication until identity/timing is resolved |
-| Recommendation | Separate deterministic core from immutable attempt evidence, with exact-byte-only completed-result adoption; approve the acyclic graph jointly with B04. Never strip fields from v1 bytes retrospectively. |
+| Owner-approved direction | Separate deterministic core from immutable attempt evidence, with exact-byte-only completed-result adoption; approve the acyclic graph jointly with B04. Never strip fields from v1 bytes retrospectively. |
 | Repository evidence | C2 embeds resource evidence digests; artifact_snapshot.py offers read-once capture but no semantic-slot reservation, publisher election or atomic multi-file commit protocol. |
 | Security/statistical consequence | Conflating equal scores with identical provenance permits substitution; restoration/retry may erase exposure or spend the same grant twice. Atomic visibility does not prove crash durability. |
 | Exact contract changes | Versioned evaluation/core/attempt identities, publication reservation/receipt, adoption/conflict/failure/recovery contracts and supported no-replace commit/durability profile |
 | Validation required | Two-writer races, exact adoption versus different receipt bytes, injected crash at every transition, output inventory verification and restored ledger reconciliation; C3.5 must prove guarantees absent from the snapshot helper |
-| Current status / unauthorized | OPEN. No publication identity approved, package published, recovery drill or backup created. All seven blockers remain prerequisites. |
+| Current status / unauthorized | POLICY DIRECTION APPROVED; CONTRACT GATE OPEN. Separate deterministic-core, attempt/evidence and publication identities with exact-byte completed-result adoption are selected. The exact acyclic graph, no-replace/durability profile and recovery proof remain unapproved. No package is published and no recovery drill or backup is created. All seven implementation/evidence gates remain prerequisites. |
+
+### 3.2. Owner-approved policy directions and change control
+
+On 2026-09-22 the product owner approved all seven recommended directions:
+
+1. **B01:** require attributable pre-cutoff evidence for causal use of
+   historical-v3.1 values; otherwise keep the affected scope synthetic-only.
+   Do not silently downgrade the causal claim. Keep the legacy v2 backtester and
+   its version gate outside the C3 path and unchanged.
+2. **B02:** target A2-single-operator for development only. Do not claim
+   independent custody. Confirmation remains closed until a genuinely independent
+   custodian and the frozen confirmation prerequisites are established.
+3. **B03:** select EVAL_AUTH. Durable authorization must precede approved-code
+   combination membership, scoring or resampling. Preserve the current synthetic
+   v1 API; any split API is a separately reviewed, versioned contract.
+4. **B04:** use completed stage receipts for conditional dispatch and a final
+   all-inclusive resource gate covering verification and publication. No receipt
+   may attest future work, and a final write/commit breach fails the attempt.
+5. **B05:** prioritize a proved contained Linux/Python 3.10 enforcement profile.
+   Native macOS remains development/synthetic-only until equivalent continuous
+   enforcement is independently proved. Freeze missing numeric budgets using
+   outcome-free synthetic evidence before protected outcome access.
+6. **B06:** use minimal ASCII decimal encoding of each positive official integer
+   player code with no sign, leading zero, whitespace or alternate spelling;
+   preserve existing UTF-8 lexical ordering. Missing, ambiguous, inferred or
+   name-based bridges fail closed, including for blank-only members.
+7. **B07:** separate deterministic-core identity from immutable attempt,
+   authority/resource and publication evidence. Completed-result adoption requires
+   exact semantic identity, exact file bytes and matching complete provenance;
+   differing receipts identify a distinct attempt and never overwrite a completed
+   slot.
+
+These choices freeze product direction, not missing engineering facts. Exact
+algorithms, trust anchors, clock bounds, grant lifetimes, budgets, stage intervals,
+schemas, filesystem profiles and evidence remain subject to separately reviewed
+contracts and validation. Until those gates close, implementation and protected
+access remain blocked.
+
+A direction may change later only through a prospective, versioned protocol/design
+amendment with independent review before the affected source, outcome or result is
+opened. A change after exposure cannot rewrite the old protocol or result; it must
+create a new request/protocol identity and preserve the earlier evidence and
+decision history. Convenience, failed gates or observed performance are not valid
+reasons to relabel an old run.
 
 ## 4. Scope, architecture and trust boundaries (A)
 
@@ -418,16 +469,17 @@ independent human custody. They are three different assurances.
 | Option | Concrete deployment and supported threat boundary | Limit and current disposition |
 |---|---|---|
 | A2-independent (ideal) | Owner approves request; a genuinely independent custodian controls sealed source release/exposure attestation; isolated verifier/broker validates grants using public verification material; worker has neither issuer secrets nor broad source/ledger access | Stronger separation of duties, still assumes trustworthy custody/OS and attributable sources. No custodian is established here; this cannot be claimed deployed. |
-| A2-single-operator (recommended development proposal) | One owner intentionally approves a bounded request and signs with an offline or separately access-controlled key. A distinct verifier/broker privilege domain has verification-only material and owns replay/revocation state. A confined worker can use only stage-specific broker access and cannot read keys or alter authority state. | Achievable as a proposed local design, subject to real isolation tests and owner choice. The owner remains issuer/operator and can override the host. It proves neither independent custody nor that the owner has never seen outcomes. |
+| A2-single-operator (owner-selected development direction) | One owner intentionally approves a bounded request and signs with an offline or separately access-controlled key. A distinct verifier/broker privilege domain has verification-only material and owns replay/revocation state. A confined worker can use only stage-specific broker access and cannot read keys or alter authority state. | Selected as policy direction, subject to a reviewed concrete contract and real isolation tests. The owner remains issuer/operator and can override the host. It proves neither independent custody nor that the owner has never seen outcomes. |
 | A2-procedural (current-style baseline) | Human records exact approval, ownership-protected request and explicit CLI acknowledgment; same-owner local process checks phase/files before executing | Useful against mistakes, not grant authenticity/replay integrity under a compromised same-UID worker or host. Recommend keeping this profile synthetic-only for C3. A request for weaker real-operation assurance needs explicit new review, not an implicit downgrade. |
 
-Recommendation is A2-single-operator **for development only**, if the owner accepts
-its limits and provides the separation needed. Independent confirmation custody is
-still required by the frozen protocol; a self-signed owner statement does not
-satisfy untouched-season attestation. If no independent custodian is available,
-confirmation remains unassigned/closed even if development infrastructure passes.
-Choosing A2-independent now or remaining synthetic-only are valid alternatives.
-No option is selected by the owner merely by receiving this recommendation.
+The owner selected A2-single-operator **for development only**, accepting the
+stated limits subject to a later reviewed contract and proof of the required
+separation. Independent confirmation custody is still required by the frozen
+protocol; a self-signed owner statement does not satisfy untouched-season
+attestation. If no independent custodian is available, confirmation remains
+unassigned/closed even if development infrastructure passes. This policy choice
+does not select the missing algorithms, numeric bounds, custody mechanism or
+enforcement backend and does not authorize their implementation.
 
 Minimum viable controls to specify and validate for A2-single-operator:
 
@@ -478,15 +530,16 @@ Minimum viable controls to specify and validate for A2-single-operator:
   verifier/broker or kernel compromise is outside this local profile's assurance;
   stop and investigate rather than claiming independent verification.
 
-**Exact owner decision required:** choose and record the authority profile;
-approve the development-only assurance and confirmation restriction; identify
-issuer/custodian/verifier roles without exposing personal details; select custody,
-trust-anchor/rotation, worker isolation, grant authentication format, expiry and
-clock policy, nonce/revocation linearization and recovery high-water procedure.
-A later reviewed specification must supply concrete algorithms, bounds and
-backend evidence. No arbitrary numeric/security default closes B02. Ownership
-alone or two services under the same unrestricted user is insufficient for the
-recommended hostile-worker boundary. No existing keys/services are assumed.
+**Recorded owner policy decision:** A2-single-operator is the development-only
+target and does not satisfy the independent-confirmation requirement. **Still
+required before B02 closes:** identify issuer/custodian/verifier roles without
+exposing personal details and approve custody, trust-anchor/rotation, worker
+isolation, grant authentication format, expiry and clock policy,
+nonce/revocation linearization and recovery high-water procedure. A later
+reviewed specification must supply concrete algorithms, bounds and backend
+evidence. No arbitrary numeric/security default closes B02. Ownership alone or
+two services under the same unrestricted user is insufficient for the proposed
+hostile-worker boundary. No existing keys/services are assumed.
 
 ### 6.2. Proposed grants, pre-read checks and separate permissions
 
@@ -516,7 +569,7 @@ never issue its own permission. No profile/format has yet been approved.
 
 Prediction and outcome grants remain separate even if issued together. Outcome
 activation requires the actual complete freeze. Statistical success is not a
-conditional grant. In the recommended EVAL_AUTH path, absent permission stops
+conditional grant. Under the owner-selected EVAL_AUTH direction, absent permission stops
 before combination computation, preserves component evidence only as incomplete
 execution, and records combination NOT_EVALUATED outside current completed C2 v1
 EvaluationResult. Never manufacture component FAIL/resource FAIL to trick the
@@ -553,7 +606,7 @@ force a skip would falsify the study result. No such workaround is permitted.
 
 | Choice | Exact control point and exposure | Contract consequence |
 |---|---|---|
-| EVAL_AUTH (recommended) | Pure component evaluation returns first. Controller validates completed component statistical/resource evidence, prebound combination scope, current revocation/time and remaining enforced budget. It durably reserves the permit before the combination membership/score/resample function can be invoked. Missing permit stops without computation. | Requires separately reviewed/versioned public component and combination APIs and result types; cannot be implemented by current evaluate plus an outer check. C2 stays free of I/O, clocks and signature verification. |
+| EVAL_AUTH (owner-selected; contract open) | Pure component evaluation returns first. Controller validates completed component statistical/resource evidence, prebound combination scope, current revocation/time and remaining enforced budget. It durably reserves the permit before the combination membership/score/resample function can be invoked. Missing permit stops without computation. | Requires separately reviewed/versioned public component and combination APIs and result types; cannot be implemented by current evaluate plus an outer check. C2 stays free of I/O, clocks and signature verification. |
 | PUBLICATION_ONLY (alternative) | Owner explicitly authorizes conditional computation up front. Current-style evaluate may then compute the combination after component PASS, creating outcome-joined derived values in memory/temporary storage. Publisher checks an additional gate before exposing a completed package. | New real-authority contracts still required. Receipt must distinguish COMPUTED_WITHHELD from NOT_EVALUATED; resources and exposure ledger include withheld computation. Denial of publication cannot erase computation or license a fresh unseen trial. |
 
 PUBLICATION_ONLY is valid only if the owner intentionally permits that computation;
@@ -588,15 +641,16 @@ compromised process did no unobservable arithmetic. B02/B05 must confine release
 outputs and privileges; owner accepts that explicit limit or keeps execution
 blocked. The private _COMBINATION_AUTHORITY sentinel is not a security capability.
 
-**Exact owner decision to close the policy portion of B03/B04:** explicitly select
-EVAL_AUTH or PUBLICATION_ONLY; define whether conditional permission controls
-computation or only release and bind that choice before outcomes; authorize a
-separate C2 contract/API design review; approve the new incomplete/withheld state
-semantics without changing statistical choice; then resolve B04's measured
-component/final resource intervals, publication completion and acyclic receipts.
-Selecting EVAL_AUTH alone does not settle resource timing. Any reinterpretation
-of frozen resource PASS must be a reviewed protocol clarification/amendment.
-Neither choice authorizes code work, protected reads or evaluation in this task.
+**Recorded owner policy decision:** EVAL_AUTH is selected, so conditional
+permission controls computation and must bind before outcomes. A separate
+versioned C2 contract/API design review is permitted as design work, including an
+incomplete authorization-stop state that does not change statistical choice.
+**Still required before B03/B04 close:** approve the exact split API and prove
+byte-identical RNG/statistical behavior, then resolve measured component/final
+resource intervals, publication completion and acyclic receipts. Selecting
+EVAL_AUTH does not settle resource timing. Any reinterpretation of frozen
+resource PASS must be a reviewed protocol clarification/amendment. This decision
+authorizes no code work, protected reads or evaluation.
 
 ## 7. Prediction/outcome phases and state machine (D, M)
 
@@ -625,14 +679,14 @@ are accessible to the analyst. Same-GW updates remain forbidden.
 | OUTCOME_AUTHORIZED | Separate grant bound to that freeze, resource preflight, exposure reservation | Resolve exact outcome objects |
 | OUTCOMES_FROZEN | Independently verified bytes/finalization and outcome receipt | Guarded join only |
 | JOIN_VALIDATED | Exact key sets, ledger, coverage/missingness reconciliation | Component evaluation |
-| COMPONENTS_EVALUATED (recommended EVAL_AUTH) | Versioned component results and completed resource gates; no combination work | Controller must verify/reserve the separate evaluation-time permit |
-| COMBINATION_AUTHORIZED (recommended EVAL_AUTH) | Durable fresh scope/nonce/revocation check binding exact component results and full freeze | New public pure combination API may construct membership, scores and resamples once |
+| COMPONENTS_EVALUATED (owner-selected EVAL_AUTH direction) | Versioned component results and completed resource gates; no combination work | Controller must verify/reserve the separate evaluation-time permit |
+| COMBINATION_AUTHORIZED (owner-selected EVAL_AUTH direction) | Durable fresh scope/nonce/revocation check binding exact component results and full freeze | New public pure combination API may construct membership, scores and resamples once |
 | COMBINATION_COMPUTED_WITHHELD (PUBLICATION_ONLY alternative) | Computation was explicitly authorized before evaluate; conditional gates passed; no exposure/publication permission yet | No analyst exposure or final selection claim; retain computation/resource/exposure accounting, do not label NOT_EVALUATED |
 | EVALUATION_COMPLETE_PENDING_PUBLICATION | All required evaluated packages, final resource protocol resolved | Exclusive finalization only |
 | RESEARCH_RESULT_PUBLISHED | Terminal receipt and fully verified immutable chain | Independent human review; no automatic next study |
 
 These alternative rows are mutually exclusive policy branches, not runtime
-fallbacks. The recommended EVAL_AUTH branch is not expressible through today's
+fallbacks. The owner-selected EVAL_AUTH direction is not expressible through today's
 monolithic C2 API; JOIN_VALIDATED must not call that API for real research. Under
 PUBLICATION_ONLY, upfront computation permission is required at JOIN_VALIDATED
 before evaluate can run; a later release gate never retroactively permits it.
@@ -944,9 +998,11 @@ reviewed accounting relation. A stricter total-thread cap may be a reviewed
 conservative profile, not an inferred protocol amendment. Linux containment
 mechanisms and macOS development controls have different capabilities; ordinary
 macOS subprocess polling alone is not continuous enforcement. A native macOS
-real run stays unsupported unless a sufficient profile is proved; a reviewed
-contained Linux environment could be a later proposal, not a silent substitute
-for the owner-platform gate. No infrastructure is installed by this design.
+real run stays unsupported unless a sufficient profile is proved. The owner has
+selected a contained Linux/Python 3.10 profile as the first enforcement target,
+but its exact backend and limits still require review and proof. It is not a
+silent substitute for a different platform claim. No infrastructure is installed
+by this design.
 
 Before **any outcome object is opened**, verify supported enforcement backend,
 resource grant/profile, source/package size metadata, scratch capacity, output
@@ -959,16 +1015,17 @@ a receipt still must not yield success.
 
 B04 is a concrete circularity blocker: do not provide a fake C2 PASS on the
 promise that publication will finish within budget; do not rerun C2 with a new
-resource token to manufacture a completed selection. The recommended EVAL_AUTH
+resource token to manufacture a completed selection. The owner-selected EVAL_AUTH
 redesign in section 6.3 would keep deterministic statistical evidence separate
 from resource-gated
 selection, permit conditional dispatch only under completed component gates,
 and expose results only after a measured terminal commit. PUBLICATION_ONLY also
 needs exact resource completion semantics; suppressing exposure does not resolve
 the timing cycle or remove the cost of already computed combination work.
-This requires a new pure interface/contract, an exact definition of publication
-completion and an acyclic receipt graph. It is not adopted here. Tests must include a breach during
-last-byte write/fsync/commit, not just during numerical work.
+The owner approved this staged direction. It still requires a new pure
+interface/contract, an exact definition of publication completion and an acyclic
+receipt graph before B04 closes. Tests must include a breach during last-byte
+write/fsync/commit, not just during numerical work.
 
 Scale claims and gates are distinct:
 
@@ -1219,8 +1276,8 @@ explicit commit permission and exact-commit CI before dependent work.
 
 | Slice | Exact deliverable and dependency | Exit gate / prohibited expansion |
 |---|---|---|
-| C3.0 — resolve design blockers | Owner decision ledger B01–B07, including authority profile and EVAL_AUTH versus PUBLICATION_ONLY, v3.1 source adapter compatibility contract, bridge encoding, measured phase boundaries and acyclic publication identity | SAFE independent review plus explicit owner decisions; all remain open after this remediation; no data reads or code to settle unknowns |
-| C3.1 — contracts and state machine | Closed schemas, selected authority/combination policy and typed computation/exposure transitions; separately reviewed versioned C2 public component/combination/final-selection contracts if EVAL_AUTH is chosen, preserving v1 synthetic API | Independent byte/state/replay and no-combination-before-permit oracles; C1/C2 remain pure, no keys/services or real-source configuration |
+| C3.0 — resolve design blockers | Apply the owner-approved directions in section 3.2 to reviewed concrete contracts: A2-single-operator development profile, EVAL_AUTH, v3.1 source adapter compatibility, minimal-decimal bridge encoding, measured stage/final resource boundaries, contained Linux-first enforcement and acyclic publication identity | Independent review must accept the exact contracts and remaining parameters; all implementation/evidence gates remain open, with no data reads or code used to settle unknowns |
+| C3.1 — contracts and state machine | Closed schemas, selected authority/combination policy and typed computation/exposure transitions; separately reviewed versioned C2 public component/combination/final-selection contracts under the selected EVAL_AUTH direction, preserving v1 synthetic API | Independent byte/state/replay and no-combination-before-permit oracles; C1/C2 remain pure, no keys/services or real-source configuration |
 | C3.2 — broker and causal source boundary | Proposed research/c3/source_adapter.py: descriptor-based v3.1 causal source serving, phase capabilities, immutable views and provenance/missingness checks; synthetic sources only | Independent v3.1 parity, strict version rejection, no metadata/schema/footer read before authority, OS/TOCTOU/chronology proof; no legacy backtester runtime dependency or v2 gate change |
 | C3.3 — full adapters and guarded joins | C1-to-versioned-C2 parity, bridges, prediction freeze and outcome packages, count reconciliation | Independent U0/formula/blank/DGW/identity oracles; no revised models or statistics |
 | C3.4 — enforced controller | Parent/OS profiles, selected authority model, completed resource receipts, policy-specific conditional dispatch/exposure ledger, interruption and recovery under C3.0 decisions | No EVAL_AUTH combination arithmetic by approved code before permit; PUBLICATION_ONLY cannot hide computed exposure; last-stage resource breach fails; no real study |
