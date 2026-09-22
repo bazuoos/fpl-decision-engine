@@ -4,28 +4,25 @@
 > artifacts, manifests, frozen decision records and Git history win on technical
 > contradiction. Verify current Git state before acting.
 
-- Implementation checkpoint summarized: **2026-09-11**,
-  `274e5bba4479f8a9637f27df0657420d02f4da1e`. It was on `main`, aligned with
-  `origin/main`, with successful CI. Identify this document's own revision and
-  any later work from Git history rather than assuming the embedded SHA is HEAD.
-- Latest completed repository work: **Task030A–D dependency reproducibility and
-  update monitoring**. CI actions are full-SHA pinned to releases using Node 24
-  runtimes. Python uses one universal `uv.lock`, exact uv 0.12.7, prohibited uv
-  interpreter downloads, an exact build constraint and a checksum-verified CI
-  bootstrap. Dependabot checks GitHub Actions and uv weekly at 09:00 Tuesday in
-  `Asia/Bangkok`, with at most three individual proposals per ecosystem and no
-  auto-merge. Independent adversarial reviews reported SAFE. Exact-commit CI run
-  34518385310 passed 582 Python and four frontend tests. The required uv update
-  run 34519957982 succeeded after remediation, and created unreviewed
-  [PR #1](https://github.com/bazuoos/fpl-decision-engine/pull/1) for pip
-  26.1.1 -> 26.2.1; its CI passed, but it remains an untrusted open proposal.
+- Latest reviewed implementation checkpoint: **2026-09-22**,
+  `6d695afc32c33627b7ddb2f8b410e5d7ab37e785`, on
+  `codex/task033a-decision-robustness-design`. Independent remediation review
+  reported SAFE and exact-commit CI run
+  [35684460984](https://github.com/bazuoos/fpl-decision-engine/actions/runs/35684460984)
+  passed on Python 3.10. Draft
+  [PR #2](https://github.com/bazuoos/fpl-decision-engine/pull/2) remains open and
+  unmerged. `main` remains `e10d4c9dc10467730cdb90fcbea494dcdf920b6f`.
+- The branch includes Tasks031A/B and 032A/B guided local operations and isolated
+  live-run safeguards, plus Task033A/B/B1/C1/C2 research foundations. None changes
+  the live `xfp_v01` model or authorizes a real research run.
 - Production completion scheduling: Task028E design and Task028F controller are
   committed. The controller can prepare, verify, inspect, run, activate,
   deactivate and sanitize one exact immutable schedule plan, while Task028B
-  retains all completion/refresh authority. Two GW4 plans were later prepared
-  locally and independently reviewed, but neither was installed or activated.
-  Both are now deliberately stale because their exact expected commits precede
-  Tasks030A–D; the controller therefore fails closed on them.
+  retains all completion/refresh authority. Two early GW4 plans remained inactive
+  and revision-stale. A later plan bound to `e10d4c9` was owner-activated,
+  produced validated GW4 realized and evaluation receipts, reached terminal
+  state and was deactivated. This is local operational evidence, not repository
+  implementation or automatic manager action.
 - **Local operational evidence, not repository-established:** after Task029B was
   reviewed, committed and green, the owner authorized capture of one current
   manager source. Its bytes matched the source hash already bound by the current
@@ -35,10 +32,11 @@
   hypothesis as human context only; none is prospective or an engine input. See
   [Task029C local-operation record](TASK029C_PRIVATE_EVIDENCE_CAPTURE_AND_CONTEXT_POPULATION.md).
 - Resilience work: Task027C local safeguards, Task027D encrypted-checkpoint
-  tooling and Task027E1 staged sensitive-content guard are committed. Task027E
-  owner custody/destination setup is **PAUSED** while a dedicated encrypted
-  removable medium suitable for an independent key-custody copy is unavailable.
-  **NO VERIFIED OFFSITE BACKUP.**
+  tooling and Task027E1 staged sensitive-content guard are committed. The owner
+  reports that password-manager custody and an encrypted removable key copy now
+  exist. Repository evidence does not verify that external state. The restricted
+  B2 drill, real checkpoint, independent restore and offsite verification remain
+  incomplete: **NO VERIFIED OFFSITE BACKUP.**
 - **Task026C has not started.** The web UX paradigm remains deliberately
   **UNDECIDED**.
 - The only visible working-tree items before this documentation refresh were
@@ -50,22 +48,24 @@
   prediction. Those ignored artifacts have **NO VERIFIED OFFSITE BACKUP**. No
   prospective GW3 journal or outcome was created or retrospectively invented.
 
-## Task033B1B scoped update (2026-09-12)
+## Task033 research checkpoint (2026-09-22)
 
-The checkpoint above predates the isolated Task033 work. At base
-`251a4c484b745346fdb1a46c674a13add0c7744c`, the Task033B1A verifier is committed;
-the separately authorized Gate 0 sanitized report establishes
-`LOCALLY_COHERENT_LEGACY_RESULTS`, with no development winner and no holdout
-evaluation for either legacy component. See the
-[candidate-freeze amendment](TASK033B1B_CANDIDATE_FREEZE_AMENDMENT.md) for verified
-public hashes, assurance limits and the proposed numerical protocol. The amendment
-is awaiting independent review/owner approval; implementation and execution are
-not authorized. Earlier unknown-result statements are historical checkpoints.
+Task033B1A/B verified and froze the legacy-result provenance and replacement
+protocol without opening holdouts. Task033C1 implements pure synthetic uncertainty
+kernels. Task033C2 implements pure synthetic evaluation, strict contracts,
+deterministic 9,999-replicate inference, multiplicity and subgroup gates, and
+fail-closed conditional selection. Its reviewed feasibility drill used synthetic
+data only and returned `DO_NOT_CONFIRM`: UM1 FAIL, UA1 FAIL and UM1UA1
+`NOT_EVALUATED`. This proves rejection mechanics, not the candidates' performance
+on authorized real evidence.
 
-The two stale-plan descriptions below refer to earlier plans only. The owner
-has identified a later GW4 schedule; this documentation task did not inspect its
-current lifecycle. Do not infer that it is active, inactive or terminal from
-these older paragraphs or elapsed time. Preserve its isolation.
+Task033C3 has not started. It must first be designed and reviewed. Its proposed
+scope is controlled causal-source loading, authorization, immutable prediction
+and outcome separation, guarded joins, resource enforcement, sanitized failures,
+exclusive publication and end-to-end validation. C1/C2 cannot read private or
+real study data, publish results, authorize confirmation access or promote a
+model. The 700-player scale, full combination and deferred decision corpus remain
+unproven.
 
 ## Current restrictions and limits
 
@@ -73,11 +73,9 @@ these older paragraphs or elapsed time. Preserve its isolation.
   model/optimizer/reliability change, operational refresh, journal creation,
   artifact regeneration, private evidence inspection, sealed-holdout access,
   credential creation or provider action.
-- Task028F is inert without a current exact plan and explicit owner lifecycle
-  action. It does not infer a target or prediction. Both existing Task028G plans
-  are immutable, stale and inactive, with zero invocations or lifecycle events.
-  A replacement plan requires a new exact revision and independent review;
-  preparation is not installation and installation is not activation.
+- Task028F does not infer a target or prediction. Historical Task028G plans and
+  their lifecycle evidence must be interpreted from their immutable local records,
+  not from older continuity prose or elapsed time.
 - Human strategy context preserves what was believed and why. It never rewrites
   trusted engine artifacts, creates prospective evidence after a deadline or
   changes xFP, legality, optimization, reliability or model selection.
@@ -113,16 +111,18 @@ model caveats. This does not authorize frontend work. See
 
 ## Immediate next question
 
-Infrastructure remains the human-stated priority. After this documentation-only
-refresh is committed and green, the smallest proposed operational boundary is to
-prepare and independently review a **new** GW4 Task028G production
-completion-monitor plan against that final revision. Preserve both earlier plans
-as immutable stale evidence. The replacement must remain uninstalled and
-inactive. Activation requires a later explicit owner decision after plan review
-and does not imply continuous operation while the Mac is off.
+After this continuity refresh is independently reviewed, the next proposed
+research boundary is **Task033C3 design only**. Do not implement C3 from this
+checkpoint. Separately, the owner authorized a bounded post-GW5 public completion
+capture on 2026-09-22. The trusted monitor returned `REALIZED_COMPLETE` for
+snapshot `20260922T042551.997487Z` with 667 players, 380 fixtures and 3,216
+history rows, then returned `COMPLETE` after evaluating the exact frozen
+pre-deadline prediction `20260915T153459.526801Z`. This created model-wide
+evaluation evidence only, with no decision, journal or FPL action. These receipts
+and artifacts remain ignored local evidence with no verified offsite backup.
 
-**REQUIRES HUMAN CONTEXT:** any Task028G activation decision; private evidence
-completeness; credential/key custody and private backup receipts; explicit
+**REQUIRES HUMAN CONTEXT:** private evidence completeness; external credential/key
+custody and private backup receipts; explicit
 acceptance of irreversible 90-day compliance retention before Task027F; verified
 live manager state; unrecovered prior review/result packages; and any permission
 to unseal an experiment. Changing football facts need fresh verification.
@@ -157,6 +157,10 @@ to unseal an experiment. Changing football facts need fresh verification.
    [boundary tests](../../tests/test_web_application.py), and
    [OpenAPI](../../contracts/api/v1/openapi.json). Read
    [fixture provenance](../../tests/fixtures/README.md) before interpreting hashes.
+7. For Task033 research: [candidate freeze](TASK033B1B_CANDIDATE_FREEZE_AMENDMENT.md),
+   [C1 implementation](TASK033C_SYNTHETIC_UNCERTAINTY_IMPLEMENTATION.md),
+   [C2 clarification](TASK033C2_PROTOCOL_CLARIFICATION.md) and
+   [C2 implementation](TASK033C2_SYNTHETIC_EVALUATION_IMPLEMENTATION.md).
 
 ## Fresh AI session bootstrap
 

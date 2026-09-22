@@ -1,10 +1,11 @@
 # Task033C2 synthetic evaluation implementation
 
-This uncommitted implementation follows the [candidate freeze](TASK033B1B_CANDIDATE_FREEZE_AMENDMENT.md)
+This committed implementation follows the [candidate freeze](TASK033B1B_CANDIDATE_FREEZE_AMENDMENT.md)
 and [reviewed clarification](TASK033C2_PROTOCOL_CLARIFICATION.md) at base
 `7874ded703c2173827738d2fc23f1d456826f95a`. The historical
 [blocker](TASK033C2_PROTOCOL_BLOCKER.md) is preserved. This document records
-implementation, not an amendment or authorization to execute a real study.
+implementation at `6d695afc32c33627b7ddb2f8b410e5d7ab37e785`, not an amendment
+or authorization to execute a real study.
 
 ## Boundary and entry point
 
@@ -92,7 +93,8 @@ These are implementation fixes, not changes to the RNG or statistical rules.
 
 ## Remaining prerequisites
 
-Independent C2 review and owner approval remain required. C3 must implement and
+Independent C2 remediation review reported SAFE, the owner authorized the commit,
+and exact-commit CI passed. C3 must implement and
 validate causal source resolution, permission checks, immutable prediction/outcome
 separation, identity bridges, exact manifests, guarded joins, resource enforcement,
 sanitized failures and exclusive publication, with end-to-end synthetic privacy
@@ -114,7 +116,8 @@ NumPy is a direct runtime dependency (`numpy>=2.2,<3`). The universal lock is
 regenerated only with repository-required uv 0.12.7; its pre-existing Python-specific
 NumPy selections are retained, with no unrelated version drift. Locked synchronization
 uses an existing interpreter with Python downloads prohibited. Exact-commit Python 3.10
-CI remains a mandatory post-commit gate and cannot be claimed for this uncommitted candidate.
+CI was the mandatory post-commit gate. Run 35684460984 passed on the exact C2
+commit using Python 3.10, pinned uv 0.12.7 and the locked environment.
 
 The serial union literally includes every distinct verified player code represented
 by the validated registered prediction universe, including codes represented only
