@@ -153,6 +153,27 @@ class CompletedRunResult:
 
 
 @dataclass(frozen=True)
+class ValidatedPreparation:
+    """Public, read-only view of one fully validated pinned preparation."""
+
+    manifest: PreparationManifest
+    manifest_path: Path
+    directory: Path
+    season: str
+    snapshot_timestamp: str
+    artifact_paths: tuple[tuple[str, Path], ...]
+
+    def artifact(self, role: str) -> Path:
+        try:
+            return dict(self.artifact_paths)[role]
+        except KeyError as exc:
+            raise OperationalRunnerError(
+                OperationalErrorCode.INVALID_PREPARATION_MANIFEST,
+                "validated preparation does not contain the requested artifact role",
+            ) from exc
+
+
+@dataclass(frozen=True)
 class OperationalStages:
     refresh: Callable[..., RefreshResult] = refresh_fpl_data
     build_features: Callable[..., Path] = build_player_gameweek_features
@@ -1283,14 +1304,10 @@ def _completed_result(
     )
 
 
-def resume_gameweek(
-    *,
+def load_validated_preparation(
     preparation_manifest_path: Path,
-    manager_evidence_path: Path,
-    clock: Callable[[], datetime] = _system_utc_now,
-    stages: OperationalStages = OperationalStages(),
-) -> CompletedRunResult:
-    """Run Phase 2 against one exact frozen preparation; never discover latest."""
+) -> ValidatedPreparation:
+    """Validate one exact preparation and every pinned analytical input."""
     preparation_directory = preparation_manifest_path.resolve().parent
     preparation = _validate_preparation_directory(preparation_directory)
     if preparation_manifest_path.resolve() != (
@@ -1298,7 +1315,7 @@ def resume_gameweek(
     ):
         raise OperationalRunnerError(
             OperationalErrorCode.INVALID_PREPARATION_MANIFEST,
-            "resume requires the exact preparation manifest path",
+            "operation requires the exact preparation manifest path",
         )
     artifacts = _artifact_paths(preparation_directory)
     season = _season_from_features(artifacts["features"], preparation)
@@ -1333,6 +1350,29 @@ def resume_gameweek(
         pinned_snapshot,
         preparation.target_gameweek,
     )
+    return ValidatedPreparation(
+        manifest=preparation,
+        manifest_path=preparation_manifest_path.resolve(),
+        directory=preparation_directory,
+        season=season,
+        snapshot_timestamp=pinned_snapshot,
+        artifact_paths=tuple(sorted(artifacts.items())),
+    )
+
+
+def resume_gameweek(
+    *,
+    preparation_manifest_path: Path,
+    manager_evidence_path: Path,
+    clock: Callable[[], datetime] = _system_utc_now,
+    stages: OperationalStages = OperationalStages(),
+) -> CompletedRunResult:
+    """Run Phase 2 against one exact frozen preparation; never discover latest."""
+    validated = load_validated_preparation(preparation_manifest_path)
+    preparation_directory = validated.directory
+    preparation = validated.manifest
+    artifacts = dict(validated.artifact_paths)
+    season = validated.season
     deadline_dt, _ = _parse_utc(preparation.official_deadline, "official deadline")
     _before_deadline(
         clock(), deadline_dt, OperationalErrorCode.DEADLINE_ALREADY_PASSED, "resume start time"

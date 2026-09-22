@@ -100,12 +100,33 @@ from .manager_state import (
     ManagerStateError,
     PublicFPLManagerStateProvider,
 )
+from .manager_evidence_authoring import (
+    DEFAULT_EVIDENCE_ROOT,
+    ManagerEvidenceAuthoringError,
+    ManagerEvidenceDraft,
+    load_preparation_for_authoring,
+    parse_draft_pick,
+    publish_verified_evidence,
+    run_existing_resume,
+)
+from .local_decision_wizard import (
+    TerminalPromptIO,
+    WizardState,
+    run_guided_manager_decision,
+)
+from .isolated_live_run import (
+    IsolatedLiveRunError,
+    PreflightRequest,
+    run_preflight as run_isolated_live_run_preflight,
+    safety_check as isolated_live_run_safety_check,
+)
 from .official_data import (
     DEFAULT_HISTORY_DELAY_SECONDS,
     OfficialDataError,
     fetch_fixtures_for_snapshot,
     fetch_player_histories_for_snapshot,
 )
+from .operational_manifest import ChipState
 from .operational_runner import (
     OperationalRunnerError,
     prepare_gameweek,
@@ -156,11 +177,60 @@ COMMANDS = {
     "evaluate-one-transfer",
     "analyze-decision-reliability",
     "prepare-gameweek",
+    "inspect-manager-preparation",
+    "publish-manager-evidence",
+    "guided-manager-decision",
+    "preflight-isolated-live-run",
+    "guided-isolated-manager-decision",
     "resume-gameweek",
     "record-decision-journal",
     "record-decision-outcome",
     "diff-decisions",
 }
+
+
+def _add_isolated_preflight_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--primary-repository", type=Path, required=True)
+    parser.add_argument("--expected-primary-commit", required=True)
+    parser.add_argument(
+        "--acknowledged-primary-untracked",
+        action="append",
+        default=[],
+        help="Repeat for each already-reviewed primary-checkout untracked path.",
+    )
+    parser.add_argument("--code-repository", type=Path, required=True)
+    parser.add_argument("--expected-code-commit", required=True)
+    parser.add_argument(
+        "--acknowledged-code-untracked",
+        action="append",
+        default=[],
+        help="Repeat for each reviewed code-worktree untracked path.",
+    )
+    parser.add_argument("--sandbox-root", type=Path, required=True)
+    parser.add_argument("--schedule-plan", type=Path, required=True)
+    parser.add_argument("--schedule-plan-sha256-file", type=Path, required=True)
+    parser.add_argument("--expected-schedule-plan-sha256", required=True)
+    parser.add_argument("--official-deadline", required=True)
+    parser.add_argument(
+        "--required-free-bytes", type=int, default=1024 * 1024 * 1024
+    )
+
+
+def _isolated_preflight_request(args: argparse.Namespace) -> PreflightRequest:
+    return PreflightRequest(
+        primary_repository=args.primary_repository,
+        expected_primary_commit=args.expected_primary_commit,
+        acknowledged_primary_untracked=tuple(args.acknowledged_primary_untracked),
+        code_repository=args.code_repository,
+        expected_code_commit=args.expected_code_commit,
+        acknowledged_code_untracked=tuple(args.acknowledged_code_untracked),
+        sandbox_root=args.sandbox_root,
+        schedule_plan=args.schedule_plan,
+        schedule_plan_sha256_file=args.schedule_plan_sha256_file,
+        expected_schedule_plan_sha256=args.expected_schedule_plan_sha256,
+        official_deadline=args.official_deadline,
+        required_free_bytes=args.required_free_bytes,
+    )
 
 
 def _add_snapshot_arguments(parser: argparse.ArgumentParser) -> None:
@@ -857,6 +927,106 @@ def build_parser() -> argparse.ArgumentParser:
     )
     prepare_parser.add_argument("--json", action="store_true")
 
+    inspect_manager_parser = subparsers.add_parser(
+        "inspect-manager-preparation",
+        help="Show the public player catalogue pinned by one exact preparation.",
+    )
+    inspect_manager_parser.add_argument(
+        "--preparation-manifest", type=Path, required=True
+    )
+    inspect_manager_parser.add_argument("--json", action="store_true")
+
+    publish_manager_parser = subparsers.add_parser(
+        "publish-manager-evidence",
+        help=(
+            "Validate manual Transfers-screen facts and publish verified evidence. "
+            "Privacy: --bank and --pick values may be retained in shell history and "
+            "process lists; prefer guided-manager-decision for normal owner use."
+        ),
+        description=(
+            "Validate manual Transfers-screen facts and publish verified evidence. "
+            "Privacy warning: --bank and --pick contain manager-specific values that "
+            "may be retained in shell history and process argument lists. Prefer "
+            "guided-manager-decision for normal owner use."
+        ),
+    )
+    publish_manager_parser.add_argument(
+        "--preparation-manifest", type=Path, required=True
+    )
+    publish_manager_parser.add_argument("--entry-id", type=int, required=True)
+    publish_manager_parser.add_argument("--bank", required=True, dest="bank_m")
+    publish_manager_parser.add_argument("--free-transfers", type=int, required=True)
+    publish_manager_parser.add_argument(
+        "--chip-state",
+        choices=tuple(item.value for item in ChipState),
+        default=ChipState.NO_CHIP.value,
+    )
+    publish_manager_parser.add_argument(
+        "--pick",
+        action="append",
+        required=True,
+        metavar="ELEMENT_ID:SELLING_PRICE_M",
+        help="Repeat exactly 15 times using current manager-specific selling prices.",
+    )
+    publish_manager_parser.add_argument(
+        "--evidence-source",
+        default="Official Transfers screen, manually verified",
+    )
+    publish_manager_parser.add_argument("--evidence-source-sha256")
+    publish_manager_parser.add_argument(
+        "--confirm-current-selection",
+        action="store_true",
+        help="Confirm squad, bank, free transfers, chip state and prices are current.",
+    )
+    publish_manager_parser.add_argument(
+        "--output-root", type=Path, default=DEFAULT_EVIDENCE_ROOT
+    )
+    publish_manager_parser.add_argument(
+        "--run",
+        action="store_true",
+        help="Immediately invoke the existing trusted resume step.",
+    )
+    publish_manager_parser.add_argument("--json", action="store_true")
+
+    guided_manager_parser = subparsers.add_parser(
+        "guided-manager-decision",
+        help="Interactively create verified manager evidence and run Engine v1.",
+    )
+    guided_manager_parser.add_argument(
+        "--preparation-manifest", type=Path, required=True
+    )
+    guided_manager_parser.add_argument(
+        "--draft",
+        type=Path,
+        help="Explicit private mutable-draft path (default uses preparation ID).",
+    )
+    guided_manager_parser.add_argument(
+        "--evidence-root",
+        type=Path,
+        default=DEFAULT_EVIDENCE_ROOT,
+        help="Explicit private immutable-evidence root.",
+    )
+
+    isolated_preflight_parser = subparsers.add_parser(
+        "preflight-isolated-live-run",
+        help="Verify one explicit local sandbox against one exact active monitor.",
+    )
+    _add_isolated_preflight_arguments(isolated_preflight_parser)
+    isolated_preflight_parser.add_argument("--json", action="store_true")
+
+    isolated_guided_parser = subparsers.add_parser(
+        "guided-isolated-manager-decision",
+        help="Preflight an isolated sandbox, then run the guided manager workflow.",
+    )
+    isolated_guided_parser.add_argument(
+        "--preparation-manifest", type=Path, required=True
+    )
+    isolated_guided_parser.add_argument("--draft", type=Path, required=True)
+    isolated_guided_parser.add_argument(
+        "--evidence-root", type=Path, required=True
+    )
+    _add_isolated_preflight_arguments(isolated_guided_parser)
+
     resume_parser = subparsers.add_parser(
         "resume-gameweek",
         help="Resume one exact preparation using verified editable-manager evidence.",
@@ -1532,6 +1702,146 @@ def main(argv: Sequence[str] | None = None) -> int:
         except OperationalRunnerError as exc:
             logging.error("Operational preparation failed [%s]: %s", exc.code.value, exc)
             return 1
+    elif args.command == "inspect-manager-preparation":
+        try:
+            preparation = load_preparation_for_authoring(args.preparation_manifest)
+            payload = {
+                "catalogue": [
+                    {
+                        "element_id": row.element_id,
+                        "display_name": row.display_name,
+                        "position": row.position,
+                        "team_id": row.team_id,
+                        "team_name": row.team_name,
+                        "market_price_m": row.market_price_m,
+                    }
+                    for row in preparation.catalogue
+                ],
+                "model_limit": "modeled components only: appearance, goals and assists",
+                "observed_at": preparation.observed_at,
+                "official_deadline": preparation.manifest.official_deadline,
+                "preparation_id": preparation.manifest.preparation_id,
+                "season": preparation.season,
+                "target_gameweek": preparation.manifest.target_gameweek,
+            }
+            if args.json:
+                print(json.dumps(payload, indent=2, sort_keys=True))
+            else:
+                print(f"Preparation: {payload['preparation_id']}")
+                print(f"Official data observed: {payload['observed_at']}")
+                print(f"Deadline: {payload['official_deadline']}")
+                print(f"Players: {len(preparation.catalogue)}")
+                print(payload["model_limit"])
+        except ManagerEvidenceAuthoringError as exc:
+            logging.error("Manager authoring failed [%s]: %s", exc.code.value, exc)
+            return 1
+    elif args.command == "publish-manager-evidence":
+        try:
+            preparation = load_preparation_for_authoring(args.preparation_manifest)
+            parsed = [parse_draft_pick(value) for value in args.pick]
+            draft = ManagerEvidenceDraft(
+                preparation_manifest_sha256=preparation.manifest.sha256,
+                entry_id=args.entry_id,
+                selected_element_ids=[item[0] for item in parsed],
+                bank_m=args.bank_m,
+                free_transfers=args.free_transfers,
+                chip_state=args.chip_state,
+                selling_price_m_by_element_id=dict(parsed),
+                evidence_source=args.evidence_source,
+                evidence_source_sha256=args.evidence_source_sha256,
+                current_selection_confirmed=args.confirm_current_selection,
+            )
+            published = publish_verified_evidence(
+                draft, preparation, output_root=args.output_root
+            )
+            payload = {
+                "evidence_path": str(published.path),
+                "evidence_sha256": published.sha256,
+                "preparation_id": preparation.manifest.preparation_id,
+                "reused": published.reused,
+                "status": "VERIFIED_EVIDENCE_PUBLISHED",
+            }
+            if args.run:
+                completed = run_existing_resume(preparation, published)
+                payload.update(
+                    {
+                        "decision_id": completed.decision_id,
+                        "final_manifest_path": str(completed.final_manifest_path),
+                        "status": completed.status,
+                    }
+                )
+            if args.json:
+                print(json.dumps(payload, indent=2, sort_keys=True))
+            else:
+                print(payload["status"])
+                print(f"Preparation: {payload['preparation_id']}")
+                print(f"Evidence: {payload['evidence_path']}")
+                if "decision_id" in payload:
+                    print(f"Decision: {payload['decision_id']}")
+                    print(f"Final manifest: {payload['final_manifest_path']}")
+        except ManagerEvidenceAuthoringError as exc:
+            logging.error("Manager authoring failed [%s]: %s", exc.code.value, exc)
+            return 1
+        except OperationalRunnerError as exc:
+            logging.error("Trusted operational resume failed [%s]", exc.code.value)
+            return 1
+    elif args.command == "guided-manager-decision":
+        result = run_guided_manager_decision(
+            args.preparation_manifest,
+            io=TerminalPromptIO(),
+            draft_path=args.draft,
+            evidence_root=args.evidence_root,
+        )
+        return (
+            0
+            if result.state
+            in {
+                WizardState.CANCELLED,
+                WizardState.VERIFIED_EVIDENCE_PUBLISHED,
+                WizardState.VERIFIED_DECISION_AVAILABLE,
+            }
+            else 1
+        )
+    elif args.command == "preflight-isolated-live-run":
+        try:
+            result = run_isolated_live_run_preflight(
+                _isolated_preflight_request(args)
+            )
+        except IsolatedLiveRunError:
+            logging.error("Isolated live-run preflight failed closed")
+            return 1
+        payload = result.public_payload()
+        if args.json:
+            print(json.dumps(payload, indent=2, sort_keys=True))
+        else:
+            print(payload["status"])
+            print(f"Monitor: {payload['monitor_state']}")
+            print(f"Schedule: {payload['schedule_plan_sha256']}")
+        return 0
+    elif args.command == "guided-isolated-manager-decision":
+        request = _isolated_preflight_request(args)
+        try:
+            run_isolated_live_run_preflight(request)
+        except IsolatedLiveRunError:
+            logging.error("Isolated live-run preflight failed before manager prompts")
+            return 1
+        result = run_guided_manager_decision(
+            args.preparation_manifest,
+            io=TerminalPromptIO(),
+            draft_path=args.draft,
+            evidence_root=args.evidence_root,
+            safety_check=isolated_live_run_safety_check(request),
+        )
+        return (
+            0
+            if result.state
+            in {
+                WizardState.CANCELLED,
+                WizardState.VERIFIED_EVIDENCE_PUBLISHED,
+                WizardState.VERIFIED_DECISION_AVAILABLE,
+            }
+            else 1
+        )
     elif args.command == "resume-gameweek":
         try:
             result = resume_gameweek(

@@ -1,10 +1,22 @@
 # Project state
 
-Implementation checkpoint summarized: 2026-09-11, commit
-`274e5bba4479f8a9637f27df0657420d02f4da1e`. Identify this document's own
-revision and any later work from Git history.
+Latest reviewed implementation checkpoint: 2026-09-22, commit
+`6d695afc32c33627b7ddb2f8b410e5d7ab37e785` on the isolated Task033 branch.
+Draft PR #2 remains unmerged; `main` remains `e10d4c9`. Identify this document's
+own revision and verify Git state rather than assuming the embedded SHA is HEAD.
 Start with [CURRENT_HANDOFF](CURRENT_HANDOFF.md); this pack is navigation and
 continuity context, not a replacement for code, contracts, or frozen evidence.
+
+## Task033 research checkpoint (2026-09-22)
+
+The [candidate freeze](TASK033B1B_CANDIDATE_FREEZE_AMENDMENT.md) records the
+hash-verified sanitized Gate 0 result and frozen replacement protocol. Task033C1
+implements pure uncertainty kernels; Task033C2 implements pure synthetic
+evaluation, deterministic inference and fail-closed selection. Both are research
+only. The reviewed C2 feasibility fixture returned `DO_NOT_CONFIRM`; it is not
+evidence about real candidate performance. Task033C3 source loading,
+authorization, immutable publication and end-to-end enforcement have not started.
+No real development or confirmation run is authorized and xFP v0.1 is unchanged.
 
 ## Purpose and maturity
 
@@ -21,16 +33,17 @@ the selected action the objectively best FPL transfer.
 
 | Area | Implemented and trusted for | Important limit |
 |---|---|---|
-| Official data | Immutable raw bytes, typed Parquet, coherent resumable refresh; stable one-shot completion monitoring; reviewed local scheduling controller | Live collection needs network; two reviewed GW4 plans are stale and inactive, so no current plan is installed or activated |
+| Official data | Immutable raw bytes, typed Parquet, coherent resumable refresh; stable one-shot completion monitoring; reviewed local scheduling controller | Live collection needs network and an authorized target; local schedule state is operational evidence, not repository state |
 | Features / xFP | Frozen inputs and explicit missingness; xFP v0.1 | Appearance + goals + assists only; unstable early samples |
 | Optimization | Legal deterministic squad/XI/C/VC; zero-or-one-free-transfer comparison | Single GW, no chips/hits/multi-GW or future-transfer valuation |
 | Reliability | Provenance and 11 diagnostic sensitivity views | Not confidence, a veto, or a replacement recommendation |
 | Engine v1 operations | Two phases, explicit IDs, manager gate, UTC deadlines, immutable completed results | Fresh verified editable manager evidence is indispensable |
 | Journal / Diff | Separate human-action record; trusted same-scope structural comparison | Outcome v1 proves GW completion, not points/counterfactual performance; diff is not causal |
 | Web | Authorization seam, explicit-ID verified decision reads, canonical payload rendering | Local single-user mode only; no real auth, uploads, commands, or research service |
-| Recovery tooling | Private-path staging guards, read-only inventory, encrypted checkpoint create/verify/restore | No production key, verified remote/disconnected copy or real restore drill |
+| Recovery tooling | Private-path staging guards, read-only inventory, encrypted checkpoint create/verify/restore | Owner reports two-key-copy custody; no verified remote checkpoint, disconnected data copy or real restore drill |
 | Private evidence/context | Content-addressed explicit source capture, immutable human-context records, separated comparison layers | Local and outside decision authority; provenance/currentness stay explicit; no offsite copy |
 | Repository CI | Full-SHA-pinned GitHub Actions on Node 24 runtimes; exact uv-managed Python dependency and npm resolutions; weekly action and uv Dependabot proposals | Package artifacts are not vendored; update PRs still require review and CI |
+| Task033 research | Frozen replacement protocol, pure synthetic uncertainty kernels and deterministic synthetic evaluation with strict fail-closed gates | C3 data/authorization/publication boundary absent; real sources, 700-player scale, decision corpus and predictive benefit unproven |
 
 Primary guide: [README](../../README.md). Implementation map:
 [ARCHITECTURE](ARCHITECTURE.md). Product constraints:
@@ -61,6 +74,10 @@ Primary guide: [README](../../README.md). Implementation map:
 - Research/user-population export is an RFC design, not a deployed service.
   No research signal may enter production without preregistration, validation,
   independent review, and an explicit approved version change.
+- Task033C1/C2 are synthetic research components under
+  `src/fpl_decision_engine/research/`. Package location does not grant production
+  authority. They have no filesystem, network, manager-state, journal, decision
+  or model-promotion path. C3 remains a separate proposed gate.
 
 ## Operational and web limits
 
@@ -123,16 +140,23 @@ context records were verified as described in the sanitized
 
 ## Validation evidence and procedure
 
-**Repository-established at this review:** HEAD `274e5bb`, branch `main`, 152
-tracked files and four frontend tests in source. The CI workflow configures
+**Repository-established at this review:** HEAD `6d695af`, branch
+`codex/task033a-decision-robustness-design`, 205 tracked files and four frontend
+tests in source. Draft PR #2 remains unmerged. The CI workflow configures
 Python 3.10, Node 22 and checksum-pinned age 1.3.1 installation. Checkout,
 setup-python, setup-node and setup-uv are pinned by full commit SHA. The first
 three use Node 24 action runtimes; setup-uv installs exact uv 0.12.7 from its
 official GitHub release after checking the supplied Linux archive SHA-256.
 
-At this exact commit, [CI run 34518385310](https://github.com/bazuoos/fpl-decision-engine/actions/runs/34518385310)
-passed 582 Python tests, four frontend tests, generated-contract freshness,
+At this exact commit, [CI run 35684460984](https://github.com/bazuoos/fpl-decision-engine/actions/runs/35684460984)
+passed 812 Python tests, four frontend tests, generated-contract freshness,
 TypeScript, production build, browser dependency-boundary and whitespace checks.
+Task033C2's independent remediation review reported SAFE before commit. Its
+synthetic feasibility evidence is diagnostic only and does not establish real
+data access, production eligibility or predictive benefit.
+
+The earlier dependency checkpoint remains relevant: CI run 34518385310 passed
+582 Python tests and four frontend tests at `274e5bb`.
 Task030A's independent review verified the release provenance and full SHA pins;
 the former Node 20 runtime warning did not recur after the upgrade. Task030B
 established bounded GitHub Actions update proposals. Task030C's reviewed design
@@ -201,11 +225,13 @@ and current code. Task028C/D now supply a reviewed scheduling-drill design and
 offline harness. The temporary synthetic `launchd` drill subsequently passed
 local execution and independent sanitized-evidence review. Task028E/F now supply
 the reviewed production-scheduling design and inert controller; older statements
-that production scheduling design is still future work are obsolete. Two local
-Task028G plans were prepared and reviewed but never installed or activated; both
-are now stale by exact revision. Automatic decision work remains unimplemented
-and unauthorized. Task029A/B add private provenance/context mechanisms; they do
-not promote human reasoning into trusted engine evidence.
+that production scheduling design is still future work are obsolete. Two early
+Task028G plans were reviewed but never activated and are revision-stale. A later
+`e10d4c9` plan was owner-activated, produced validated GW4 realized and evaluation
+receipts, reached terminal state and is now deactivated. This local evidence does
+not add decision or manager-action authority. Task029A/B add private
+provenance/context mechanisms; they do not promote human reasoning into trusted
+engine evidence.
 
 ## Current local public-data evidence
 
@@ -223,6 +249,17 @@ gameweek is insufficient for tuning or promotion. The ignored local data is not
 included in this continuity diff and has **NO VERIFIED OFFSITE BACKUP**. A
 prospective GW3 journal cannot be recreated honestly after its deadline; none
 was created by the refresh or evaluation.
+
+**Additional local public-data state observed on 2026-09-22:** the owner
+authorized one bounded Task028B reconciliation for Gameweek 5. After two stable
+finalized observations at least 15 minutes apart, the monitor returned
+`REALIZED_COMPLETE` and accepted snapshot `20260922T042551.997487Z` with 667
+players, 380 fixtures and 3,216 player-history rows. A second bounded invocation
+supplied exact frozen pre-deadline prediction `20260915T153459.526801Z`; the
+monitor returned `COMPLETE` and published a validated xFP v0.1 evaluation at
+`20260922T043215.403352Z`. This is model-wide realized evidence, not a decision,
+journal, human-action record or promotion result. The receipts and artifacts
+remain ignored local evidence with **NO VERIFIED OFFSITE BACKUP**.
 
 **Additional local operational state observed on 2026-09-10:** one explicitly
 selected current manager source was captured with Task029B and verified against
@@ -264,13 +301,13 @@ identity and declared provenance only. It does not prove football truth,
 prospective timing, manager-state currency or semantic validity of a referenced
 engine artifact.
 
-The owner reports that password-manager recovery and a private B2 bucket with
+The owner reports that password-manager recovery, an encrypted removable key
+copy and a private B2 bucket with
 default encryption, Object Lock and 90-day compliance retention have been
 prepared. Label this as external owner-reported state; repository evidence does
-not verify it, and identifiers and credentials do not belong here. Task027E is paused
-before production age-key generation, application-key creation or a synthetic
-upload while a dedicated encrypted removable medium suitable for an independent
-key-custody copy is unavailable. The owner must
+not verify it, and identifiers and credentials do not belong here. Task027E
+remains incomplete before restricted application-key creation and a synthetic
+exact-version upload/readback. The owner must
 explicitly accept the irreversible 90-day lock before Task027F uploads real
 evidence. There is no production checkpoint, exact-version readback,
 disconnected copy or clean-environment real restore drill: **NO VERIFIED OFFSITE

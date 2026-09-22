@@ -1,0 +1,481 @@
+{
+  "$defs": {
+    "CountDistribution": {
+      "additionalProperties": false,
+      "description": "Already-published Poisson or Gamma-mixture predictive parameters.",
+      "properties": {
+        "exposure": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exposure"
+        },
+        "kind": {
+          "enum": [
+            "POISSON",
+            "GAMMA_MIXTURE"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "mean": {
+          "minimum": 0,
+          "title": "Mean",
+          "type": "number"
+        },
+        "minute_pmf": {
+          "anyOf": [
+            {
+              "items": {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minute Pmf"
+        },
+        "rates": {
+          "default": [],
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "title": "Rates",
+          "type": "array"
+        },
+        "shapes": {
+          "default": [],
+          "items": {
+            "exclusiveMinimum": 0,
+            "type": "number"
+          },
+          "title": "Shapes",
+          "type": "array"
+        },
+        "weights": {
+          "default": [],
+          "items": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "title": "Weights",
+          "type": "array"
+        }
+      },
+      "required": [
+        "kind",
+        "mean"
+      ],
+      "title": "CountDistribution",
+      "type": "object"
+    },
+    "Forecast": {
+      "additionalProperties": false,
+      "properties": {
+        "appearance_points": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Appearance Points"
+        },
+        "appearance_probability": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Appearance Probability"
+        },
+        "assist_distribution": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CountDistribution"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assists": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Assists"
+        },
+        "candidate": {
+          "enum": [
+            "U0",
+            "UM1",
+            "UA1",
+            "UM1UA1"
+          ],
+          "title": "Candidate",
+          "type": "string"
+        },
+        "complete": {
+          "title": "Complete",
+          "type": "boolean"
+        },
+        "expected_minutes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Expected Minutes"
+        },
+        "goal_distribution": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CountDistribution"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "goals": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Goals"
+        },
+        "minute_pmf": {
+          "anyOf": [
+            {
+              "items": {
+                "maximum": 1,
+                "minimum": 0,
+                "type": "number"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Minute Pmf"
+        },
+        "modeled_points": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Modeled Points"
+        },
+        "start_probability": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Start Probability"
+        }
+      },
+      "required": [
+        "candidate",
+        "complete",
+        "expected_minutes",
+        "appearance_points",
+        "goals",
+        "assists",
+        "modeled_points",
+        "minute_pmf",
+        "appearance_probability",
+        "start_probability",
+        "goal_distribution",
+        "assist_distribution"
+      ],
+      "title": "Forecast",
+      "type": "object"
+    },
+    "PredictionRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "availability_known": {
+          "title": "Availability Known",
+          "type": "boolean"
+        },
+        "chance": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Chance"
+        },
+        "chance_target_bound": {
+          "title": "Chance Target Bound",
+          "type": "boolean"
+        },
+        "element_id": {
+          "minimum": 1,
+          "title": "Element Id",
+          "type": "integer"
+        },
+        "fixture_ids": {
+          "items": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "title": "Fixture Ids",
+          "type": "array"
+        },
+        "forecasts": {
+          "items": {
+            "$ref": "#/$defs/Forecast"
+          },
+          "title": "Forecasts",
+          "type": "array"
+        },
+        "gameweek": {
+          "maximum": 38,
+          "minimum": 2,
+          "title": "Gameweek",
+          "type": "integer"
+        },
+        "new_entrant": {
+          "title": "New Entrant",
+          "type": "boolean"
+        },
+        "player_code": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Player Code"
+        },
+        "position": {
+          "enum": [
+            "GK",
+            "DEF",
+            "MID",
+            "FWD"
+          ],
+          "title": "Position",
+          "type": "string"
+        },
+        "previous_minutes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Previous Minutes"
+        },
+        "previous_reason": {
+          "enum": [
+            "OBSERVED",
+            "BLANK",
+            "NEW_ENTRANT",
+            "MISSING_CONTEXT"
+          ],
+          "title": "Previous Reason",
+          "type": "string"
+        },
+        "prior_minutes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Prior Minutes"
+        },
+        "promoted": {
+          "title": "Promoted",
+          "type": "boolean"
+        },
+        "season": {
+          "minLength": 1,
+          "title": "Season",
+          "type": "string"
+        },
+        "status": {
+          "anyOf": [
+            {
+              "enum": [
+                "a",
+                "d",
+                "i",
+                "s",
+                "u"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Status"
+        }
+      },
+      "required": [
+        "season",
+        "gameweek",
+        "element_id",
+        "player_code",
+        "position",
+        "fixture_ids",
+        "status",
+        "chance",
+        "availability_known",
+        "chance_target_bound",
+        "prior_minutes",
+        "previous_minutes",
+        "previous_reason",
+        "new_entrant",
+        "promoted",
+        "forecasts"
+      ],
+      "title": "PredictionRecord",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "authority": {
+      "const": "SYNTHETIC_ONLY",
+      "title": "Authority",
+      "type": "string"
+    },
+    "clarification_commit": {
+      "const": "7874ded703c2173827738d2fc23f1d456826f95a",
+      "default": "7874ded703c2173827738d2fc23f1d456826f95a",
+      "title": "Clarification Commit",
+      "type": "string"
+    },
+    "formula_identities": {
+      "default": [
+        "xfp_v01",
+        "UM1-joint-minute-dirichlet-v1",
+        "UA1-gamma-mixture-loss-update-v1",
+        "UM1UA1-v1"
+      ],
+      "maxItems": 4,
+      "minItems": 4,
+      "prefixItems": [
+        {
+          "const": "xfp_v01",
+          "type": "string"
+        },
+        {
+          "const": "UM1-joint-minute-dirichlet-v1",
+          "type": "string"
+        },
+        {
+          "const": "UA1-gamma-mixture-loss-update-v1",
+          "type": "string"
+        },
+        {
+          "const": "UM1UA1-v1",
+          "type": "string"
+        }
+      ],
+      "title": "Formula Identities",
+      "type": "array"
+    },
+    "prediction_bytes_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Prediction Bytes Sha256",
+      "type": "string"
+    },
+    "protocol_identity": {
+      "const": "TASK033B1B-candidate-freeze-d6716bc",
+      "default": "TASK033B1B-candidate-freeze-d6716bc",
+      "title": "Protocol Identity",
+      "type": "string"
+    },
+    "rows": {
+      "items": {
+        "$ref": "#/$defs/PredictionRecord"
+      },
+      "title": "Rows",
+      "type": "array"
+    },
+    "stage": {
+      "enum": [
+        "DEVELOPMENT",
+        "CONFIRMATION"
+      ],
+      "title": "Stage",
+      "type": "string"
+    }
+  },
+  "required": [
+    "authority",
+    "stage",
+    "rows",
+    "prediction_bytes_sha256"
+  ],
+  "title": "PredictionBatch",
+  "type": "object"
+}
