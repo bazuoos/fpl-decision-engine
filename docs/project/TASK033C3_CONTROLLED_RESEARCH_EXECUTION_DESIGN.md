@@ -3,8 +3,8 @@
 ## 1. Status, objective and stop decision
 
 **DESIGN ONLY — BLOCKED BEFORE IMPLEMENTATION.** The original design was
-prepared against `5ab1c393fb36c73e2e2cf559dbe4ffd242a88ca6`; this owner-decision
-amendment is prepared against reviewed design commit
+prepared against `5ab1c393fb36c73e2e2cf559dbe4ffd242a88ca6`; the owner-decision
+amendment was prepared against reviewed design commit
 `2da9d7d63b6ac74626c957a7ec8e5be9f17ab21b` on
 `codex/task033a-decision-robustness-design`. This document is a constrained
 architecture and precise blocker report, not an executable authorization or an
@@ -33,9 +33,10 @@ material execution choices. Section 3 identifies them and the exact evidence or
 reviewed decisions required. No implementer may fill these gaps with convenient
 defaults. Sections 4–16 specify preserved rules and proposed requirements for
 review; where a contract is blocked, it is deliberately not a runnable schema.
-The next permissible proposal is the remaining C3.0 contract-resolution work,
-separately scoped and reviewed. This task creates no C3 implementation, source
-registration or grant.
+Section 17 now supplies the separately scoped C3.0 contract proposal against
+`d55421e52f7c8a921a87967434bbf9ca903b6a39`. It is ready for independent design
+review with explicit open decisions/evidence, not implementation. This task
+creates no C3 implementation, source registration or grant.
 
 ## 2. Repository-established foundation
 
@@ -290,9 +291,9 @@ rate mixtures and candidate assembly. C2 remains pure: realized-value derivation
 proper scores, missingness/coverage, pair-specific ranking membership, both RNG
 streams, complete-family bounds, subgroup gates and fixed statistical choice.
 C3 must not duplicate these formulas or decide a different winner. New authority
-wrappers may be designed only through B03, including the still-unapproved
-EVAL_AUTH versus PUBLICATION_ONLY choice in section 6.3. I/O, clocks, credentials
-and process controls never enter C1/C2.
+wrappers may be designed only through B03 under the owner-selected EVAL_AUTH
+direction. Section 6.3 retains PUBLICATION_ONLY as an unselected alternative.
+I/O, clocks, credentials and process controls never enter C1/C2.
 
 Preserve three evidence layers: historical human reasoning records beliefs and
 motivation; trusted engine artifacts retain validated decision semantics;
@@ -313,8 +314,8 @@ Proposed components and access matrix:
 | Reviewer/exporter | Allowlisted sanitized metadata and aggregates | Source rows, resolution map, credentials, manager state |
 | Future backup tool | Separately authorized opaque encrypted checkpoint capture/restore | Research grants, decryption authority by implication, execution or promotion |
 
-Recommended EVAL_AUTH flow (not implemented or owner-approved; each arrow
-requires a validated receipt):
+Owner-selected EVAL_AUTH direction (exact flow contracts remain proposed, not
+implemented or approved; each arrow requires a validated receipt):
 
 ```text
 reviewed protocol + request + explicit stage grant
@@ -554,7 +555,8 @@ is explicit; single-operator receipts must never assert independent custody.
 Credentials and approval conversation contents stay outside the artifact.
 An editable digest of prose is not an authenticated grant. The same human may
 approve and operate under the selected single-operator profile; the worker must
-never issue its own permission. No profile/format has yet been approved.
+never issue its own permission. The profile direction is approved; its concrete
+format/parameters remain proposed in section 17.3.
 
 | Permission | Required prerequisite | Grants no authority for |
 |---|---|---|
@@ -596,7 +598,7 @@ minimums pending the specific B02 contract, not evidence of deployed guarantees.
 
 ### 6.3. Evaluation-time versus publication-time combination control (B03/B04)
 
-**Recommend EVAL_AUTH. Owner selection is still required.** Current C2
+**EVAL_AUTH policy is owner-approved; the split contract remains open.** Current C2
 `evaluate()` has no external callback, stage permit or return between the two
 component results and `run('UM1UA1')`. A wrapper checking permission after return
 is too late. Supplying a missing/FAIL UM1UA1 ResourceGate does not prevent its
@@ -868,8 +870,9 @@ UTC times are recorded by the trusted controller/broker with the explicitly
 selected B02 clock-assurance profile, anchor/source identity and health evidence,
 and monotonic sequence/duration. An operator-attested local anchor must be labelled
 as trusting the operator/host, not an independently authenticated historical time
-source. B02 must select and bound this profile; neither alternative is approved
-here. Wall clock alone cannot prove causal archive availability or access order.
+source. B02 must approve and bound the concrete clock profile; section 17.3 proposes
+parameters without treating them as accepted. Wall clock alone cannot prove
+causal archive availability or access order.
 Monotonic elapsed time is for budgets, not a portable historical timestamp.
 After clock/ledger discontinuity, require reconciliation; never backdate receipts.
 
@@ -1043,8 +1046,8 @@ an isolated combination kernel cost, but cannot certify the complete conditional
 path. No reduced replicates, dropped subgroups, shortened season or extrapolated
 linear timing is a substitute. Record exact dimensions, versions, observed
 resources and claims not exercised. Numeric scratch/output caps must be frozen
-through outcome-free engineering review before implementing real-source access;
-this document invents none.
+through outcome-free engineering review before implementing real-source access.
+Section 17.6 proposes concrete caps; none is approved or measured.
 
 CI remains Linux x86-64/Python 3.10 with exact uv 0.12.7 and the committed lock.
 The available macOS arm64 evidence used a different Python/NumPy resolution.
@@ -1253,9 +1256,10 @@ reviewed documents and separately authorized slices demonstrate:
    full trust-chain tests and exact-commit CI. Decision-corpus status remains
    NOT_EVALUATED and component diagnostic eligibility is only a ceiling, not earned.
 
-This submission is one unstaged, uncommitted design document. Documentation-only
-validation must check whitespace (including the untracked file), its local relative
-links, exactly one new design file, unchanged index/HEAD and primary checkout,
+The original submission was one new design document. This C3.0 continuation
+modifies that same tracked file, unstaged and uncommitted. Documentation-only
+validation checks whitespace, its local relative links, exactly one modified
+design file, unchanged index/HEAD and primary checkout,
 preserved Task025 byte hashes, and sanitized review-package inventories/hashes.
 No continuity documents are edited. The external review package records actual
 validation results and exact Git status; it is not a research publication.
@@ -1292,3 +1296,831 @@ If a slice finds a new material ambiguity, stop it and write the exact conflicti
 contract/evidence and required decision. Do not weaken a guard, change a budget,
 choose a new season, drop a row/family, retry a failed scientific question or call
 missing evidence PASS to keep the sequence moving.
+
+## 17. C3.0 concrete contract proposal (2026-09-28)
+
+**Ready for independent adversarial design review; NOT implementation-ready.**
+This addendum is proposed against branch tip
+`d55421e52f7c8a921a87967434bbf9ca903b6a39`. Sections 3.2 and 17 distinguish
+approved direction from proposed mechanics. Every contract, bound and backend
+below is a review proposal, not a deployed control or an executable grant.
+B01–B07 remain OPEN. No new protocol rule takes effect merely by appearing here.
+If a proposal conflicts with the freeze, code or approved clarification, stop
+and obtain a prospective amendment; do not implement the convenient reading.
+Sections 1–16 preserve the earlier design and its history; this section supplies
+concrete candidates for the previously unspecified details.
+
+Repository setup was inspected first. The former temporary worktree had only
+remaining directories at its root, no `.git` link and no design file; Git retained
+a prunable registration at the stated branch tip. Neither that directory nor its
+registration was removed, repaired or overwritten. A new managed isolated
+worktree was created from the existing Task033 branch, detached at the exact
+SHA above. This avoids forcing the branch into two checkouts. The primary
+checkout remained on `main` at `e10d4c9dc10467730cdb90fcbea494dcdf920b6f`, with its
+two unrelated Task025 files preserved. Absolute host paths belong only in the
+local delivery message, not in this document or exported bundle.
+
+### 17.1. Evidence, precedence and proposal notation
+
+Current technical evidence was read as source text, never executed. In particular:
+
+| Evidence at the base SHA | Contract consequence |
+|---|---|
+| `historical.py` schema tuples, `_build_features_and_actuals`, `_previous_context`, manifest construction; `historical_sources.PARSER_SCHEMA_VERSION` | v3.1 contains numeric/null semantics and archive provenance, but no historical completion timestamp or authenticated first-availability proof. Its feature builder filters GW/kickoff, not the proposed field-version knowledge proof. |
+| `historical_backtest.EXPECTED_HISTORICAL_VERSION`, `_input_paths`, `_validate_input_manifest` | v2 remains an exact legacy gate; not a v3.1 runtime path or trusted parity oracle. |
+| C1 `TargetContext`, `HistoryFixture`, `PeerHistory`, `U0FixtureInput`, `build_u0`, three assemblers | The new broker must supply evidence-backed identities/flags; adapters must preserve nullable evaluation fields and component-specific count distributions. |
+| C1 `ArtifactHeader.__post_init__` and `task033c1_prediction_header.schema.json` required constant properties | `PREDICTION_ONLY`, `UNOPENED_UNAUTHORIZED` and false `outcome_joined` are verified facts about the old contract. Do not relabel them as a new grant. |
+| C2 `PredictionRecord`, `PredictionBatch`, `JoinedOutcomes`, `ResourceGate`, `EvaluationResult` | Strict synthetic authority; exactly four forecasts; supplied resource hashes are not measured evidence. v1 stays byte/schema compatible. |
+| C2 `evaluation.evaluate`, `_Pair.run`, `inference.resamples`, `conditional_choice` | Combination currently runs automatically; resource status is checked after statistics. A post-return wrapper cannot implement EVAL_AUTH. |
+| Compatibility, serial-union and orchestration test source | Existing parity examples are partial; serial union includes blank-only codes; orchestration PASS tests use fixed numerical seams. Reading these tests is not running them. |
+| Candidate freeze sections 2, 3, 7–10; clarification sections 2, 3, 5, 7 | Corrected v3.1 values, populations, chronology, complete families, exact RNG and inclusive resource ceilings remain binding. |
+| `artifact_snapshot.py`; local app authorization; schedule controller | Stable read pattern and procedural local controls exist. Research grants, exclusive publication and rollback-resistant custody do not follow from them. |
+| CI workflow and locked dependencies | CI requests Python 3.10 on `ubuntu-latest`; that moving label is not a frozen research kernel/image/filesystem profile or new C3 certification. |
+
+History read: `7874ded` clarified the resampling protocol; `6d695af` added
+synthetic C2; `5ab1c39` refreshed continuity; `2da9d7d` added the reviewed C3
+design; `d55421e` recorded seven policy approvals. No current remote or CI check
+was performed. Earlier CI/reviewer claims remain dated reported evidence.
+Continuity's statement that C3 has not started is stale navigation, not a reason
+to ignore the current design. Earlier human beliefs, legacy candidate rejection
+and original artifacts remain historical evidence, not retrospectively repaired
+predictions. Nothing here establishes predictive superiority.
+
+Notation: `C(x)` is the existing compact, sorted-key, finite JSON encoding with
+UTF-8 and one terminal LF; schema-defined arrays retain their prescribed order.
+`H(x)` is lowercase SHA-256 of exact bytes. `ID(domain, fields)` is
+`H(C({"domain":domain,"fields":fields}))`. Domain is a fixed version literal,
+never a caller string. This defines NEW semantic identities only; existing C1/C2
+hashes, including membership hashes, retain their exact existing byte scope.
+Times/counters use integer units in new authority/resource records. Numeric
+model values keep C1/C2 serialization; no decimal rounding or platform smoothing.
+All proposed objects are recursively closed and strictly typed; duplicate JSON
+keys, booleans in integer fields, unknown versions and nonfinite numbers reject.
+A hash proves byte identity only.
+
+`Dxx` below denotes an owner/reviewer decision still required; `Exx` denotes
+missing evidence. A parameter without an accepted D record is not a default.
+An evidence assertion without its E record is not a guarantee. Section 17.9 is
+the closure register; new discoveries must extend it rather than be guessed.
+
+### 17.2. B01 — causal source/evidence contract and compatibility
+
+Propose `task033c3-asof-evidence-v1`, separate from historical-v3.1. A reviewed
+source registration binds exact upstream object hashes/sizes, parser/schema
+hashes, permitted seasons/GWs/fields, proof authority, correction policy,
+finalization policy, exposure class, bridge/map IDs and contract version. Its
+private resolver mapping never enters the research request or review export.
+Before any protected stat/open/footer/decompression, the broker must hold a
+current stage grant and durable access reservation. Mixed-archive partitioning
+requires its own `BLIND_SOURCE_PREPARATION` grant; prediction permission cannot
+open the mixed archive even for an opaque copy.
+
+Each field-version proof has the following closed payload (shared proof objects
+may be referenced by hash; no unchecked Boolean stands in for them):
+
+| Field group | Required content and interpretation |
+|---|---|
+| Identity | season, element ID where relevant, fixture ID where relevant, source GW or target GW, field enum, raw object digest plus row/column locator; no display-name join |
+| Value | typed value or explicit null, original-value encoding digest, parser/normalization revision, exact v3.1 value digest; null has provenance too |
+| Event time | registered kickoff interval, completion interval for performance fields, authoritative deadline interval and their independent proof references |
+| Knowledge time | earliest **proved** availability interval for this exact value version; not a claim to know the unknowable first-ever publication time |
+| Capture/parse time | actual capture and parse instants, capture authority and proof digests; these are distinct from valid/knowledge time |
+| Revision lineage | immutable version ID, predecessor hash or explicit genesis, correction reason enum, attribution proof; no replacement of predecessor bytes |
+| Assurance | proof method enum, attestor/key identity, raw evidence digest, uncertainty bounds, verified scope and permitted claim literal |
+
+For target deadline interval `[d_lo,d_hi]`, require snapshot availability upper
+bound `< d_lo`. For every released history field require same season, source
+GW `< target GW`, proven source-universe membership, kickoff upper bound
+`< d_lo`, completion upper bound `< d_lo`, and exact value-version knowledge
+upper bound `< d_lo`. Equality and overlapping/unknown bounds reject. A later
+capture may attest earlier availability only through independently attributable
+pre-cutoff evidence for identical bytes; a newly signed retrospective assertion,
+filename or Git timestamp alone does not establish it. Parse time never moves
+a value's knowledge time backward. The proof-method allowlist, trust anchors,
+time uncertainty and acceptable attribution are **D01/E01**, currently empty.
+No numerical grace period makes a post-cutoff value causal.
+
+The broker needs two independent checks: (a) this exact historical-v3.1 value
+has admissible pre-cutoff proof; (b) all required identities/missingness and
+value semantics match the frozen v3.1 contract. A corrected v3.1 value first
+available after the cutoff fails (a), even if an earlier different value exists.
+Do not substitute that earlier value, drop the affected row/GW, choose a different
+archive or call it statistical missingness. The required study scope remains
+blocked unless a prospective source/protocol amendment is reviewed. A correction
+of unchanged value bytes still needs attribution to that exact value and its
+identity, not a matching decimal elsewhere.
+
+Illustrative chronology vectors, not observations or executed tests (cutoff
+lower bound 100 in arbitrary time units):
+
+| Source GW / target GW | Kickoff upper | Completion upper | Exact-value knowledge upper | Decision |
+|---|---:|---:|---:|---|
+| 4 / 5 | 80 | 90 | 95 | Timeline predicates pass; remaining identity/v3.1 proofs still required |
+| 5 / 5 | 80 | 90 | 95 | Reject same-GW history |
+| 4 / 5 | 101 | 110 | 111 | Exclude causally ineligible postponed fixture by frozen rule; record exclusion |
+| 4 / 5 | 80 | 101 | 95 | Reject inconsistent or still-playing history |
+| 4 / 5 | 80 | 90 | 100 | Reject equality at cutoff |
+| 4 / 5 | 80 | 90 | unknown | Reject unproved availability |
+| 4 / 5 | 80 | 90 | 105 for frozen corrected value; 95 for different predecessor | Block v3.1 compatibility; no predecessor substitution |
+
+The implementation candidate remains
+`src/fpl_decision_engine/research/c3/source_adapter.py`, broker-only and not
+created here. It must not import the mixed legacy backtest loader. Prediction
+and outcome releases have separate inventories, descriptors, capabilities and
+process lifetimes. The following is the proposed mapping boundary:
+
+| v3.1 inputs | C1/C2 target and parity obligation |
+|---|---|
+| PREDEADLINE `season,target_gameweek,element_id,code,position,team_id` | TargetContext plus season-scoped bridge; preserve snapshot universe and position/team, exclude AM/unknown positions by frozen rule with counts |
+| Snapshot time/deadline and status/chance | Proof-backed Availability; normalize recognized letter case only, retain unknown versus null and target-next-round binding; do not derive knownness from a Boolean alone |
+| FIXTURE identity/GW/home-away teams | Exact sorted target fixture tuple; explicit verified blank, no absent-file inference. Exclude scores/finished fields from predictor release |
+| PLAYER_FIXTURE identity/GW/historical position/minutes/starts/xg/xa | HistoryFixture and PeerHistory in same-season calendar windows; exact joint observations, registered peers, source-time position and C1 flags backed by proofs |
+| FEATURE previous-GW minutes/context, prior total minutes/xg/xa and rates | Independent reconstruction on admitted fixture history must match frozen U0 formula and null semantics; feature rows alone cannot prove admissibility |
+| `_previous_context` reason fields | OBSERVED including recorded zero -> value; verified blank -> BLANK/null; proved absent previous registration -> NEW_ENTRANT/null; genuine unavailable context -> MISSING_CONTEXT/null only where frozen rules permit. Missing expected source rows remain corruption |
+| `prior_xg_per_90`, `prior_xa_per_90` | Existing nullable aggregate numerator and total-minute denominator; do not replace with UA1 event-specific denominator, repair missing event exposure or change no-history semantics |
+| Public preseason membership map | Proved promoted diagnostic only; no model input or inference from performance. No map exists by approval of this design |
+| Separately granted finalized fixture outcomes | Exact expected fixture set and original nullable minutes/starts/goals/assists to C2; exclude total FPL points and unrelated archived statistics |
+
+The existing feature builder's lower-GW/kickoff filtering does not itself prove
+source-universe or field-version availability. If adding proof filters would
+change a required frozen feature/value, fail **D01/E01/E06**, not silently
+recompute a more convenient U0. The all-row/all-field comparison includes null,
+zero, datatype, overflow flags, previous-GW reason and row/fixture membership;
+not just equal final point totals. Existing functions may serve as read-only
+semantic references; independently handwritten/algebraic oracles must also
+check them on generated examples in a later authorized task.
+
+Keep `restricted_pseudo_backtest` and finalized-assignment limitation explicit.
+Field-causal performance inputs do not prove predeadline fixture scheduling.
+Propose separate claims `performance_asof_verified` and
+`fixture_assignment_verified_predeadline=false`, never a blanket
+`perfect_causal_replay=true`. **D01** must approve the precise claim wording and
+which finalized context is permitted; stronger scheduling claims need a separate
+amendment and proof. Outcome finalization requires an exact whole-GW expected
+fixture inventory, attributed finalization/version proof and complete identity
+reconciliation. A legitimate null is retained; an inaccessible/corrupt object
+or unfinalized GW is not a scored partial subset. Admissible unavailable-object
+reason enums and finalization authority remain **D01/E01**, not inferred here.
+
+### 17.3. B02 — development authority, time and recovery proposal
+
+Propose profile `A2-SINGLE-OPERATOR-DEV-1`. Scope is exactly the two development
+seasons, not confirmation. Same owner controls intent and operation; no statement
+of independent custody, outcome ignorance or protection from owner/root, signer,
+broker, verifier or kernel compromise is valid. Separate OS privilege domains
+are necessary even when the human is the same. Approved-code dispatch can be
+controlled; a malicious already-authorized evaluator cannot be proved unable
+to reconstruct a combination from component parameters/outcomes.
+
+Proposed roles: owner-operated offline signing device; online verifier/ledger
+service with public issuer key only; broker with source capabilities and no
+issuer key; one confined compute worker; publisher with owned-output capabilities
+only. An online receipt authentication key, if selected, is separate, has only
+receipt audience and cannot sign grants or trust-anchor changes. Worker cannot
+access any issuer/receipt private key, ledger mutation API, unrestricted source
+root, network, inherited privileged descriptor, executable installation or host
+control socket. Different process names under unrestricted same UID are invalid.
+No device, key, account or service is assumed to exist or created here.
+
+Concrete cryptographic proposal for **D02**: Ed25519 signatures over
+`ASCII("TASK033C3-GRANT-V1") || LF || C(payload)` (LF is byte 0x0a); SHA-256
+identities; exact 32-byte public key and
+64-byte signature encoded as lowercase hex. Key ID is H of raw public-key bytes.
+Signature envelope has exactly `schema,payload,key_id,signature_hex`; payload
+has the following fields, all required, with explicit null only where stated:
+
+- `authority_profile`, `assurance=SINGLE_OPERATOR_DEVELOPMENT_ONLY`, opaque
+  issuer/owner/audience IDs, `approval_record_sha256`, `request_id`, `study_id`,
+  exact stage enum, code/environment/profile IDs and protocol hashes;
+- `source_scope` as ordered exact registration/field/season/GW bindings;
+  `prediction_freeze_id`, `outcome_id`, `component_core_ids` when already known;
+  otherwise only the closed prebound predicate below, never a wildcard;
+- `publication_slot` and package kind when applicable; no path, URL or key material;
+- 256-bit one-use nonce, `use_limit=1`, `issuer_epoch`, `not_before_utc_ns`,
+  `expires_utc_ns`, clock-policy ID and recovery-policy ID.
+
+A pre-issued conditional grant cannot contain unknown future component hashes.
+It binds exact request/freeze, candidate UM1UA1, and predicate
+`BOTH_COMPONENTS_ALL_COMPLETED_GATES_PASS_FOR_THIS_ATTEMPT`; the verifier later
+creates a one-use derived permit binding exact component/core/resource/join
+hashes after checking that predicate. A post-outcome owner signature cannot
+introduce a newly chosen candidate, scope, gate or seed. Grant payloads and
+signatures remain immutable; no placeholder hash is filled in later.
+
+Proposed **D02** numeric choices: grant validity at most 36 hours, run time never
+extended beyond frozen resource ceilings; an operator-attested UTC anchor made
+within 5 minutes of launch with declared uncertainty at most 2 seconds; a
+suspend-inclusive monotonic clock and boot identity; backward realtime step or
+realtime-versus-anchor drift over 2 seconds stops progress. Treat uncertainty
+conservatively: the whole derived UTC interval must lie inside grant validity.
+No expiry grace, renewal during a stage, cross-boot monotonic subtraction or
+clock-reset retry. Suspend/resume detection stops this initial profile even
+though its elapsed time must be charged. These numbers and clock mechanisms
+are proposals requiring owner acceptance and backend evidence, not evidence
+of trustworthy UTC or historical archive time.
+
+Online verifier maintains a serialized, durable ledger with increasing sequence,
+previous-event hash, boot/session identity, authority epoch and study/stage fence.
+Propose no cached revocation grace: every new access/release, dispatch and
+publication admission serializes against current local verifier state. Missing
+verifier response denies operation. While authorized work runs, propose heartbeat
+at most 1 second and whole-group cancellation target at most 2 seconds after
+revocation/heartbeat loss. These are **D02/E02** proposed upper bounds, not
+real-time OS guarantees. Reads already dispatched may complete during this
+window; released bytes remain exposed. If the owner requires instantaneous
+revocation, this profile is unsuitable and must remain blocked.
+
+Ledger ordering must durably record nonce consumption and possible exposure
+before issuing a bounded per-object capability. Capabilities have exact object,
+field, byte and time scope, cannot be extended by worker input and cannot survive
+a stage/boot change. Broker checks the same epoch/fence before each new protected
+operation, including stat and footer reads; it records bounded release progress.
+An already-spent nonce can retrieve only an existing safe receipt with separate
+current read permission, never execute again. At first outcome dispatch mark
+`POSSIBLY_EXPOSED`; successful release refines that event, failure never erases it.
+Propose read leases no longer than 1 second, renewed by the broker for continued
+reads, subject to the same cancellation limit. Blocked I/O and buffered releases
+must be included in **E02**, not treated as instantaneous atomic reads.
+
+Custody/recovery candidate: offline issuer enrolls exact public trust anchor;
+verifier stores append-only epoch/nonce/exposure events on trusted storage outside
+worker/checkpoint scope; a separate owner-controlled witness store synchronously
+acknowledges each authority/exposure reservation before protected dispatch.
+Witness acknowledgments bind monotonically increasing sequence and chain hash.
+That separate store is rollback detection only under its explicit nonrollback
+trust assumption, not independent human custody or a verified offsite backup.
+Physical/provider choice, authentication, atomicity and retention are **D02/E02**.
+An offline stale digest alone is insufficient. No witness, uncertain latest head,
+ledger fork or restored state behind the witness -> stop all new grants/access.
+
+Rotation requires an owner-approved new epoch and enrollment record; revoke old
+key for new activity while preserving verification of historical receipts with
+its historical validity interval. Lost issuer key -> no new grants until new
+trust anchor enrollment and ledger reconciliation. Lost receipt key or witness
+state -> no manufacture of missing history. Restoring a worker snapshot cannot
+restore unspent authority. Recovery uses a distinct grant and attempt ID, only
+reverifies named artifacts; it cannot resume scoring or authorize prediction
+regeneration after possible exposure. Retention lengths and compromise response
+are **D02/D07**; key generation, witness installation and recovery drills remain
+outside this task.
+
+### 17.4. B03 — proposed versioned EVAL_AUTH interfaces
+
+Candidate API namespace: `research.c2.controlled_v2`; schema prefix
+`task033c2-controlled-*-v2`. No code or schema is added. Public v1 `evaluate`, its
+synthetic literals, result bytes and tests stay intact. This is a new structural
+input/result layer around unchanged pure numerical rules, not relabeling an old
+PredictionBatch or calling private `_Pair` from C3.
+
+All v2 input views carry `protocol_identity`, clarification hash, four formula
+IDs, stage DEVELOPMENT, exact two-season/GW universe, source-class literal
+`GENERATED_SYNTHETIC` or `REGISTERED_DEVELOPMENT_V31`, request/freeze/outcome/join
+bindings and view bytes hashes. Source class describes provenance, not authority.
+Real confirmation is rejected by this initial profile, not admitted using a
+synthetic confirmation switch. Pure C2 receives typed structural admission
+receipts; C3 alone authenticates grants. No signer, clock, I/O or source resolver
+enters C2. Full four-slot prediction freeze remains mandatory before outcomes.
+
+Each controlled input has two separately hashed closed objects: `core_view`
+contains request ID, prediction/outcome/join **core** IDs, candidate projection,
+ordered rows and fixed original source/proof/adapter identities; `admission_binding`
+contains the actual attempt-specific freeze ID, grant/permit and receipt bindings.
+The pure API validates both. Deterministic cores hash only `core_view`, never the
+whole controlled input envelope. Likewise admitted source views keep run-specific
+capture/parse/verification receipts outside their deterministic value/provenance
+projection. Immutable original archive proof identities remain inside it. This
+prevents a freeze receipt timestamp from indirectly contaminating core identity.
+
+| Proposed pure API | Closed input/output contract and admission |
+|---|---|
+| `evaluate_component_v2(candidate, component_view, joined_outcomes, admission)` | Candidate is exactly UM1 or UA1. View contains U0 and that candidate only, with exact projections from full freeze and original row universe including blanks. Admission binds this component stage, attempt/request/join and proof digests. Returns one StatisticalPackageV2. Controller calls UM1 then UA1, measuring/persisting each completed interval between calls. No combination memberships, metrics, distributions or resamples are computed. |
+| `admit_components_v2(statistics, completed_stage_evidence)` | Validates binding and completed component intervals, produces structural admission decision with separate statistical status and stage-resource status. No computation is rerun; no final attempt PASS is asserted. C3 checks actual evidence authenticity before calling. |
+| `evaluate_combination_v2(combination_view, joined_outcomes, component_admission, permit)` | View contains U0/UM1UA1 projected from the original freeze. Checks both component gates, exact join/freeze/core/admission IDs and derived permit. Fresh isolated worker starts only after durable C3 authorization. Returns one StatisticalPackageV2; no synthetic fallback or private sentinel bypass. |
+| `prepare_selection_v2(package_cores, admissions)` | Pure fixed priority produces `SelectionPlanV2` with `effective=false` pending final resource/publication gate. Both component passes require evaluated combination. This plan is private and cannot be exposed as completed selection. |
+| `validate_completed_result_v2(plan, final_gate, publication_evidence)` | Pure structural validation of matching completed evidence yields development decision or rejects. The outer verifier must authenticate final authority/resource evidence first; this function cannot certify clocks or publication. Final-gate backend remains B04/B07 blocked. |
+
+`StatisticalPackageV2` retains ALL existing membership, populations, metrics,
+endpoint families, clusters, diagnostics, calibration hashes and objective
+failure reasons. Its `statistical_status` is PASS/FAIL only for fully evaluated
+statistics; it contains no clock, resource digest, grant/attempt ID, selection,
+publication timestamp or inferred eligibility. Numerical/infrastructure failures
+are separate attempt failures; never manufacture DO_NOT_CONFIRM.
+`NOT_EVALUATED` is a disjoint record with candidate and reason only, no membership
+or result payload. `SelectionPlanV2` records exact package-core hashes and the
+fixed rule, but is neither a research result nor authorization for confirmation.
+
+Owner/reviewer **D03** must approve these exact names/field closures and distinguish
+(a) statistical FAIL after complete calculation, (b) absent computation by rule,
+(c) authorization/infrastructure interruption. **E03** requires independent
+old/new arithmetic and all 9,999-draw parity; no implementation test exists yet.
+New core bytes differ intentionally from the v1 envelope; compare defined
+mathematical payloads, never claim entire v1/v2 byte equality or strip resource
+fields from a published v1 artifact.
+
+Truth table for DEVELOPMENT after completed component intervals:
+
+| UM1 / UA1 complete component gates | Permit and combination | Permissible next state |
+|---|---|---|
+| FAIL / FAIL | Not requested; no combination work | Pending plan selecting none; DO_NOT_CONFIRM only after successful final gate/publication |
+| PASS / FAIL or FAIL / PASS | Not requested; no combination work | Pending plan selecting the passing component; same final prerequisites |
+| PASS / PASS | Missing/expired/revoked permit | `UNAUTHORIZED`, combination NOT_EVALUATED; no completed selection or fallback to UM1 |
+| PASS / PASS | Valid permit; combination full statistical FAIL with completed resource interval | Pending UM1 plan under frozen priority |
+| PASS / PASS | Valid permit; combination full PASS | Pending UM1UA1 plan |
+| Any | Missing resource evidence, interrupted computation or final write breach | Infrastructure failure; no completed selection or candidate eligibility |
+
+A component statistical rejection and an infrastructure failure are not
+interchangeable. Stage-resource failure stops this proposed execution attempt;
+it does not falsify a component's statistical record to open or close a gate.
+Whether this stricter attempt failure semantics and stage admission preserve
+all frozen resource-gate meanings needs **D03/D04** protocol review. Repeated
+entry cannot consume RNG twice or change seeds: each evaluated package follows
+the current full reference stream; separate views cannot change its universe,
+code union, season order, common populations or pair-specific membership.
+
+### 17.5. B04 — completed intervals, final gate and the remaining terminal problem
+
+Propose stage receipt `task033c3-completed-resource-v2` with exact fields:
+`schema,attempt_id,request_id,stage,candidates,seasons,predecessor_receipt_ids,
+input_ids,output_manifest_sha256,profile_id,clock_session,start_ns,end_ns,
+measurements,limits,enforcement_events,status,ledger_sequence`.
+Nested measurements specify units and process scope, peak/total rather than an
+ambiguous number, and whether controller/OS or worker supplied each observation.
+No end time or PASS may precede the final operation of the interval it certifies.
+Receipt emission has a cost charged to the next interval and enclosing total;
+there is never an uncharged gap. Stage PASS means **this completed interval**,
+not a promise about remaining work. Missing/unknown observation is not zero.
+
+Proposed accounting (**D04**, stricter counting must be explicitly accepted):
+
+- Prediction clock begins before broker preparation/read for the first target;
+  ends only after prediction payload verification, writes and freeze commit.
+  Per-season/candidate 6-hour counters include that candidate's input and output
+  I/O. Shared source preparation/freeze costs are conservatively charged in full
+  to each affected candidate; no favorable fractional allocation after outcomes.
+- Propose a conservative enclosing 24-hour clock beginning before the first
+  run-specific prediction/source preflight, including predictions, outcome
+  authorization/resolution, joining, both component phases, conditional wait,
+  combination if permitted, selection, verification, all publication and final
+  authority/resource recording. This is broader than a statistics-only reading
+  of the freeze and needs D04 acceptance, not a silent reinterpretation.
+  Waiting for grants, retries and blocked I/O cannot pause this elapsed interval.
+- Per-season/candidate scoring counters preserve the 6-hour ceiling. Shared
+  two-season bootstrap, join and publication work is charged in full to each
+  affected season/candidate counter. If this conservative attribution makes the
+  study infeasible, report that; do not silently charge bootstrap elsewhere.
+  Prediction and scoring get distinct counters in this proposal; whether the
+  freeze intended a combined 6-hour counter is an explicit **D04** ambiguity.
+- Source registration is a separately authorized preparation task; run-specific
+  source capture, verification or partitioning cannot be renamed registration
+  to escape the execution budget. Exact reuse/capture boundary is **D04**.
+
+Completed stage chain:
+
+```text
+request + scope + preflight
+  -> prediction payload + completed freeze interval
+  -> outcome reservation/read/freeze + guarded join
+  -> UM1 statistics + completed UM1 interval
+  -> UA1 statistics + completed UA1 interval
+  -> components admission + fresh durable derived permit (both pass only)
+  -> UM1UA1 statistics + completed combination interval (if authorized)
+  -> deterministic selection plan + sealed prepared inventory
+  -> payload installation/verification/flush [UNCERTIFIED]
+  -> observation of completed publication work
+  -> final resource/authority attestation
+  -> completed-result admission [BLOCKED on terminal contract below]
+```
+
+Component dispatch consumes only receipts for already-completed work and checks
+remaining *enforced* time/space. Proposed dispatch headroom is 15 minutes for
+finalization (D05); it is admission headroom, not proof publication will finish.
+A final breach invalidates the attempt even if all component receipts passed.
+The owner-approved stage direction must be formalized as a protocol clarification:
+"every component resource gate" in the freeze cannot silently become a promise
+of final PASS. No supplied v1 PASS, fake FAIL or evaluator rerun closes this gap.
+
+**Terminal-resource problem remains an explicit blocker, not a hidden exclusion.**
+A stored final receipt can hash/measure earlier work, but cannot contain a
+measurement of the completion of its own last write/fsync/commit. Adding another
+marker moves the problem; a post-rename timer check allows an unqualified reader
+to see a late result unless admission remains guarded. Budget reservation is not
+measurement. The existing local snapshot helper supplies no timed durable commit
+primitive that resolves this.
+
+Concrete review candidate **D04-F**: separate immutable payload from a trusted
+publication admission service. Payload installation is never visible as success;
+only the service can admit a result after observing all completed payload and
+receipt I/O and checking the live enclosing budget, current authority and fence.
+Its final attestation references prior payload/resource hashes; those objects do
+not hash back to it. This is an acyclic data graph. However, persisting/exporting
+the service's terminal admission and its recovery proof is itself work. This
+proposal does **not** declare that work outside the frozen ceiling.
+
+Before implementation the owner/protocol reviewer must choose and accept one
+of these precise closure paths, with evidence:
+
+1. Prove a backend terminal transaction/admission contract with an explicit
+   linearization point, deadline and durability accounting covering its final
+   write/acknowledgment, plus reader/crash semantics. No such backend is established
+   in the repository; naming a database transaction or no-replace rename is not proof.
+2. Prospectively amend the protocol to define payload-publication completion and
+   separately bounded audit/admission work. Specify which final I/O lies in each
+   budget, how an audit breach prevents success, and what a recovered reader
+   accepts. This is a **proposed amendment**, not permission to exclude the audit.
+3. Keep completed publication blocked. This is the current effective disposition.
+
+Thus completed-stage gates and identity dependencies are concrete and acyclic;
+the all-inclusive durable final gate is specified as an unmet acceptance contract.
+No completed result, adoption or eligibility is possible until **D04-F/E04/E07**
+close. This limitation is a central independent-review question, not a claim
+that B04 was solved by renaming publication. Final receipts must never attest
+future resource success. The same issue applies to prediction freeze completion
+where outcome release depends on a durable completed freeze; it cannot be bypassed
+by treating prediction publication as outside the budget.
+
+### 17.6. B05 — contained Linux/Python 3.10 candidate and proposed budgets
+
+Candidate profile `C3-LINUX-X86_64-PY310-1`, not an implemented platform guarantee:
+owner-administered dedicated Linux environment, exact pinned kernel/build, boot
+configuration, image digest, CPU/native-library identities, CPython 3.10 patch
+version, lockfile and resolved wheel hashes. No reliance on the moving CI image.
+Proposed OS baseline is a supported Linux 6.6-series build with cgroup v2,
+seccomp and a local ext4 publication volume; exact revisions, mount options,
+storage/cache assumptions and support horizon are **D05/E05/E07**. This is a
+candidate requiring proof, not a claim about this macOS host or every Linux build.
+macOS stays native synthetic/development-only. Emulation/VM results bind that
+profile and cannot certify native macOS enforcement or byte parity.
+
+Worker runs without privilege escalation, mount/network/ptrace/host-control
+capabilities, with only exact read-only stage inputs and bounded output channels.
+Proposed seccomp policy denies process fork/vfork, arbitrary exec, namespace
+creation and unexpected clone modes; permit only audited thread creation needed
+by pinned libraries. Reject clone3 unless a separately proved policy constrains
+it. Establish constraints before numerical imports or any source release; inherited
+FD/mount/environment allowlists are explicit. An architecture test is regression
+coverage, not proof of sandbox enforcement. Syscall/FD/mount lists and container
+launcher/provider remain **D05/E05** and must not be guessed by an implementer.
+
+Concrete numeric **proposals**, all OPEN under **D05**, with outcome-free full-scale
+certification **E05** required before any protected outcome access:
+
+| Limit | Proposed enforceable scope and value | Acceptance evidence still missing |
+|---|---|---|
+| Compute | One evaluator address space, no child processes; at most 4 total live tasks in its cgroup (main plus all threads) | Conservative total-task cap rather than treating CPU quota as thread count; thread creation/syscall escape and pinned native-pool compatibility |
+| Worker memory | 1,536 MiB virtual-address ceiling AND 1,536 MiB cgroup memory ceiling, swap disabled | This is a proposed conservative restriction, not an equation of AS/cgroup usage with RSS. Prove resident-accounting relation and brief-spike containment on selected kernel, including shared pages/file maps; independently measure peak RSS |
+| Trusted overhead | Broker 256 MiB; publisher 128 MiB; ONE combined 128 MiB allowance for controller, verifier/ledger, witness-related processes and otherwise unassigned trusted helpers; aggregate experiment peak RSS <=2,048 MiB including worker | This is not 128 MiB per controller/verifier/witness role. Exact process topology, witness placement, collective accounting and enforcement remain D02/D05/D07 and E02/E05/E07 gates; see clarification below |
+| Helper tasks | At most 16 total tasks across trusted role groups, no second numerical worker; serialize broker/publisher work where possible | Role-specific no-fork/exec permissions, process-tree membership and correct concurrency accounting |
+| Wall time | Frozen <=6 h per season/candidate prediction/scoring and <=24 h complete evaluation; 15 min finalization headroom; 1 s heartbeat / 2 s cancellation target | Continuous enclosing timer, defined suspend/clock semantics and last-operation breach tests. Kill latency is not zero and a late kill still fails |
+| Scratch | Dedicated per-attempt storage, <=16 GiB allocated AND logical bytes, <=65,536 inodes, including temporary copies/decompression/spill | Filesystem hard quota plus bounded logical writers; sparse files, hardlinks, mmap writes, unlinked-open files and quota exhaustion coverage |
+| Canonical payload | <=512 MiB per file, <=8 GiB total, <=8,192 files per attempt across predictions/outcomes/evaluation/receipts, no compression discount | Count before every write; chunking fixed before outcomes, exact inventory and full-PMF/analytic reconstruction verified |
+| Input/parser | <=512 MiB uncompressed object; <=16 GiB cumulative uncompressed bytes processed per attempt, repeats counted; metadata object <=1 MiB, JSON nesting <=16 | Trusted registration declares exact sizes before open; streaming parser/decompression cap; incompatible source layout blocks, cannot silently repartition under another grant |
+| Audit/failure reserve | Additional dedicated <=64 MiB and <=4,096 records per attempt; each receipt <=64 KiB, sanitized stderr <=64 KiB total | Reserve before release; include its CPU/RSS/time in applicable totals. Overflow stops; cannot drop exposure events. B04-F determines terminal audit treatment |
+
+**B05 review clarification — shared budget, unresolved topology.** The proposed
+sum is worker 1,536 + broker 256 + publisher 128 + combined trusted helpers 128
+= 2,048 MiB. Controller and verifier remain functionally distinct roles; separate
+processes/privilege domains must collectively fit the ONE 128 MiB allowance,
+not receive 128 MiB each. This does not merge their permissions or select a
+single-process implementation. All descendants and helper processes count.
+The exact process layout and subdivision of that allowance remain blocked owner
+choices under D02/D05/D07; fitting or enforcing it has not been demonstrated.
+
+The witness store in section 17.3 is outside the restorable worker checkpoint,
+not automatically outside experiment accounting. Its client, server, ledger and
+storage-service processes attributable to this attempt must be accounted for
+within the combined 128 MiB allowance and existing helper-task ceiling. A local
+witness does not earn an extra budget. An external/shared witness service is
+NOT an accepted exclusion: it requires a reviewed attribution/enforcement method
+within the same 2,048 MiB aggregate ceiling, or a prospective protocol amendment
+explicitly changing scope. Until then that deployment is unsupported. Witness
+placement, shared-service attribution and rollback assurance remain unresolved;
+no witness backend is selected or assumed to exist. Witness request/acknowledgment
+waits, retries, CPU, storage and I/O also stay in the applicable existing time,
+process and byte accounting; separate storage supplies no uncharged allowance.
+If any of this is unmeasurable, uncontained or infeasible, preflight fails. Neither
+the frozen 2 GiB ceiling nor the absence of enforcement evidence has changed.
+
+Binary units: MiB=1,048,576 bytes, GiB=1,073,741,824 bytes; limits are inclusive,
+no rounding before comparison. Proposed canonical cap counts all logical payload
+bytes written for the attempt; scratch peak includes simultaneous copies. Audit
+reserve is storage headroom only, not a waiver of final time or memory limits.
+Any requirement for more space/tasks/VA changes D05 before outcomes, never after
+seeing performance. Grants bind accepted numbers/profile hash, not mutable config.
+
+Cgroup `memory.max`, RLIMIT_AS, pids limits, mount quotas and watchdogs are
+**candidate mechanisms**. Neither cgroup memory counters nor virtual-address
+limits are called RSS measurements. A conservative containment proof needs the
+actual supported mappings/process model and continuous failure behavior; absent
+that proof this row remains unsupported. Brief violations missed by polling,
+quota overrun, task migrations, unavailable counters, controller death or hung
+I/O fail closed. Child logs/configured environment are supplementary only.
+No unproved kernel, real-time scheduler, filesystem flush or power-loss guarantee
+is asserted. The implementer must not install a backend under this design grant.
+
+Certification must separately cover existing 100-player rejection mechanics,
+700-player full two-season/all-37-target pipeline, real conditional combination
+using all 9,999 draws in both streams with no fixed-statistic seam, repeat byte
+identity in one frozen environment, all last-write/timeout/cancellation failures,
+and the budgeted authority/publication chain. Existing C1 single-target evidence
+and C2 mocked orchestration do not satisfy these. No such benchmark ran here.
+If no outcome-independent synthetic population traverses real component PASS,
+conditional end-to-end feasibility remains unproved; forced dispatch can describe
+kernel cost only. Actual source completeness/real-development feasibility is
+still a later authorized task. The 3,000-candidate/12-view/60-second decision corpus
+remains NOT_EVALUATED and a separate downstream blocker.
+
+### 17.7. B06 — decimal identity vectors and adapter parity contract
+
+Propose bridge schema `task033c3-decimal-bridge-v1`: ordered entries contain
+`season,element_id,official_code,player_code,source_identity_sha256,
+verification_evidence_sha256`; order by season then numeric element ID.
+`official_code` is a strict positive integer in the v3.1 signed BIGINT range
+1..9,223,372,036,854,775,807; `player_code` is its unique minimal ASCII decimal
+UTF-8 spelling. Proposed explicit upper bound requires **D06** acceptance; it
+reflects the tracked BIGINT source field and must not be silently narrowed to
+JavaScript's safe-integer range or parsed through float. Raw text sources require
+a separately reviewed parser contract; an alias cannot be accepted by coercion.
+Within season, one element maps to one code and one code to one element. Across
+seasons, official proof must establish continuity; element ID alone does not.
+The same code may have a different element ID/club/name next season, without
+carrying any C1 history across seasons. Transfer/name changes never mint codes.
+
+Literal, unexecuted design vectors:
+
+| Input | Expected text / action |
+|---|---|
+| integer 1; 2; 10; 100; 20; 3 | `"1"`; `"2"`; `"10"`; `"100"`; `"20"`; `"3"` respectively |
+| integer 9007199254740993 | `"9007199254740993"` exactly; no binary64 round trip |
+| integer 9223372036854775807 | `"9223372036854775807"` exactly |
+| 0, negative integer, 9223372036854775808 | Reject range |
+| true, 2.0, null | Reject type; not integer aliases |
+| raw `"02"`, `"+2"`, `" 2"`, `"2 "`, `"2.0"`, `"2e0"`, `"٢"`, `"２"` | Reject alternate spelling; no Unicode or whitespace normalization |
+| same-season two elements assigned code 10 | Reject collision before any resampling |
+| missing bridge for a blank-only member | Reject entire serial admission; no independent-season fallback |
+
+Canonical sorted union bytes for the first row's six distinct codes are exactly
+`["1","10","100","2","20","3"]` followed by one LF. Thus index 1 is code 10,
+not code 2. A hypothetical index vector `[3,1,1,5,0,3]` has code multiplicities
+`1:1,10:2,100:0,2:2,20:0,3:1`. This is a hand-specified mapping oracle, **not** a
+PCG64 draw or a claimed seed result. If code 100 occurs only on blank rows, it
+still occupies index 2 and keeps union size six. Dropping it changes the draw
+law and RNG consumption even if its realized score weight is zero.
+
+Cross-season illustrative mapping: season A elements 7->10 and 8->2, season B
+9->10 and 7->3. Code 10 shares multiplicity between A/7 and B/9; element 7 does
+not link A/7 to B/7. Canonical row key order remains season/GW/numeric element;
+crossed bootstrap player order remains numeric element on its frozen nonblank
+universe. No decimal lexical order is substituted there. These identifiers are
+invented examples, not source rows or evidence about any player.
+
+Future literal bytes/hashes and full-stream vectors must be independently
+checked under the frozen NumPy environment; none are generated by importing
+C1/C2 here. Existing serial tests use `c1/c2/c3/zz`, proving the current rule's
+intent but not a complete historical-decimal adapter. **E06** must supply exact
+9999-replicate reference streams with decimal union including blank-only members,
+without changing seeds or adding an implementation-derived oracle.
+
+Adapter completeness obligations beyond identity (all OPEN under E06):
+
+| Case/field | Exact required C1 -> v2 mapping or independent oracle |
+|---|---|
+| U0 | Map `*_for_evaluation` nullable fields, `prediction_complete`, modeled_points, full minute PMF and Poisson means; preserve separate numeric incomplete aggregates in C1 detail only |
+| UM1 | Preserve gameweek PMF, start/appearance probabilities and expected appearance sum; UM1-only raw-rate means and nulls; goal/assist distributions absent |
+| UA1 | Preserve U0 minute fields/start undefined; exact posterior weights/shapes/rates and fixed exposure U0 evaluation minutes/90, not a fitted Poisson substitute |
+| UM1UA1 | Preserve UM1 minute fields and same UA1 rate parameters, mixing over full minute PMF; missing attack component leaves combined total null |
+| Blank | Four present complete forecasts, empty fixture tuple, support `[0]`, PMF `[1]`, zero moments; U0/UA1 start undefined, UM1/combined start as defined by C1; zero-exposure registered distribution families retained |
+| DGW+ | PMF support 0..90*f; per-fixture appearance expectations sum, not appearance formula applied to total minutes; all fixture IDs and overflow counts retained |
+| Nonblank missing rates/minutes/starts | No dropped row or null-to-zero; numeric component-only totals may exist while completeness=false; no false complete C2 row |
+| Availability | Hard zero, soft chance, unknown, target binding, uppercase normalization and null order agree with C1/production; hard zero cannot repair missing baseline minutes |
+| Strata/history | Same-season source/target positions, previous-GW reason, unweighted prior minutes, prior-only/partial event exposure and promoted map; no outcome-dependent grouping |
+
+Hand-checkable numeric vectors for later parity review: one complete MID fixture
+with baseline minutes 90, raw xG/90=1, xA/90=1 and known available status gives
+U0 expected minutes 90, appearance 2, goals 1, assists 1, modeled points 10,
+point-mass minutes at 90, start undefined. Two such fixtures give minutes 180,
+appearance 4, goals 2, assists 2, modeled points 20. Two fixtures at 30 minutes
+each have appearance total 2 (one per fixture), not an inference that the player
+started. Missing raw xG with known minutes retains missing goal mean and false
+completeness even when a component-only numeric total exists. No scientific
+success is inferred from these algebraic examples. Numerical posterior, tail,
+overflow and all-null golden values remain E06; do not invent them here.
+
+Required ranking membership byte vector, independent of bridge serialization:
+`[{"gameweek":2,"season":"2023-24"},{"gameweek":38,"season":"2024-25"}]`
+plus LF. It includes no candidate, player code, exclusion or source hash. Those
+belong in separate provenance fields. C2's existing membership/common-population
+hash scopes remain unchanged, including blanks where the relevant scope requires.
+
+### 17.8. B07 — identity DAG, exclusive slots and recovery
+
+Propose the following identities; objects store their inputs and a separate
+content hash. No object includes its own hash or a downstream hash. For new
+contracts this refines section 9's earlier common-envelope sketch: schema-specific
+objects may omit time/attempt fields that would pollute deterministic identity;
+field sets must be closed explicitly in D03/D07 before schema implementation.
+
+| Identity / domain | Exact semantic inputs; exclusions and use |
+|---|---|
+| `study-slot-v1` | Owner-assigned opaque study ID, stage DEVELOPMENT, authorized exposure-scope ID and protocol lineage. Stable across code/request revisions for the same scientific question; cannot mint a fresh untouched slot by changing a hash |
+| `request-v2` | Study ID, exact protocol/clarification/design/contract hashes, scope/universe/exclusion rules, source registration and bridge/map/proof policy IDs, code commit + relevant source hashes, lock/runtime/native profile, authority/clock/resource policy, EVAL_AUTH and output contracts. Excludes future outcome content hash, grant nonce, attempt and times |
+| `prediction-core-v2` | Request ID, ordered admitted source/view/bridge/map content hashes, all four canonical forecast slot hashes, C1 detail inventory/flags, exact universe. No resource/access receipt hashes or recording times |
+| `prediction-freeze-v2` | Prediction core plus exact immutable package-manifest hash and completed authority/freeze evidence. Attempt-specific freeze; must be fully certified before outcome release |
+| `outcome-core-v2` | Exact authorized registration/finalization versions, ordered canonical outcome files and missingness inventory, protocol/scope. No grant/attempt/time fields; join separately binds prediction freeze |
+| `join-core-v2` | Prediction core, outcome core, bridge/join rule, canonical joined bytes and exhaustive reconciliation counts/digests. Access/freeze receipts live in attempt envelope |
+| `statistical-core-v2` | Request, prediction/outcome/join core IDs, candidate, exact `core_view` hashes and ALL deterministic StatisticalPackageV2 fields. No stage resource receipt, timestamps, permit, attempt or operational choice |
+| `selection-core-v2` | Ordered statistical core IDs/NOT_EVALUATED-by-rule records, frozen selection rule and candidate scope. Resource/admission-dependent effectiveness is outside this deterministic mathematical core |
+| `attempt-v1` | Study slot, request, verifier epoch, durable sequence and fresh 256-bit nonce allocated before any protected access. Every interrupted/recovery/reproduction attempt gets a distinct ID |
+| `prepared-package-v2` | Complete exact payload manifest/file hashes, deterministic core IDs, attempt ID and completed upstream authority/resource evidence available before publication. A package candidate, not completion |
+| `publication-v2` | Exact prepared-package hash, attempt, reserved slot/fence and terminal evidence admitted by the accepted B04-F backend. Never fed back into core/prepared payload; unavailable until B04-F is resolved |
+| `adoption-v1` / `recovery-v1` | New action ID/grant/ledger sequence, exact prior publication or incomplete attempt, current witness head and verification report. Outside original publication inventory; cannot change original bytes/history |
+
+Statistical core identity excludes policy-dependent operational PASS; report it
+only as mathematical evidence, never as a complete result. Changing an input
+source/version/code/environment changes request/core identity even if point
+scores happen to coincide. Repeating identical inputs in the exact environment
+must reproduce deterministic core bytes; new attempt times, receipt hashes or
+resource observations change the attempt/publication, not those mathematical
+bytes. This is a new versioned contract, not retroactive field-stripping from v1.
+If completed prediction freeze identity differs on reproduction, mathematical
+comparison binds its prediction **core**; attempt envelopes retain both freezes
+and full provenance. No ambiguity between byte equality and semantic similarity.
+
+Acyclic references, arrows meaning "depends on already-existing":
+
+```text
+request -> protocol/source registrations/code/environment/policy
+prediction core -> request + admitted views + four forecasts
+prediction freeze -> prediction core + completed attempt evidence
+outcome core -> authorized outcome versions
+join core -> prediction core + outcome core + reconciliation
+component cores -> join core + component views
+component admissions -> component cores + completed resource receipts
+combination permit -> component admissions + grant reservation + prediction freeze
+combination core -> join core + combination view (permit bound in attempt evidence)
+selection core -> evaluated cores + frozen rule
+prepared package -> cores + completed attempt evidence + exhaustive inventory
+terminal evidence -> prepared package + completed measured publication operations
+publication admission -> terminal evidence + slot fence [B04-F unresolved]
+adoption/recovery -> original publication/attempt + fresh grant/witness proof
+```
+
+Resource receipts bind completed output manifests and previous receipts, not a
+future whole-result hash. A prepared manifest excludes itself and downstream
+terminal receipts from its file inventory. A publication verifier requires the
+separate terminal chain; directory existence is never sufficient. Terminal
+attestation emission is not silently excluded from accounting: section 17.5
+remains a hard stop. An acyclic hash graph alone does not prove acyclic durable
+completion or inclusive resource measurement.
+
+Proposed concurrency protocol (**D07/E07**): trusted verifier atomically reserves
+both study-stage slot and grant nonce, emits a monotonically increasing fencing
+number, obtains durable witness acknowledgment, then authorizes work. Only its
+current fence can mutate owned staging or request publication. A losing contender
+has no source read capability. No lock stolen because of PID reuse, age, process
+absence or elapsed lease. Recovery first proves old workers/capabilities revoked,
+ledger/witness agreement and exact authorized scope before any new fence. If
+that cannot be established, remain INTERRUPTED_REVIEW_REQUIRED.
+
+Prepared files have safe fixed logical names and exact inventories, absent-only
+creation, no symlink/hardlink/device acceptance, single-filesystem staging and
+bounded writes. Candidate Linux primitive is no-replace installation plus
+file/directory flushes on the selected filesystem; exact syscall and durability
+semantics require backend review and crash/race proof. Plain exists-check then
+rename is insufficient. Privileged host mutation/storage failure is outside
+local immutability assurance and must not be described as impossible.
+`artifact_snapshot.py` proves none of slot arbitration, fencing, publisher
+election, atomic complete visibility or crash durability.
+
+Completed-result adoption means current authorized re-verification of the SAME
+publication identity, SAME exact manifest and every file byte, SAME upstream
+provenance and valid terminal evidence. Record adoption separately, do not rewrite
+timestamps or resource evidence, and perform no new source read or scoring.
+A new measured attempt with equal core but different receipts is a reproduction,
+not adoption. It needs a separately authorized reproduction namespace linked to
+the original study/exposure history; it cannot overwrite or reopen its slot.
+Different bytes presented for an occupied slot -> PUBLICATION_CONFLICT. Different
+requests for the same study do not escape the slot or restart an unseen trial.
+Assignment/governance of study IDs and reproduction namespace is **D07**, not a
+UUID-generation solution to scientific replay.
+
+Recovery matrix:
+
+| Last independently durable fact | Permissible action under fresh recovery authority |
+|---|---|
+| Reserved nonce, no proven dispatch | Preserve consumed nonce; reconcile broker/witness events. Absence of a completion event is not proof of no read |
+| Prediction staged, no certified freeze | No outcome access; no adoption of partial prediction; retry only with affirmative no-outcome-exposure proof and exact approved identity |
+| Certified freeze, outcome dispatch reserved | Treat outcomes as possibly exposed, prohibit prediction regeneration in study path |
+| Components complete, no combination permit | Preserve component evidence; no completed selection if both passed and combination remains unauthorized |
+| Combination permit reserved or start uncertain | Treat compute as possibly performed; never replay automatically or label unseen |
+| Payload installed, terminal evidence absent/late/corrupt | Quarantine as uncertified; no result admission, no synthetic reconstruction of historical resource PASS |
+| Complete publication with accepted terminal evidence | Reverify exact chain/files under current read grant, reconcile witness/high-water, then exact adoption only |
+| Any rollback/fork, missing latest witness or unknown cleanup | Block new authority and reuse; preserve exposure; owner/reviewer reconciliation required |
+
+No recovery pass from hashing today's files proves historical authorization,
+chronology, untouchedness or a missing past resource measurement. Cancellation
+records survive crashes; discarded payloads do not erase possible computation.
+Cleanup touches only verified owned scratch under scoped authority; unknown
+cleanup quarantines. Retention and secure deletion guarantees are not assumed.
+No public upload, offsite backup, key recovery, successful restore or promotion
+is established. **NO VERIFIED OFFSITE BACKUP** remains the project status.
+
+### 17.9. Open decision/evidence register and B01–B07 ledger
+
+All entries below are required closure inputs, not optional enhancements. Owners
+are roles; no person, key, service or source instance is invented. Approval of
+section 3.2 does not approve the following parameter values or missing evidence.
+No request or grant may use unresolved placeholders.
+
+| ID | Decision owner and precise outstanding acceptance |
+|---|---|
+| D01 | Owner + source/protocol reviewer: admissible attribution/proof methods and uncertainty, exact as-of versus corrected-v3.1 compatibility rule/claims, finalized scheduling limitation, outcome finalization authority and unavailable-object enums. No source instance is approved; incompatible frozen corrections require an amendment or continued synthetic-only scope |
+| D02 | Owner + security reviewer: Ed25519 format/provider and key enrollment/custody/rotation/compromise policy; role/audience IDs and privilege separation; 36 h validity, 5 min anchor age, 2 s uncertainty/drift, 1 s lease/heartbeat and 2 s cancellation semantics; clock source/boot/suspend policy; verifier/witness backend, synchronous acknowledgment and retention/recovery authority |
+| D03 | Owner + independent C2/protocol reviewer: exact v2 API/schema field sets, synthetic/registered provenance literals, structural permit projection, incomplete versus statistical FAIL semantics, immutable selection-plan effectiveness, compatibility/parity acceptance. No real confirmation API admitted by this development profile |
+| D04 | Owner + protocol/resource reviewer: completed-component admission interpretation versus freeze wording; exact prediction/evaluation/shared-cost intervals, separate versus combined 6 h phase reading, retries/waits and registration boundary. D04-F must choose/prove terminal completion or explicitly amend audit accounting; current effective choice is remain blocked |
+| D05 | Owner + platform reviewer: all proposed numeric table values, exact Linux/kernel/CPython/native/wheel/image/filesystem builds, backend launcher and syscall/FD/mount allowlists, conservative memory relation, helper/witness accounting, headroom and certification dimensions. No sampling-only waiver or platform substitution |
+| D06 | Owner + source/statistical reviewer: exact bridge schema/BIGINT bound/parser, official identity evidence, no normalization aliases, full parity/missingness mapping; freeze independent decimal/reference vectors and same-environment numerical acceptance without rounding |
+| D07 | Owner + publication/recovery reviewer: study/exposure slot governance, reproduction/adoption scope, fencing/ledger/witness atomicity, terminal evidence linkage with D04-F, supported durability/power-loss claim, retention and cleanup policy, recovery admission and RPO/RTO claim (currently unmeasured) |
+
+| Evidence | Required proof; current disposition |
+|---|---|
+| E01 | Separately authorized exact source-version/correction/completion/availability, bridge/map and finalization evidence; no protected source inspected here; availability/compatibility may prove impossible |
+| E02 | Independent real isolation, issuer/verifier/capability/replay/revocation tests and witnessed rollback/clock/recovery failures on accepted backend; no keys/services created and no tests run |
+| E03 | Closed v2 contracts, no unauthorized combination dispatch, immutable projections and independent v1/v2 numerical/RNG/membership/selection parity; no v2 implementation exists |
+| E04 | Completed-stage scope/timer evidence and full terminal accounting, last-byte/fsync/ack timeout and reader-admission proof; no final backend or justified audit exclusion exists |
+| E05 | Actual continuous memory/task/thread/byte/inode/deadline enforcement and full-scale outcome-free certification on exact Linux/Python 3.10 profile; neither CI configuration nor old feasibility report proves it |
+| E06 | Independent decimal, cross-season, blank-only, null/blank/DGW/overflow/availability/full-distribution/U0 parity vectors plus full 9,999-reference-stream comparison; examples in this document are specified, not executed |
+| E07 | Two-writer races, fences/no-read losers, exact adoption conflicts, crash/power-loss/durability and witness reconciliation at every transition; no proof inherited from the snapshot helper |
+
+| Gate | Approved policy / concrete C3.0 candidate | Remaining decisions/evidence and effective status |
+|---|---|---|
+| B01 | Attributable pre-cutoff evidence; separate v3.1 adapter, unchanged legacy v2 gate; field-version contract and literal timeline vectors in 17.2 | D01, E01, E06; OPEN, real source scope unregistered/unauthorized |
+| B02 | Development single operator without independent custody; signature/grant/clock/lease/witness proposal in 17.3 | D02, D05, D07, E02; OPEN, no grants or access; confirmation closed |
+| B03 | EVAL_AUTH before combination computation; explicit pure v2 interfaces/truth table in 17.4 | D03/D04, E03/E06; OPEN, v1 remains synthetic-only; no private API workaround |
+| B04 | Completed intervals for conditional admission, inclusive final gate; 17.5 gives accounting and exposes terminal-attestation gap | D04 including D04-F, E04/E07; OPEN, no certified freeze/result publication until terminal contract closes |
+| B05 | Linux/Python 3.10 first; proposed numeric containment profile and full-scale gates in 17.6 | D05, E05 and terminal/isolation evidence; OPEN, no Linux/macOS resource guarantee |
+| B06 | Minimal ASCII decimal, unchanged UTF-8 lexical serial order, blank-only inclusion; 17.7 literal identity and parity obligations | D06, E01/E03/E06; OPEN, decimal examples do not certify actual bridges or predictive performance |
+| B07 | Deterministic cores separate from attempts/receipts; exact-byte adoption, acyclic identities and recovery matrix in 17.8 | D07/D04-F, E02/E04/E07; OPEN, no completed-result adoption or recovery guarantee |
+
+Alternatives remain explicit: reject insufficient source scope rather than weaken
+causality (B01); stay synthetic-only if custody/isolation cannot be proved (B02);
+keep v1 rather than bypass EVAL_AUTH (B03); remain publication-blocked or obtain
+an explicit prospective terminal-accounting amendment (B04/B07); deny unsupported
+profiles rather than infer guarantees (B05); reject unresolved bridges rather
+than infer identities (B06). Changing an approved direction requires section
+3.2's prospective change control, not a fallback chosen during implementation.
+
+### 17.10. Review handoff, validation boundary and stopping point
+
+This proposal is independently reviewable as a **design with explicit blockers**,
+not a complete implementation specification certified by its author. Review must
+challenge especially the final-attestation accounting problem, conservative RSS
+containment, source correction compatibility and hidden v2/RNG semantic changes.
+A SAFE design verdict can mean it correctly stops; it does not close any evidence
+gate or authorize code. All dependent implementation remains blocked pending
+accepted contracts/parameters, a separately authorized scope and the relevant
+staged evidence plan. Source-specific E01 remains a later separately authorized
+registration gate even if synthetic infrastructure is eventually permitted.
+
+Only this design file is modified. Validation for this task consists of complete
+single-file diff inspection, whitespace and relative-link checks, Git HEAD/index/
+status checks, preserved primary Task025 hashes, and byte/inventory/sanitization
+checks on the external review bundle. These are document checks, not executed
+bridge/parity tests, kernel tests, experiments or benchmarks. Full mathematical
+and platform evidence is explicitly absent. Source/test/schema files are read
+and copied as tracked review context, never imported or executed.
+
+No protected/private/credential/data-directory contents were opened or enumerated.
+Existing ignored operational artifacts were not touched by task actions; their
+contents were deliberately not audited, so no claim about concurrent actors is
+made. No grant, credential, prediction, outcome, research publication, confirmation
+access, model promotion or FPL action was created or performed. Nothing was
+staged, committed, pushed, submitted to Claude or changed on PR #2. The sanitized
+review bundle is an external design-review artifact, not a research result.
+
+
+### 17.11. Owner decision sheet — D01–D07 remain open
+
+The owner-supplied independent Claude Sonnet 5 High review reported **SAFE /
+IMPLEMENTATION READY: NO** for the preceding proposal, with one mandatory Medium
+B05 memory/witness-accounting ambiguity. Section 17.6 clarifies that ambiguity;
+this amendment has not itself been independently re-reviewed. No policy direction
+from section 3.2 is reopened. Every recommendation below is a **proposal**, not
+an owner decision, evidence of feasibility, or permission to implement or run.
+The detailed parameter register in 17.9 remains binding; these summaries do not
+approve unspecified algorithms, providers, clock bounds, budgets or schemas.
+
+| Decision | Plain-language choice and recommendation (proposal) | Consequence and evidence needed | What remains blocked |
+|---|---|---|---|
+| D01 — Which historical evidence is sufficient? | Approve an explicit proof standard for when each exact corrected v3.1 value was available. Recommend requiring attributable pre-cutoff proof and keeping incompatible scope synthetic-only. | Some corrected values may be unusable; no earlier-value substitution or row deletion. E01/E06: exact version/correction/completion timelines, finalization and independent mapping/parity evidence. | Real-source registration/use and stronger causal claims; no historical data inspection is authorized by choosing the standard. |
+| D02 — How will one owner control access safely? | Approve custody, role separation, signing/clock/lease/revocation parameters and recovery witness arrangements. Recommend the development-only profile in 17.3, subject to explicit acceptance of each parameter and proof; retain separate worker and authority privileges. | The owner/root remains trusted; this cannot prove independent custody or instantaneous revocation. E02/E05/E07: isolation, clock/replay/revocation failures and current witness/rollback reconciliation. | Grant infrastructure implementation pending accepted contracts and separate scope; all grant issuance, real reads and confirmation access remain unauthorized. |
+| D03 — How will computation wait for permission? | Accept or revise the exact versioned pure component/combination interfaces. Recommend the proposed EVAL_AUTH split, retaining synthetic v1 unchanged and authorization-stop states outside completed results. | Requires a reviewed API/schema change, not a wrapper after computation. E03/E06: independent full-stream, membership, numerical and selection parity, plus no-combination-before-permit evidence. | C2 changes and real evaluation; policy approval alone does not approve schemas or prove parity. |
+| D04 — What exactly counts as finished within budget? | Set the phase/shared-cost boundaries and resolve D04-F terminal attestation. Recommend keeping final completion blocked until an inclusive terminal contract is proved; any audit exclusion needs an explicit prospective amendment. | A final receipt cannot certify its own future write. E04/E07: final-write/fsync/ack timing, reader admission and crash evidence; owner must also resolve the 6-hour and enclosing 24-hour interpretations. | Certified prediction freeze, completed research publication and dependent outcome release; no reserved headroom may substitute for measurement. |
+| D05 — Can the whole system fit the limits? | Approve exact Linux/Python 3.10 backend, numeric caps, process layout and witness accounting. Recommend distinct functional roles sharing the one combined helper allowance in 17.6; do not approve a topology or external-service exclusion without evidence. | The allowance is collective, not per role: the four allocations sum to 2,048 MiB. Feasibility is unknown. E05 plus E02/E07: continuous aggregate RSS/task/byte/time containment, witness attribution and full-scale synthetic certification. | Platform/profile implementation pending accepted scope, resource PASS and protected outcome access; no extra witness budget or macOS equivalence is implied. |
+| D06 — How are player identities and forecasts preserved? | Approve the exact decimal/BIGINT bridge and complete adapter mapping. Recommend minimal ASCII decimal, current lexical serial order and rejection of ambiguous or blank-only missing bridges. | No name matching, float conversion or seeded-order repair. E01/E03/E06: official identity proof, independent decimal/full-stream vectors and null/blank/DGW/distribution/U0 parity. | Real bridge admission and adapter certification; handwritten examples are not executed proof. |
+| D07 — What can be published, adopted or recovered? | Approve study-slot governance, exact-byte adoption/reproduction rules, durability/retention and recovery scope. Recommend separate immutable cores/attempts and exposure-preserving recovery; keep terminal admission coupled to D04-F. | Equal scores do not permit replacement or a new unseen trial. E02/E04/E07: competing-writer/fencing tests, exact provenance checks, crash/durability and witness reconciliation. | Completed adoption/publication and recovery guarantees; no verified offsite backup, confirmation authority or promotion follows. |
+
+All D01–D07 and E01–E07 remain OPEN; B01–B07 remain implementation/evidence
+gates. Evidence requires later separately authorized work in the relevant slice;
+this sheet authorizes none. Synthetic infrastructure success would still not
+establish predictive validation. The present amendment requires only document
+checks and a short diff-only re-review; no new full review bundle is requested.
