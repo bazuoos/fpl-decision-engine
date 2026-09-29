@@ -42,11 +42,14 @@ exact immutable Task028F plan -> LaunchAgent -> preflighted controller
     -> one typed Task028B call per active invocation -> terminal marker
     -> later invocations quiescent -> explicit owner deactivation
          -X-> no inferred target/prediction, decision, journal or manager action
-         -X-> two reviewed GW4 plans are stale; neither was installed or activated
+         -> two early GW4 plans stale; later e10d4c9 plan completed and deactivated
 
-RESEARCH: historical*.py + separately stored historical/experiment artifacts
+RESEARCH: historical*.py + pure Task033 C1/C2 components
 pinned archives -> causal features -> frozen baseline / preregistered experiments
-                    -X-> no automatic promotion or runtime feedback to production
+synthetic records -> uncertainty kernels -> deterministic evaluation/gates
+    -> future C3 authorized loader / guarded join / immutable publication
+         -X-> C3 not implemented; C1/C2 cannot load or publish real evidence
+         -X-> no automatic promotion or runtime feedback to production
 
 LOCAL/PRIVATE RECOVERY (outside decision authority and outside Git)
 authorized quiescent data + recorded clean Git revision
@@ -73,6 +76,17 @@ the browser presentation layer is not. GameweekDecision validates persisted
 selection using `decision.validate_decision_selection`, not `optimize_xi`.
 Transfer proof uses existing trusted mechanisms/candidates separately.
 
+## Task033 research boundary
+
+The [candidate freeze](TASK033B1B_CANDIDATE_FREEZE_AMENDMENT.md) binds the
+replacement protocol. Task033C1 implements pure uncertainty kernels and
+Task033C2 consumes validated in-memory synthetic records to produce strict
+canonical result records. C2 does not construct predictions or access a
+filesystem, database, network, clock, manager state or publication service.
+Task033C3 is the proposed boundary for authorized causal sources, guarded joins,
+resource enforcement and immutable publication; it has not started. Synthetic
+success or failure cannot promote `xfp_v01` or authorize real/holdout access.
+
 ## Code navigation
 
 Package location does not establish production authority: `historical*.py` and
@@ -91,6 +105,7 @@ All paths below are under [src/fpl_decision_engine](../../src/fpl_decision_engin
 | Contracts and execution | `operational_manifest.py`, `operational_runner.py`; `test_operational_manifest`, `test_operational_runner` |
 | Presentation / human record / comparison | `presentation/gameweek_decision.py`, `decision_journal.py`, `decision_diff.py`; corresponding tests |
 | Historical research | `historical.py`, `historical_sources.py`, `historical_backtest.py`, `historical_*_experiment.py`; historical tests |
+| Task033 synthetic research | `research/task033c1.py`, `research/c2/`; Task033C1/C2 tests and closed research schemas |
 
 Operational tooling outside the engine package includes
 [`scripts/completion_monitor_schedule_drill.py`](../../scripts/completion_monitor_schedule_drill.py),
@@ -158,12 +173,14 @@ implements the controller and lifecycle tooling outside the engine package. A
 prepared plan binds one exact target, finite window, code revision, interpreter,
 environment, paths and optional prediction. After preflight, each active
 invocation may call Task028B once. A validated immutable terminal marker makes
-later invocations network-inert until exact-label owner deactivation. Two GW4
-Task028G plans were prepared locally and independently reviewed, but neither was
-installed or activated. Their expected revisions (`cc30c99` and `f66fe4b`) now
-precede current HEAD, so exact-commit preflight rejects both. They remain
-immutable historical operational evidence. The controller operates on one Mac
-and makes no continuous-availability claim.
+  later invocations network-inert until exact-label owner deactivation. Two early
+GW4 Task028G plans were prepared locally and independently reviewed but remained
+inactive. Their expected revisions (`cc30c99` and `f66fe4b`) now precede current
+HEAD, so exact-commit preflight rejects both. A later plan bound to `e10d4c9` was
+owner-activated, produced validated realized and evaluation receipts, reached
+terminal state and was deactivated. All remain immutable local operational
+evidence. The controller operates on one Mac and makes no continuous-availability
+claim.
 
 ## Application boundary today
 

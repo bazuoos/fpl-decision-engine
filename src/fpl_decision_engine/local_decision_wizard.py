@@ -106,6 +106,7 @@ class WizardState(str, Enum):
     TRUST_CHAIN_INVALID = "TRUST_CHAIN_INVALID"
     IMMUTABLE_CONFLICT = "IMMUTABLE_CONFLICT"
     STORAGE_FAILURE = "STORAGE_FAILURE"
+    SAFETY_CHECK_FAILED = "SAFETY_CHECK_FAILED"
 
 
 @dataclass(frozen=True)
@@ -431,6 +432,7 @@ def run_guided_manager_decision(
     draft_path: Path | None = None,
     draft_root: Path = DEFAULT_DRAFT_ROOT,
     evidence_root: Path = DEFAULT_EVIDENCE_ROOT,
+    safety_check: Callable[[], None] | None = None,
     clock: Callable[[], datetime] = _system_utc_now,
     ports: WizardPorts = WizardPorts(),
 ) -> WizardResult:
@@ -620,6 +622,15 @@ def run_guided_manager_decision(
                 summary = ", ".join(f"{item.field}:{item.code}" for item in errors)
                 io.show_public(f"INVALID_DRAFT: {summary}")
                 return WizardResult(WizardState.CANCELLED, preparation.manifest.preparation_id)
+        if safety_check is not None:
+            try:
+                safety_check()
+            except Exception:
+                io.show_public("SAFETY_CHECK_FAILED: draft saved; nothing published.")
+                return WizardResult(
+                    WizardState.SAFETY_CHECK_FAILED,
+                    preparation.manifest.preparation_id,
+                )
         if not io.confirm("publish", PUBLISH_PHRASE):
             io.show_public("CANCELLED: draft saved; nothing published.")
             return WizardResult(WizardState.CANCELLED, preparation.manifest.preparation_id)
@@ -629,6 +640,19 @@ def run_guided_manager_decision(
         ports.save_saved_draft(draft, path)
         published = ports.publish(draft, preparation, output_root=evidence_root, clock=clock)
         io.show_public("VERIFIED_EVIDENCE_PUBLISHED")
+        if safety_check is not None:
+            try:
+                safety_check()
+            except Exception:
+                io.show_public(
+                    "SAFETY_CHECK_FAILED: verified evidence is preserved; "
+                    "no recommendation is available."
+                )
+                return WizardResult(
+                    WizardState.SAFETY_CHECK_FAILED,
+                    preparation.manifest.preparation_id,
+                    evidence_path=published.path,
+                )
         if not io.confirm("run", RUN_PHRASE):
             return WizardResult(
                 WizardState.VERIFIED_EVIDENCE_PUBLISHED,

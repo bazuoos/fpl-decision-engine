@@ -1,0 +1,1081 @@
+{
+  "$defs": {
+    "Bound": {
+      "additionalProperties": false,
+      "properties": {
+        "family_q": {
+          "$ref": "#/$defs/Statistic"
+        },
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "percentile_high": {
+          "$ref": "#/$defs/Statistic"
+        },
+        "percentile_low": {
+          "$ref": "#/$defs/Statistic"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_APPLICABLE",
+            "INSUFFICIENT_EVIDENCE",
+            "NUMERICAL_FAILURE",
+            "UNDEFINED",
+            "STRUCTURALLY_IDENTICAL"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "system": {
+          "enum": [
+            "crossed",
+            "serial"
+          ],
+          "title": "System",
+          "type": "string"
+        },
+        "upper": {
+          "$ref": "#/$defs/Statistic"
+        }
+      },
+      "required": [
+        "system",
+        "status",
+        "upper",
+        "family_q",
+        "percentile_low",
+        "percentile_high",
+        "passed"
+      ],
+      "title": "Bound",
+      "type": "object"
+    },
+    "CalibrationBin": {
+      "additionalProperties": false,
+      "properties": {
+        "bin": {
+          "maximum": 9,
+          "minimum": 0,
+          "title": "Bin",
+          "type": "integer"
+        },
+        "candidate": {
+          "enum": [
+            "U0",
+            "UM1",
+            "UA1",
+            "UM1UA1"
+          ],
+          "title": "Candidate",
+          "type": "string"
+        },
+        "event": {
+          "minLength": 1,
+          "title": "Event",
+          "type": "string"
+        },
+        "forecast": {
+          "$ref": "#/$defs/Statistic"
+        },
+        "gameweek": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Gameweek"
+        },
+        "group": {
+          "minLength": 1,
+          "title": "Group",
+          "type": "string"
+        },
+        "observed": {
+          "$ref": "#/$defs/Statistic"
+        },
+        "season": {
+          "minLength": 1,
+          "title": "Season",
+          "type": "string"
+        },
+        "weight": {
+          "minimum": 0,
+          "title": "Weight",
+          "type": "number"
+        }
+      },
+      "required": [
+        "season",
+        "gameweek",
+        "group",
+        "candidate",
+        "event",
+        "bin",
+        "weight",
+        "forecast",
+        "observed"
+      ],
+      "title": "CalibrationBin",
+      "type": "object"
+    },
+    "ClusterSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "observed_gameweeks": {
+          "minimum": 0,
+          "title": "Observed Gameweeks",
+          "type": "integer"
+        },
+        "observed_players": {
+          "minimum": 0,
+          "title": "Observed Players",
+          "type": "integer"
+        },
+        "replicates": {
+          "const": 9999,
+          "title": "Replicates",
+          "type": "integer"
+        },
+        "retained_gameweeks": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "minimum": 0,
+              "type": "integer"
+            }
+          ],
+          "title": "Retained Gameweeks",
+          "type": "array"
+        },
+        "retained_players": {
+          "maxItems": 3,
+          "minItems": 3,
+          "prefixItems": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "minimum": 0,
+              "type": "integer"
+            }
+          ],
+          "title": "Retained Players",
+          "type": "array"
+        },
+        "season": {
+          "minLength": 1,
+          "title": "Season",
+          "type": "string"
+        },
+        "system": {
+          "enum": [
+            "crossed",
+            "serial"
+          ],
+          "title": "System",
+          "type": "string"
+        }
+      },
+      "required": [
+        "system",
+        "season",
+        "observed_players",
+        "observed_gameweeks",
+        "retained_players",
+        "retained_gameweeks",
+        "replicates"
+      ],
+      "title": "ClusterSummary",
+      "type": "object"
+    },
+    "DiagnosticInterval": {
+      "additionalProperties": false,
+      "properties": {
+        "group": {
+          "minLength": 1,
+          "title": "Group",
+          "type": "string"
+        },
+        "high": {
+          "$ref": "#/$defs/Statistic"
+        },
+        "low": {
+          "$ref": "#/$defs/Statistic"
+        },
+        "metric": {
+          "minLength": 1,
+          "title": "Metric",
+          "type": "string"
+        },
+        "season": {
+          "minLength": 1,
+          "title": "Season",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "FINITE",
+            "UNDEFINED",
+            "INSUFFICIENT_EVIDENCE",
+            "POSITIVE_INFINITY"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "system": {
+          "enum": [
+            "crossed",
+            "serial"
+          ],
+          "title": "System",
+          "type": "string"
+        }
+      },
+      "required": [
+        "system",
+        "season",
+        "group",
+        "metric",
+        "status",
+        "low",
+        "high"
+      ],
+      "title": "DiagnosticInterval",
+      "type": "object"
+    },
+    "ExcludedGameweek": {
+      "additionalProperties": false,
+      "properties": {
+        "common_players": {
+          "minimum": 0,
+          "title": "Common Players",
+          "type": "integer"
+        },
+        "identity": {
+          "$ref": "#/$defs/Identity"
+        },
+        "reasons": {
+          "items": {
+            "enum": [
+              "FEWER_THAN_50_COMMON_PLAYERS",
+              "CONSTANT_ACTUAL",
+              "CONSTANT_CANDIDATE",
+              "CONSTANT_CONTROL"
+            ],
+            "type": "string"
+          },
+          "title": "Reasons",
+          "type": "array"
+        }
+      },
+      "required": [
+        "identity",
+        "common_players",
+        "reasons"
+      ],
+      "title": "ExcludedGameweek",
+      "type": "object"
+    },
+    "GateEndpoint": {
+      "additionalProperties": false,
+      "properties": {
+        "crossed": {
+          "$ref": "#/$defs/Bound"
+        },
+        "family": {
+          "enum": [
+            "global",
+            "subgroup"
+          ],
+          "title": "Family",
+          "type": "string"
+        },
+        "group": {
+          "minLength": 1,
+          "title": "Group",
+          "type": "string"
+        },
+        "improvement": {
+          "title": "Improvement",
+          "type": "boolean"
+        },
+        "metric": {
+          "minLength": 1,
+          "title": "Metric",
+          "type": "string"
+        },
+        "observed_adverse": {
+          "$ref": "#/$defs/Statistic"
+        },
+        "passed": {
+          "title": "Passed",
+          "type": "boolean"
+        },
+        "population_status": {
+          "enum": [
+            "PASS",
+            "NOT_APPLICABLE",
+            "INSUFFICIENT_EVIDENCE",
+            "NUMERICAL_FAILURE"
+          ],
+          "title": "Population Status",
+          "type": "string"
+        },
+        "scale": {
+          "minimum": 0,
+          "title": "Scale",
+          "type": "number"
+        },
+        "season": {
+          "minLength": 1,
+          "title": "Season",
+          "type": "string"
+        },
+        "serial": {
+          "$ref": "#/$defs/Bound"
+        },
+        "threshold": {
+          "title": "Threshold",
+          "type": "number"
+        }
+      },
+      "required": [
+        "family",
+        "group",
+        "season",
+        "metric",
+        "scale",
+        "threshold",
+        "improvement",
+        "observed_adverse",
+        "population_status",
+        "crossed",
+        "serial",
+        "passed"
+      ],
+      "title": "GateEndpoint",
+      "type": "object"
+    },
+    "Identity": {
+      "additionalProperties": false,
+      "properties": {
+        "gameweek": {
+          "maximum": 38,
+          "minimum": 2,
+          "title": "Gameweek",
+          "type": "integer"
+        },
+        "season": {
+          "minLength": 1,
+          "title": "Season",
+          "type": "string"
+        }
+      },
+      "required": [
+        "season",
+        "gameweek"
+      ],
+      "title": "Identity",
+      "type": "object"
+    },
+    "Membership": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate": {
+          "enum": [
+            "UM1",
+            "UA1",
+            "UM1UA1"
+          ],
+          "title": "Candidate",
+          "type": "string"
+        },
+        "claim": {
+          "const": "BYTE_IDENTITY_ONLY",
+          "default": "BYTE_IDENTITY_ONLY",
+          "title": "Claim",
+          "type": "string"
+        },
+        "control": {
+          "const": "U0",
+          "default": "U0",
+          "title": "Control",
+          "type": "string"
+        },
+        "included": {
+          "items": {
+            "$ref": "#/$defs/Identity"
+          },
+          "title": "Included",
+          "type": "array"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "candidate",
+        "included",
+        "sha256"
+      ],
+      "title": "Membership",
+      "type": "object"
+    },
+    "Metric": {
+      "additionalProperties": false,
+      "properties": {
+        "adverse_difference": {
+          "$ref": "#/$defs/Statistic"
+        },
+        "candidate_common": {
+          "$ref": "#/$defs/Statistic"
+        },
+        "candidate_infinities": {
+          "minimum": 0,
+          "title": "Candidate Infinities",
+          "type": "integer"
+        },
+        "candidate_natural": {
+          "$ref": "#/$defs/Statistic"
+        },
+        "candidate_rows": {
+          "minimum": 0,
+          "title": "Candidate Rows",
+          "type": "integer"
+        },
+        "common_rows": {
+          "minimum": 0,
+          "title": "Common Rows",
+          "type": "integer"
+        },
+        "control_common": {
+          "$ref": "#/$defs/Statistic"
+        },
+        "control_infinities": {
+          "minimum": 0,
+          "title": "Control Infinities",
+          "type": "integer"
+        },
+        "control_natural": {
+          "$ref": "#/$defs/Statistic"
+        },
+        "control_rows": {
+          "minimum": 0,
+          "title": "Control Rows",
+          "type": "integer"
+        },
+        "group": {
+          "minLength": 1,
+          "title": "Group",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "season": {
+          "minLength": 1,
+          "title": "Season",
+          "type": "string"
+        }
+      },
+      "required": [
+        "season",
+        "group",
+        "name",
+        "candidate_natural",
+        "control_natural",
+        "candidate_common",
+        "control_common",
+        "adverse_difference",
+        "common_rows",
+        "candidate_rows",
+        "control_rows",
+        "candidate_infinities",
+        "control_infinities"
+      ],
+      "title": "Metric",
+      "type": "object"
+    },
+    "PackageResult": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CalibrationBin"
+          },
+          "title": "Calibration",
+          "type": "array"
+        },
+        "candidate": {
+          "enum": [
+            "UM1",
+            "UA1",
+            "UM1UA1"
+          ],
+          "title": "Candidate",
+          "type": "string"
+        },
+        "clusters": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ClusterSummary"
+          },
+          "title": "Clusters",
+          "type": "array"
+        },
+        "control": {
+          "const": "U0",
+          "default": "U0",
+          "title": "Control",
+          "type": "string"
+        },
+        "diagnostic_intervals": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/DiagnosticInterval"
+          },
+          "title": "Diagnostic Intervals",
+          "type": "array"
+        },
+        "endpoints": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/GateEndpoint"
+          },
+          "title": "Endpoints",
+          "type": "array"
+        },
+        "evaluation_status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "NOT_EVALUATED"
+          ],
+          "title": "Evaluation Status",
+          "type": "string"
+        },
+        "excluded_gameweeks": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ExcludedGameweek"
+          },
+          "title": "Excluded Gameweeks",
+          "type": "array"
+        },
+        "failures": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Failures",
+          "type": "array"
+        },
+        "global_alpha": {
+          "const": "1/120",
+          "default": "1/120",
+          "title": "Global Alpha",
+          "type": "string"
+        },
+        "membership": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Membership"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "metrics": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Metric"
+          },
+          "title": "Metrics",
+          "type": "array"
+        },
+        "populations": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/Population"
+          },
+          "title": "Populations",
+          "type": "array"
+        },
+        "resampled_calibration_sha256": {
+          "default": [],
+          "items": {
+            "pattern": "^[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Resampled Calibration Sha256",
+          "type": "array"
+        },
+        "reserved_alpha": {
+          "const": "1/60",
+          "default": "1/60",
+          "title": "Reserved Alpha",
+          "type": "string"
+        },
+        "resource_evidence_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resource Evidence Sha256"
+        },
+        "resource_status": {
+          "enum": [
+            "PASS",
+            "FAIL",
+            "MISSING",
+            "NOT_APPLICABLE",
+            "NOT_EVALUATED"
+          ],
+          "title": "Resource Status",
+          "type": "string"
+        },
+        "serial_diagnostics": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SerialDiagnostic"
+          },
+          "title": "Serial Diagnostics",
+          "type": "array"
+        },
+        "subgroup_alpha": {
+          "const": "1/120",
+          "default": "1/120",
+          "title": "Subgroup Alpha",
+          "type": "string"
+        }
+      },
+      "required": [
+        "candidate",
+        "evaluation_status",
+        "membership",
+        "resource_status"
+      ],
+      "title": "PackageResult",
+      "type": "object"
+    },
+    "Population": {
+      "additionalProperties": false,
+      "properties": {
+        "actual_complete": {
+          "minimum": 0,
+          "title": "Actual Complete",
+          "type": "integer"
+        },
+        "actual_complete_including_blanks": {
+          "minimum": 0,
+          "title": "Actual Complete Including Blanks",
+          "type": "integer"
+        },
+        "blanks": {
+          "minimum": 0,
+          "title": "Blanks",
+          "type": "integer"
+        },
+        "candidate_complete": {
+          "minimum": 0,
+          "title": "Candidate Complete",
+          "type": "integer"
+        },
+        "candidate_complete_including_blanks": {
+          "minimum": 0,
+          "title": "Candidate Complete Including Blanks",
+          "type": "integer"
+        },
+        "common": {
+          "minimum": 0,
+          "title": "Common",
+          "type": "integer"
+        },
+        "common_membership_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Common Membership Sha256",
+          "type": "string"
+        },
+        "control_complete": {
+          "minimum": 0,
+          "title": "Control Complete",
+          "type": "integer"
+        },
+        "control_complete_including_blanks": {
+          "minimum": 0,
+          "title": "Control Complete Including Blanks",
+          "type": "integer"
+        },
+        "gameweeks": {
+          "minimum": 0,
+          "title": "Gameweeks",
+          "type": "integer"
+        },
+        "group": {
+          "minLength": 1,
+          "title": "Group",
+          "type": "string"
+        },
+        "missing_assist": {
+          "minimum": 0,
+          "title": "Missing Assist",
+          "type": "integer"
+        },
+        "missing_goal": {
+          "minimum": 0,
+          "title": "Missing Goal",
+          "type": "integer"
+        },
+        "missing_outcome": {
+          "minimum": 0,
+          "title": "Missing Outcome",
+          "type": "integer"
+        },
+        "missing_start": {
+          "minimum": 0,
+          "title": "Missing Start",
+          "type": "integer"
+        },
+        "overflow_count": {
+          "minimum": 0,
+          "title": "Overflow Count",
+          "type": "integer"
+        },
+        "players": {
+          "minimum": 0,
+          "title": "Players",
+          "type": "integer"
+        },
+        "season": {
+          "minLength": 1,
+          "title": "Season",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "PASS",
+            "NOT_APPLICABLE",
+            "INSUFFICIENT_EVIDENCE"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "universe": {
+          "minimum": 0,
+          "title": "Universe",
+          "type": "integer"
+        },
+        "universe_including_blanks": {
+          "minimum": 0,
+          "title": "Universe Including Blanks",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "season",
+        "group",
+        "universe",
+        "common",
+        "players",
+        "gameweeks",
+        "candidate_complete",
+        "control_complete",
+        "actual_complete",
+        "missing_outcome",
+        "missing_start",
+        "missing_goal",
+        "missing_assist",
+        "blanks",
+        "universe_including_blanks",
+        "candidate_complete_including_blanks",
+        "control_complete_including_blanks",
+        "actual_complete_including_blanks",
+        "common_membership_sha256",
+        "overflow_count",
+        "status"
+      ],
+      "title": "Population",
+      "type": "object"
+    },
+    "SerialDiagnostic": {
+      "additionalProperties": false,
+      "properties": {
+        "lag1": {
+          "$ref": "#/$defs/Statistic"
+        },
+        "lag2": {
+          "$ref": "#/$defs/Statistic"
+        },
+        "primary": {
+          "enum": [
+            "brier",
+            "mean_rps"
+          ],
+          "title": "Primary",
+          "type": "string"
+        },
+        "season": {
+          "minLength": 1,
+          "title": "Season",
+          "type": "string"
+        }
+      },
+      "required": [
+        "season",
+        "primary",
+        "lag1",
+        "lag2"
+      ],
+      "title": "SerialDiagnostic",
+      "type": "object"
+    },
+    "Statistic": {
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reason"
+        },
+        "status": {
+          "enum": [
+            "FINITE",
+            "POSITIVE_INFINITY",
+            "UNDEFINED",
+            "NUMERICAL_FAILURE",
+            "NOT_DEFINED_FOR_CONTROL",
+            "NOT_APPLICABLE",
+            "INSUFFICIENT_EVIDENCE",
+            "STRUCTURALLY_IDENTICAL"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "status",
+        "value"
+      ],
+      "title": "Statistic",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "authority": {
+      "const": "SYNTHETIC_ONLY",
+      "default": "SYNTHETIC_ONLY",
+      "title": "Authority",
+      "type": "string"
+    },
+    "better_fpl_decisions_established": {
+      "const": false,
+      "default": false,
+      "title": "Better Fpl Decisions Established",
+      "type": "boolean"
+    },
+    "clarification_commit": {
+      "const": "7874ded703c2173827738d2fc23f1d456826f95a",
+      "default": "7874ded703c2173827738d2fc23f1d456826f95a",
+      "title": "Clarification Commit",
+      "type": "string"
+    },
+    "contract": {
+      "const": "task033c2-evaluation-v1",
+      "default": "task033c2-evaluation-v1",
+      "title": "Contract",
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "DO_NOT_CONFIRM",
+        "AWAITING_AUTHORIZED_CONFIRMATION",
+        "DO_NOT_PROMOTE",
+        "SYNTHETIC_CONFIRMATION_PASS"
+      ],
+      "title": "Decision",
+      "type": "string"
+    },
+    "decision_corpus": {
+      "const": "NOT_EVALUATED",
+      "default": "NOT_EVALUATED",
+      "title": "Decision Corpus",
+      "type": "string"
+    },
+    "eligibility_established": {
+      "const": false,
+      "default": false,
+      "title": "Eligibility Established",
+      "type": "boolean"
+    },
+    "formula_identities": {
+      "default": [
+        "xfp_v01",
+        "UM1-joint-minute-dirichlet-v1",
+        "UA1-gamma-mixture-loss-update-v1",
+        "UM1UA1-v1"
+      ],
+      "maxItems": 4,
+      "minItems": 4,
+      "prefixItems": [
+        {
+          "const": "xfp_v01",
+          "type": "string"
+        },
+        {
+          "const": "UM1-joint-minute-dirichlet-v1",
+          "type": "string"
+        },
+        {
+          "const": "UA1-gamma-mixture-loss-update-v1",
+          "type": "string"
+        },
+        {
+          "const": "UM1UA1-v1",
+          "type": "string"
+        }
+      ],
+      "title": "Formula Identities",
+      "type": "array"
+    },
+    "hash_claim": {
+      "const": "BYTE_IDENTITY_ONLY",
+      "default": "BYTE_IDENTITY_ONLY",
+      "title": "Hash Claim",
+      "type": "string"
+    },
+    "historical_immutability_established": {
+      "const": false,
+      "default": false,
+      "title": "Historical Immutability Established",
+      "type": "boolean"
+    },
+    "maximum_eligibility": {
+      "const": "ELIGIBLE_FOR_TASK033D_COMPONENT_DIAGNOSTICS",
+      "default": "ELIGIBLE_FOR_TASK033D_COMPONENT_DIAGNOSTICS",
+      "title": "Maximum Eligibility",
+      "type": "string"
+    },
+    "outcomes_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Outcomes Sha256",
+      "type": "string"
+    },
+    "packages": {
+      "items": {
+        "$ref": "#/$defs/PackageResult"
+      },
+      "title": "Packages",
+      "type": "array"
+    },
+    "prediction_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Prediction Sha256",
+      "type": "string"
+    },
+    "production_suitability_established": {
+      "const": false,
+      "default": false,
+      "title": "Production Suitability Established",
+      "type": "boolean"
+    },
+    "protocol_identity": {
+      "const": "TASK033B1B-candidate-freeze-d6716bc",
+      "default": "TASK033B1B-candidate-freeze-d6716bc",
+      "title": "Protocol Identity",
+      "type": "string"
+    },
+    "selected": {
+      "anyOf": [
+        {
+          "enum": [
+            "UM1",
+            "UA1",
+            "UM1UA1"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Selected"
+    },
+    "source_validity_established": {
+      "const": false,
+      "default": false,
+      "title": "Source Validity Established",
+      "type": "boolean"
+    },
+    "stage": {
+      "enum": [
+        "DEVELOPMENT",
+        "CONFIRMATION"
+      ],
+      "title": "Stage",
+      "type": "string"
+    }
+  },
+  "required": [
+    "stage",
+    "prediction_sha256",
+    "outcomes_sha256",
+    "packages",
+    "selected",
+    "decision"
+  ],
+  "title": "EvaluationResult",
+  "type": "object"
+}

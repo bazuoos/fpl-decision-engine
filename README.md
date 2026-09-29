@@ -1479,6 +1479,14 @@ Repeating the same comparison safely reuses byte-identical output; conflicting
 bytes at the same identity fail closed. Reverse order has a distinct identity
 and reversed before/after semantics.
 
+## Isolated live-run safeguards
+
+The first-live-run boundary is documented in
+[`docs/project/TASK032B_ISOLATED_LIVE_RUN_RUNBOOK.md`](docs/project/TASK032B_ISOLATED_LIVE_RUN_RUNBOOK.md).
+It verifies a durable ignored sandbox against one explicit active-monitor plan
+before private prompts, evidence publication and engine execution. It does not
+authorize a live refresh or claim that local evidence has an offsite backup.
+
 ## Run tests
 
 ```bash
