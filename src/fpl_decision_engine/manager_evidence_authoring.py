@@ -8,9 +8,11 @@ hash-pinned operational preparation.
 
 from __future__ import annotations
 
+import errno
 import hashlib
 import json
 import os
+import stat
 import uuid
 from collections import Counter
 from collections.abc import Callable, Mapping, Sequence
@@ -169,19 +171,98 @@ def parse_draft_pick(value: str) -> tuple[int, str]:
 def _private_directory(path: Path) -> None:
     missing: list[Path] = []
     cursor = path
-    while not cursor.exists():
-        missing.append(cursor)
-        cursor = cursor.parent
-    for directory in reversed(missing):
-        directory.mkdir(mode=0o700, exist_ok=True)
-        os.chmod(directory, 0o700)
-    if path.is_dir():
-        os.chmod(path, 0o700)
-    else:
+    try:
+        while True:
+            try:
+                info = cursor.lstat()
+            except FileNotFoundError:
+                missing.append(cursor)
+                parent = cursor.parent
+                if parent == cursor:
+                    raise
+                cursor = parent
+                continue
+            if stat.S_ISLNK(info.st_mode) or not stat.S_ISDIR(info.st_mode):
+                raise ManagerEvidenceAuthoringError(
+                    AuthoringErrorCode.STORAGE_FAILURE,
+                    "private storage root is not a directory",
+                )
+            break
+
+        for directory in reversed(missing):
+            created = False
+            try:
+                directory.mkdir(mode=0o700)
+                created = True
+            except FileExistsError:
+                # A concurrent creator is caller-owned unless it proves the same
+                # private-directory contract below.
+                pass
+            if created:
+                os.chmod(directory, 0o700)
+            info = directory.lstat()
+            if (
+                stat.S_ISLNK(info.st_mode)
+                or not stat.S_ISDIR(info.st_mode)
+                or info.st_uid != os.geteuid()
+                or stat.S_IMODE(info.st_mode) & 0o077
+            ):
+                raise ManagerEvidenceAuthoringError(
+                    AuthoringErrorCode.STORAGE_FAILURE,
+                    "private storage root must be an owner-only directory",
+                )
+
+        info = path.lstat()
+        if (
+            stat.S_ISLNK(info.st_mode)
+            or not stat.S_ISDIR(info.st_mode)
+            or info.st_uid != os.geteuid()
+            or stat.S_IMODE(info.st_mode) & 0o077
+        ):
+            raise ManagerEvidenceAuthoringError(
+                AuthoringErrorCode.STORAGE_FAILURE,
+                "private storage root must be an owner-only directory",
+            )
+    except ManagerEvidenceAuthoringError:
+        raise
+    except OSError as exc:
         raise ManagerEvidenceAuthoringError(
             AuthoringErrorCode.STORAGE_FAILURE,
-            "private storage root is not a directory",
-        )
+            "private storage root could not be validated",
+        ) from exc
+
+
+def _reuse_published_evidence(
+    directory: Path, final: Path, body: bytes, digest: str
+) -> PublishedManagerEvidence:
+    _private_directory(directory)
+    try:
+        info = final.lstat()
+        if (
+            stat.S_ISLNK(info.st_mode)
+            or not stat.S_ISREG(info.st_mode)
+            or info.st_uid != os.geteuid()
+            or stat.S_IMODE(info.st_mode) & 0o077
+            or final.read_bytes() != body
+        ):
+            raise ManagerEvidenceAuthoringError(
+                AuthoringErrorCode.IMMUTABLE_CONFLICT,
+                "verified evidence identity already contains conflicting bytes",
+            )
+        load_verified_manager_evidence(final)
+    except ManagerEvidenceAuthoringError:
+        raise
+    except FileNotFoundError as exc:
+        raise ManagerEvidenceAuthoringError(
+            AuthoringErrorCode.IMMUTABLE_CONFLICT,
+            "verified evidence identity already contains conflicting bytes",
+        ) from exc
+    except (OSError, OperationalRunnerError) as exc:
+        raise ManagerEvidenceAuthoringError(
+            AuthoringErrorCode.STORAGE_FAILURE,
+            "verified evidence publication or contract validation failed",
+        ) from exc
+    return PublishedManagerEvidence(final, digest, True)
 
 
 def _write_mutable_private(path: Path, body: bytes) -> None:
@@ -495,17 +576,15 @@ def publish_verified_evidence(
     digest = _sha256(body)
     directory = output_root / preparation.manifest.preparation_id / digest
     final = directory / "verified_manager_evidence.json"
-    if directory.exists():
-        if final.is_file() and final.read_bytes() == body:
-            load_verified_manager_evidence(final)
-            return PublishedManagerEvidence(final, digest, True)
-        raise ManagerEvidenceAuthoringError(
-            AuthoringErrorCode.IMMUTABLE_CONFLICT,
-            "verified evidence identity already contains conflicting bytes",
-        )
     _private_directory(output_root)
     parent = directory.parent
     _private_directory(parent)
+    try:
+        directory.lstat()
+    except FileNotFoundError:
+        pass
+    else:
+        return _reuse_published_evidence(directory, final, body, digest)
     staging = parent / f".{digest}.{uuid.uuid4().hex}.tmp"
     try:
         staging.mkdir(mode=0o700)
@@ -519,15 +598,13 @@ def publish_verified_evidence(
         _require_before_deadline(fresh_preparation, clock)
         try:
             staging.rename(directory)
-        except FileExistsError:
-            if final.is_file() and final.read_bytes() == body:
-                staging.rmdir()
-                load_verified_manager_evidence(final)
-                return PublishedManagerEvidence(final, digest, True)
-            raise ManagerEvidenceAuthoringError(
-                AuthoringErrorCode.IMMUTABLE_CONFLICT,
-                "verified evidence was concurrently published with conflicting bytes",
-            )
+        except OSError as exc:
+            if exc.errno not in (errno.EEXIST, errno.ENOTEMPTY):
+                raise
+            reused = _reuse_published_evidence(directory, final, body, digest)
+            candidate.unlink()
+            staging.rmdir()
+            return reused
     except ManagerEvidenceAuthoringError:
         if staging.exists():
             for child in staging.iterdir():

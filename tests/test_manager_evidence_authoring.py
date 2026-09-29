@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import errno
 import json
 import os
 import tempfile
@@ -9,10 +10,12 @@ from contextlib import ExitStack
 from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
+from unittest.mock import patch
 
 from fixture_support import materialized_frozen_gw2
 from test_operational_runner import BEFORE, DEADLINE, OperationalFixture, SequenceClock
 
+from fpl_decision_engine.decision import DecisionError, resolve_existing_squad
 from fpl_decision_engine.manager_evidence_authoring import (
     AuthoringErrorCode,
     ManagerEvidenceAuthoringError,
@@ -25,7 +28,23 @@ from fpl_decision_engine.manager_evidence_authoring import (
     save_draft,
     validate_draft,
 )
-from fpl_decision_engine.operational_runner import load_verified_manager_evidence
+from fpl_decision_engine.editable_manager import (
+    EditableManagerError,
+    ManualEditablePick,
+    _validated_picks,
+)
+from fpl_decision_engine.operational_runner import (
+    load_verified_manager_evidence,
+)
+from fpl_decision_engine.projection_provider import (
+    PROJECTION_PROVIDER_VERSION,
+    XFP_V01_MODEL_ID,
+    XFP_V01_MODEL_SCOPE,
+    XFP_V01_PROVIDER_ID,
+    ProjectionDataset,
+    ProjectionPlayer,
+    ProjectionState,
+)
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -126,6 +145,98 @@ class ManagerEvidenceAuthoringTests(unittest.TestCase):
                 clock=SequenceClock(BEFORE),
             )
         self.assertEqual(raised.exception.code, AuthoringErrorCode.IMMUTABLE_CONFLICT)
+
+    def test_concurrent_publication_reuses_identical_winner_on_platform_errnos(self) -> None:
+        for collision_errno in (errno.EEXIST, errno.ENOTEMPTY):
+            with self.subTest(collision_errno=collision_errno):
+                root = self.root / f"concurrent-{collision_errno}"
+
+                def publish_winner(staging: Path, destination: Path) -> None:
+                    destination.mkdir(mode=0o700)
+                    winner = destination / "verified_manager_evidence.json"
+                    winner.write_bytes(
+                        (staging / "verified_manager_evidence.json").read_bytes()
+                    )
+                    winner.chmod(0o600)
+                    raise OSError(collision_errno, "synthetic rename collision")
+
+                with patch.object(
+                    Path, "rename", autospec=True, side_effect=publish_winner
+                ):
+                    result = publish_verified_evidence(
+                        self.draft,
+                        self.preparation,
+                        output_root=root,
+                        clock=SequenceClock(BEFORE),
+                    )
+
+                self.assertTrue(result.reused)
+                self.assertEqual(
+                    load_verified_manager_evidence(result.path).input_sha256,
+                    result.sha256,
+                )
+                self.assertEqual(list(result.path.parent.parent.glob(".*.tmp")), [])
+
+    def test_concurrent_publication_rejects_different_winner_without_touching_it(self) -> None:
+        for collision_errno in (errno.EEXIST, errno.ENOTEMPTY):
+            with self.subTest(collision_errno=collision_errno):
+                root = self.root / f"conflict-{collision_errno}"
+                winner_body = b"different winner bytes"
+
+                def publish_winner(_staging: Path, destination: Path) -> None:
+                    destination.mkdir(mode=0o700)
+                    winner = destination / "verified_manager_evidence.json"
+                    winner.write_bytes(winner_body)
+                    winner.chmod(0o600)
+                    raise OSError(collision_errno, "synthetic rename collision")
+
+                with patch.object(
+                    Path, "rename", autospec=True, side_effect=publish_winner
+                ):
+                    with self.assertRaises(ManagerEvidenceAuthoringError) as raised:
+                        publish_verified_evidence(
+                            self.draft,
+                            self.preparation,
+                            output_root=root,
+                            clock=SequenceClock(BEFORE),
+                        )
+
+                self.assertEqual(
+                    raised.exception.code, AuthoringErrorCode.IMMUTABLE_CONFLICT
+                )
+                winner = next(root.rglob("verified_manager_evidence.json"))
+                self.assertEqual(winner.read_bytes(), winner_body)
+                self.assertEqual(list(winner.parent.parent.glob(".*.tmp")), [])
+
+    def test_existing_storage_permissions_are_validated_without_mutation(self) -> None:
+        private = self.root / "existing-private"
+        private.mkdir(mode=0o700)
+        private.chmod(0o700)
+        original_mode = os.stat(private).st_mode & 0o777
+        save_draft(self.draft, private / "draft.json")
+        self.assertEqual(os.stat(private).st_mode & 0o777, original_mode)
+
+        permissive = self.root / "existing-permissive"
+        permissive.mkdir(mode=0o755)
+        permissive.chmod(0o755)
+        with self.assertRaises(ManagerEvidenceAuthoringError) as raised:
+            save_draft(self.draft, permissive / "draft.json")
+        self.assertEqual(raised.exception.code, AuthoringErrorCode.STORAGE_FAILURE)
+        self.assertEqual(os.stat(permissive).st_mode & 0o777, 0o755)
+        self.assertFalse((permissive / "draft.json").exists())
+
+    def test_symlinked_private_directory_is_rejected_without_touching_target(self) -> None:
+        target = self.root / "target"
+        target.mkdir(mode=0o700)
+        linked = self.root / "linked"
+        linked.symlink_to(target, target_is_directory=True)
+
+        with self.assertRaises(ManagerEvidenceAuthoringError) as raised:
+            save_draft(self.draft, linked / "draft.json")
+
+        self.assertEqual(raised.exception.code, AuthoringErrorCode.STORAGE_FAILURE)
+        self.assertFalse((target / "draft.json").exists())
+        self.assertTrue(linked.is_symlink())
 
     def test_deadline_gate_precedes_reuse_of_existing_evidence(self) -> None:
         root = self.root / "private-evidence"
@@ -250,6 +361,132 @@ class ManagerEvidenceAuthoringTests(unittest.TestCase):
         codes = {item.code for item in validate_draft(self.draft, altered)}
         self.assertIn("POSITION_COMPOSITION", codes)
 
+    def test_authoring_position_acceptance_is_subset_of_trusted_manager_validator(self) -> None:
+        positions = tuple({row.position for row in self.preparation.catalogue})
+        ids = tuple(self.draft.selected_element_ids)
+        for goalkeepers in range(16):
+            for defenders in range(16 - goalkeepers):
+                for midfielders in range(16 - goalkeepers - defenders):
+                    forwards = 15 - goalkeepers - defenders - midfielders
+                    composition = (
+                        ("GK",) * goalkeepers
+                        + ("DEF",) * defenders
+                        + ("MID",) * midfielders
+                        + ("FWD",) * forwards
+                    )
+                    self.assertEqual(len(composition), 15)
+                    self.assertTrue(set(composition).issubset(positions))
+                    catalogue = tuple(
+                        replace(
+                            next(
+                                row
+                                for row in self.preparation.catalogue
+                                if row.element_id == element_id
+                            ),
+                            position=position,
+                            team_id=index + 1,
+                        )
+                        for index, (element_id, position) in enumerate(
+                            zip(ids, composition)
+                        )
+                    )
+                    altered = replace(self.preparation, catalogue=catalogue)
+                    authoring_accepts = not validate_draft(self.draft, altered)
+                    trusted_picks = tuple(
+                        ManualEditablePick(
+                            element_id=row.element_id,
+                            display_name=row.display_name,
+                            position=row.position,
+                            selling_price_units=50,
+                        )
+                        for row in catalogue
+                    )
+                    try:
+                        _validated_picks(trusted_picks, selling_prices_verified=True)
+                    except EditableManagerError:
+                        trusted_accepts = False
+                    else:
+                        trusted_accepts = True
+                    self.assertFalse(
+                        authoring_accepts and not trusted_accepts,
+                        composition,
+                    )
+
+    def test_authoring_club_limit_matches_trusted_squad_validator(self) -> None:
+        ids = tuple(self.draft.selected_element_ids)
+        selected = {
+            row.element_id: row
+            for row in self.preparation.catalogue
+            if row.element_id in ids
+        }
+        position_ids = {"GK": 1, "DEF": 2, "MID": 3, "FWD": 4}
+
+        for repeated_club_count in range(1, 16):
+            with self.subTest(repeated_club_count=repeated_club_count):
+                team_ids = (1,) * repeated_club_count + tuple(
+                    range(2, 17 - repeated_club_count)
+                )
+                catalogue = tuple(
+                    replace(selected[element_id], team_id=team_id)
+                    for element_id, team_id in zip(ids, team_ids)
+                )
+                altered = replace(self.preparation, catalogue=catalogue)
+                authoring_accepts = not validate_draft(self.draft, altered)
+                projections = ProjectionDataset(
+                    season=self.preparation.season,
+                    target_gameweek=self.preparation.manifest.target_gameweek,
+                    snapshot_timestamp=self.preparation.observed_at,
+                    provider_id=XFP_V01_PROVIDER_ID,
+                    provider_version=PROJECTION_PROVIDER_VERSION,
+                    source_model_id=XFP_V01_MODEL_ID,
+                    model_scope=XFP_V01_MODEL_SCOPE,
+                    source_artifact_path="/synthetic/predictions.parquet",
+                    source_artifact_sha256="a" * 64,
+                    players_artifact_path="/synthetic/players.parquet",
+                    players_artifact_sha256="b" * 64,
+                    players=tuple(
+                        ProjectionPlayer(
+                            season=self.preparation.season,
+                            target_gameweek=self.preparation.manifest.target_gameweek,
+                            fpl_player_id=row.element_id,
+                            player_name=row.display_name,
+                            team_id=row.team_id,
+                            team_name=row.team_name,
+                            team_short_name=f"T{row.team_id}",
+                            position_id=position_ids[row.position],
+                            position=row.position,
+                            price_units=50,
+                            projection=1.0,
+                            projection_state=ProjectionState.VALID,
+                            verified_blank=False,
+                            availability_status="a",
+                            chance_of_playing_next_round=None,
+                            source_model_id=XFP_V01_MODEL_ID,
+                            model_scope=XFP_V01_MODEL_SCOPE,
+                            source_artifact_path="/synthetic/predictions.parquet",
+                            source_artifact_sha256="a" * 64,
+                            expected_minutes=90.0,
+                        )
+                        for row in catalogue
+                    ),
+                )
+                try:
+                    resolve_existing_squad(projections, ids)
+                except DecisionError:
+                    trusted_accepts = False
+                else:
+                    trusted_accepts = True
+                self.assertEqual(
+                    trusted_accepts,
+                    repeated_club_count <= 3,
+                    repeated_club_count,
+                )
+                self.assertEqual(
+                    authoring_accepts,
+                    trusted_accepts,
+                    repeated_club_count,
+                )
+
     def test_tampered_preparation_and_draft_fail_closed(self) -> None:
         players = (
             self.prepared.preparation_manifest_path.parent
@@ -288,6 +525,16 @@ class ManagerEvidenceAuthoringTests(unittest.TestCase):
             clock=SequenceClock(BEFORE, BEFORE, BEFORE, BEFORE, BEFORE),
         )
         self.assertEqual(completed.status, "COMPLETED")
+        self.assertEqual(
+            len(
+                list(
+                    completed.final_manifest_path.parent.rglob(
+                        "one_transfer_decision.json"
+                    )
+                )
+            ),
+            1,
+        )
 
     def test_pick_parser_is_exact_and_private_errors_do_not_echo_values(self) -> None:
         self.assertEqual(parse_draft_pick("42:5.7"), (42, "5.7"))
