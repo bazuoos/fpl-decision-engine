@@ -1,8 +1,10 @@
 # Project state
 
-Implementation checkpoint summarized: 2026-09-11, commit
-`274e5bba4479f8a9637f27df0657420d02f4da1e`. Identify this document's own
-revision and any later work from Git history.
+Latest verified `main` checkpoint: 2026-09-29, merge commit
+`8a883eeb6a93b3b160c4d0429aa96be76e0b529b` for Task031. The detailed
+validation history below includes an earlier 2026-09-11 snapshot at `274e5bb`;
+do not read that historical snapshot as the current HEAD. Identify any later
+work from Git history.
 Start with [CURRENT_HANDOFF](CURRENT_HANDOFF.md); this pack is navigation and
 continuity context, not a replacement for code, contracts, or frozen evidence.
 
@@ -21,11 +23,12 @@ the selected action the objectively best FPL transfer.
 
 | Area | Implemented and trusted for | Important limit |
 |---|---|---|
-| Official data | Immutable raw bytes, typed Parquet, coherent resumable refresh; stable one-shot completion monitoring; reviewed local scheduling controller | Live collection needs network; two reviewed GW4 plans are stale and inactive, so no current plan is installed or activated |
+| Official data | Immutable raw bytes, typed Parquet, coherent resumable refresh; stable one-shot completion monitoring; reviewed local scheduling controller | Live collection needs network; two early GW4 plans became stale, and a later completed plan was deactivated; no standing schedule is authorized |
 | Features / xFP | Frozen inputs and explicit missingness; xFP v0.1 | Appearance + goals + assists only; unstable early samples |
 | Optimization | Legal deterministic squad/XI/C/VC; zero-or-one-free-transfer comparison | Single GW, no chips/hits/multi-GW or future-transfer valuation |
 | Reliability | Provenance and 11 diagnostic sensitivity views | Not confidence, a veto, or a replacement recommendation |
 | Engine v1 operations | Two phases, explicit IDs, manager gate, UTC deadlines, immutable completed results | Fresh verified editable manager evidence is indispensable |
+| Local owner workflow | Task031 guided terminal authoring, private draft, immutable verified evidence and trusted decision display | Single-owner/local only; no FPL login, transfer execution, automatic journal or permission for a real run |
 | Journal / Diff | Separate human-action record; trusted same-scope structural comparison | Outcome v1 proves GW completion, not points/counterfactual performance; diff is not causal |
 | Web | Authorization seam, explicit-ID verified decision reads, canonical payload rendering | Local single-user mode only; no real auth, uploads, commands, or research service |
 | Recovery tooling | Private-path staging guards, read-only inventory, encrypted checkpoint create/verify/restore | No production key, verified remote/disconnected copy or real restore drill |
@@ -106,11 +109,11 @@ standard-library controller outside the engine package. It consumes Task028B's
 typed outcome only after exact plan, code, environment, repository and path
 preflight. One immutable terminal marker makes later invocations network-inert;
 activation and exact-label deactivation remain explicit owner operations. Two
-GW4 Task028G plans were later prepared locally and independently reviewed; one
-was realized-only and one bound the exact pre-deadline GW4 prediction. Neither
-was installed or activated, and both now fail exact-commit preflight after later
-repository work. The controller cannot operate while the Mac is powered off and
-makes no continuous-availability claim.
+early GW4 Task028G plans were prepared and reviewed; neither was installed or
+activated, and both became exact-commit stale. A later owner-authorized plan
+reached terminal completion and was deactivated. This local evidence does not
+authorize a standing schedule. The controller cannot operate while the Mac is
+powered off and makes no continuous-availability claim.
 
 Task029A defines evidence provenance and human-context separation; Task029B
 implements explicit content-addressed private source capture, immutable context
@@ -122,6 +125,22 @@ context records were verified as described in the sanitized
 [Task029C record](TASK029C_PRIVATE_EVIDENCE_CAPTURE_AND_CONTEXT_POPULATION.md).
 
 ## Validation evidence and procedure
+
+**Latest merged slice:** [Task031 PR #5](https://github.com/bazuoos/fpl-decision-engine/pull/5)
+merged at `8a883ee` after independent SAFE/no-mandatory-finding review. The
+[exact-merge-commit CI run 36587619212](https://github.com/bazuoos/fpl-decision-engine/actions/runs/36587619212)
+passed. The pre-merge PR-head
+[CI run 36530915472](https://github.com/bazuoos/fpl-decision-engine/actions/runs/36530915472)
+also passed Python, web, contract, build, boundary and whitespace checks. A separate
+2026-09-29 scripted walkthrough used committed public-derived GW2 fixture
+bytes, a constructed squad, fake manager ID, injected pre-deadline clock and
+temporary storage. It verified the complete result path and both confirmation
+stop paths. It did not read current private manager evidence or demonstrate
+live-data freshness or predictive benefit. Draft PR #2 still contains later
+Task032/033/034 work; its green CI does not make it merged or authorize
+research/operations.
+
+### Historical validation snapshot (2026-09-11)
 
 **Repository-established at this review:** HEAD `274e5bb`, branch `main`, 152
 tracked files and four frontend tests in source. The CI workflow configures
@@ -201,9 +220,9 @@ and current code. Task028C/D now supply a reviewed scheduling-drill design and
 offline harness. The temporary synthetic `launchd` drill subsequently passed
 local execution and independent sanitized-evidence review. Task028E/F now supply
 the reviewed production-scheduling design and inert controller; older statements
-that production scheduling design is still future work are obsolete. Two local
-Task028G plans were prepared and reviewed but never installed or activated; both
-are now stale by exact revision. Automatic decision work remains unimplemented
+that production scheduling design is still future work are obsolete. Two early
+Task028G plans stayed inactive and became exact-commit stale; a later plan
+completed and was deactivated. Automatic decision work remains unimplemented
 and unauthorized. Task029A/B add private provenance/context mechanisms; they do
 not promote human reasoning into trusted engine evidence.
 

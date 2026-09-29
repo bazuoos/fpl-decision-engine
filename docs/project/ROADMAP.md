@@ -1,7 +1,7 @@
 # Roadmap
 
-As of `274e5bb` (2026-09-11). This is a planning map, not authorization to
-execute. The [RFC phased plan](../rfcs/0026a-web-product-architecture.md#28-phased-implementation-plan)
+As of merged Task031 `8a883ee` (2026-09-29). This is a planning map, not
+authorization to execute. The [RFC phased plan](../rfcs/0026a-web-product-architecture.md#28-phased-implementation-plan)
 is the source for Tasks026B–D. Proposed capabilities are not completed merely
 because they appear in an RFC or this file.
 
@@ -49,6 +49,11 @@ because they appear in an RFC or this file.
   GitHub Actions and uv Dependabot proposals are bounded and never auto-merged.
   Exact-commit CI and the remediated live uv update run passed. Open pip-update
   PR #1 remains an unreviewed proposal despite green CI.
+- Task031A/B/C: local guided manager-evidence authoring, private draft and
+  immutable publication, and verified decision display merged through
+  [PR #5](https://github.com/bazuoos/fpl-decision-engine/pull/5) at `8a883ee`.
+  Independent review found no mandatory findings and exact-head CI passed.
+  This does not authorize a real manager-data run or FPL action.
 
 ## LOCAL OPERATIONAL EVIDENCE — not repository implementation
 
@@ -60,20 +65,23 @@ because they appear in an RFC or this file.
   created and verified. See the sanitized [Task029C record](TASK029C_PRIVATE_EVIDENCE_CAPTURE_AND_CONTEXT_POPULATION.md).
 - These private/ignored artifacts are local only. They are not included in Git
   and have **NO VERIFIED OFFSITE BACKUP**.
-- Two GW4 Task028G completion-monitor plans were prepared and independently
-  reviewed: an earlier realized-only plan bound to `cc30c99`, then an
-  evaluation-enabled replacement bound to `f66fe4b`. Neither was installed or
-  activated; both have zero invocations and lifecycle events. Subsequent
-  repository work made both exact-commit plans stale, so they cannot pass
-  current preflight.
+- Two early GW4 Task028G completion-monitor plans were prepared and independently
+  reviewed but stayed inactive and became stale. A later owner-authorized plan
+  reached validated terminal completion and was deactivated. This is local
+  operational evidence, not an active schedule or authorization to repeat it.
+- A scripted Task031 walkthrough on 2026-09-29 used committed public-derived
+  GW2 fixture bytes, a constructed squad, fake manager ID and temporary files.
+  It reached a verified decision; the two stop paths behaved as designed. This
+  did not inspect current manager evidence or validate predictive performance.
 
-## NEXT — proposed implementation boundary, not work started
+## NEXT — proposed boundaries, not authorization
 
-1. After this continuity refresh is committed and green, prepare and
-   independently review a **new** GW4 Task028G completion-monitor plan against
-   that final exact revision. Preserve the two earlier plans unchanged as stale
-   operational evidence. The replacement must remain uninstalled and inactive
-   until a separate owner activation decision.
+1. Decide whether to plan a first real Task031 use for a future gameweek.
+   Task032A/B on [draft PR #2](https://github.com/bazuoos/fpl-decision-engine/pull/2)
+   were scoped to an active GW4 monitor and older exact commits. Re-scope and
+   independently review any reusable safeguards before real execution. A public
+   refresh and private manager entry need separate applicable owner authority.
+   Do not merge PR #2 wholesale.
 2. Preserve the two remaining
    [Task026B follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups): keep
    the current shell/navigation disposable and the UX paradigm undecided.
@@ -81,20 +89,21 @@ because they appear in an RFC or this file.
    additional artifact read routes are needed. Also record the missing
    reliability/model-caveat rendering envisaged by the RFC. Neither delivery gap
    authorizes implementation.
-4. Plan Task026C only after human approval: identity/ownership,
+4. Task033C3 remains design-only and blocked on source, authority, contract,
+   resource and publication gates. Synthetic C1/C2 success is not real
+   validation or permission to access outcomes, open confirmation or promote.
+5. Plan Task026C only after human approval: identity/ownership,
    OIDC/session/CSRF, PostgreSQL, private evidence review/storage, explicit engine
    commands/workers, consent/retention/export/deletion and isolation tests.
 
-Replacing the stale Task028G plan is the smallest proposed infrastructure
-boundary currently unblocked by the unavailable key-custody drive. It does not
-authorize installation, activation, a live FPL request or automatic manager
-action. A local LaunchAgent cannot run while the Mac is powered off.
+The first real owner workflow and the research design are separate tracks.
+Neither a merged workflow nor this roadmap permits an operational run, model
+change, journal entry or automatic manager action.
 
 ## PAUSED — recovery owner setup
 
-Task027E remains incomplete. Resume only when the owner has a dedicated encrypted
-removable medium suitable for an independent key-custody copy. Remaining gates
-include production age identity custody, restricted B2 application keys, a
+Task027E remains incomplete and owner-paused. Remaining gates include
+production age identity custody, restricted B2 application keys, a
 synthetic exact-version upload/readback, decrypt/verify through both custody
 copies, and sanitized independent review. No real evidence upload belongs to
 Task027E. Before Task027F, the owner must explicitly accept the irreversible
