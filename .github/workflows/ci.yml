@@ -70,25 +70,9 @@ jobs:
         working-directory: web
         run: npm ci
 
-      - name: Check generated web contracts
+      - name: Verify web application
         working-directory: web
-        run: npm run check:contracts
-
-      - name: Test web application
-        working-directory: web
-        run: npm test
-
-      - name: Type-check web application
-        working-directory: web
-        run: npm run typecheck
-
-      - name: Build web application
-        working-directory: web
-        run: npm run build
-
-      - name: Check web dependency boundary
-        working-directory: web
-        run: npm run check:boundary
+        run: npm run verify
 
       - name: Check patch whitespace
         run: git diff --check

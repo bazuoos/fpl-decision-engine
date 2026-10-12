@@ -30,6 +30,11 @@ button:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px 
 dt { color: #99aa9f; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
 dd { margin: .3rem 0 0; font-weight: 750; overflow-wrap: anywhere; }
 section p { color: #c6d2ca; line-height: 1.6; }
+.decision-caveats { border: 1px solid #6b6747; background: #242818; border-radius: .65rem; padding: 1rem 1.2rem; margin: 1.5rem 0; }
+.decision-caveats h3 { margin-top: 0; }
+.decision-caveats h4 { margin-bottom: .35rem; }
+.decision-caveats p { margin: .5rem 0; }
+.decision-caveats ul { margin: .5rem 0 0; padding-left: 1.4rem; color: #e1e8d2; line-height: 1.6; }
 details { margin-top: 1.6rem; }
 summary { cursor: pointer; }
 .identity { display: grid; grid-template-columns: minmax(100px, 160px) 1fr; gap: .6rem; margin-top: 1rem; }
