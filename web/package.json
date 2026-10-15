@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "verify": "npm run check:contracts && npm test && npm run typecheck && npm run build && npm run check:boundary",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "build": "vite build",

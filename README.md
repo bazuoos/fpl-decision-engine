@@ -121,12 +121,18 @@ Run all application checks with:
 ```bash
 uv run --locked --no-sync --no-python-downloads python -m unittest discover -s tests
 cd web
-npm run check:contracts
-npm test
-npm run typecheck
-npm run build
-npm run check:boundary
+npm run verify
 ```
+
+`npm run verify` runs the existing contract, synthetic UI test, type, production
+build and dependency-boundary checks in order, stopping at the first failure.
+It needs the locked web dependencies installed first and rebuilds `web/dist`;
+it does not install dependencies or start a server. The UI tests mock API
+responses with the constructed fixture in `web/src/test/fixture.ts`. This is
+frontend verification, not an end-to-end browser walkthrough or an independent
+verification of the engine trust chain. Run the Python tests above when checking
+the complete application boundary. A passing run does not authorize operational
+data access, research execution or model promotion.
 
 OIDC, multi-user ownership, uploads, writes, PostgreSQL, object storage,
 commands/workers, research export, and caching are deliberately deferred to

@@ -33,6 +33,46 @@ describe("trusted decision presentation", () => {
     expect(await screen.findByText("3-5-2")).toBeInTheDocument();
     expect(screen.getAllByText("Synthetic Player 08").length).toBeGreaterThan(0);
     expect(screen.getByText("55.00 xFP")).toBeInTheDocument();
+    expect(screen.getByText(/xFP v0.1 models appearance, goals and assists only/)).toBeInTheDocument();
+    expect(screen.getByText(/No reliability warnings were recorded/)).toBeInTheDocument();
+  });
+
+  it("shows verified reliability and lineup warnings without changing the recommendation", async () => {
+    const supplied = structuredClone(syntheticDecision);
+    supplied.payload.reliability.warnings = [
+      { code: "sample_warning", message: "The incoming player has limited prior appearances." },
+    ];
+    supplied.payload.recommended_action.selection.warnings = [
+      "xfp_v01_models_appearance_goals_assists_only",
+      "appearance_only_policy_admits_incomplete_projections",
+    ];
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => supplied }));
+    renderApp(`/?decision_id=${supplied.artifact_identity.semantic_id}`);
+    expect(await screen.findByRole("heading", { name: "How to read this decision" })).toBeInTheDocument();
+    expect(screen.getByText("The incoming player has limited prior appearances.")).toBeInTheDocument();
+    expect(screen.getByText("The selected squad includes an incomplete projection admitted under the appearance-only policy.")).toBeInTheDocument();
+    expect(screen.queryByText("xfp_v01_models_appearance_goals_assists_only")).not.toBeInTheDocument();
+    expect(screen.getByText("Synthetic Player 12 → Synthetic Player 16")).toBeInTheDocument();
+    expect(screen.getByText("55.00 xFP")).toBeInTheDocument();
+  });
+
+  it("does not attach v0.1-specific scoring claims to an unknown model", async () => {
+    const supplied = structuredClone(syntheticDecision);
+    supplied.payload.engine.model_id = "future_model";
+    supplied.payload.recommended_action.selection.warnings = ["xfp_v01_models_appearance_goals_assists_only"];
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => supplied }));
+    renderApp(`/?decision_id=${supplied.artifact_identity.semantic_id}`);
+    expect(await screen.findByText(/Model: future_model/)).toBeInTheDocument();
+    expect(screen.queryByText(/xFP v0.1 models appearance/)).not.toBeInTheDocument();
+    expect(screen.getByText(/unrecognized warning code \(xfp_v01_models_appearance_goals_assists_only\)/)).toBeInTheDocument();
+  });
+
+  it("does not silently discard an unknown selection warning", async () => {
+    const supplied = structuredClone(syntheticDecision);
+    supplied.payload.recommended_action.selection.warnings = ["future_warning_code"];
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => supplied }));
+    renderApp(`/?decision_id=${supplied.artifact_identity.semantic_id}`);
+    expect(await screen.findByText("The verified decision includes an unrecognized warning code (future_warning_code).")).toBeInTheDocument();
   });
 
   it("distinguishes missing from invalid trusted evidence", async () => {
