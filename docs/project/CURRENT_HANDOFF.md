@@ -4,7 +4,19 @@
 > artifacts, manifests, frozen decision records and Git history win on technical
 > contradiction. Verify current Git state before acting.
 
-- Latest verified `main` checkpoint: **2026-09-29**,
+- Latest repository checkpoint: **2026-10-15**, `688ada6f566cacac0784268d924b87a51e32c114`,
+  the merge of [PR #7](https://github.com/bazuoos/fpl-decision-engine/pull/7).
+  The decision view now explains model limits, diagnostic-only reliability and
+  selection warnings. `npm run verify` runs the five existing frontend checks;
+  CI uses the same command. Independent Claude Sonnet 5 High review reported
+  SAFE with no mandatory findings and reproduced all five checks, including
+  seven UI tests. Exact PR-head `aa40490`
+  [CI run 38226870992](https://github.com/bazuoos/fpl-decision-engine/actions/runs/38226870992)
+  passed. Exact merge-head
+  [CI run 38709220371](https://github.com/bazuoos/fpl-decision-engine/actions/runs/38709220371)
+  also passed Python tests, all five frontend checks and whitespace. This does not improve the prediction
+  model or authorize operational use.
+- Historical Task031 checkpoint: **2026-09-29**,
   `8a883eeb6a93b3b160c4d0429aa96be76e0b529b`, the merge of
   [Task031 PR #5](https://github.com/bazuoos/fpl-decision-engine/pull/5).
   Independent Claude Sonnet 5 High review reported SAFE with no mandatory
@@ -106,14 +118,16 @@ follow-ups remain planning inputs, not authorization for implementation:
 1. Keep `App.tsx` and explicit-ID navigation disposable.
 2. Keep final styling and the UX paradigm **UNDECIDED**.
 
-Additional documented RFC gap: current `DecisionView` omits reliability and
-model caveats. This does not authorize frontend work. See
+The reliability/model-caveat rendering gap was addressed by PR #7. Broader
+artifact routes and the final UX remain undecided. See
 [implementation versus proposal](DECISIONS.md#web-rfc-decision-status).
 
 ## Immediate next question
 
-Task031 is merged and its scripted test-fixture walkthrough passed. The next
-product decision is whether to plan a first real use for a future gameweek.
+Task031 and the decision-caveat follow-up are merged. The next recommended step
+is the [offline weekly-workflow readiness assessment](WEEKLY_WORKFLOW_READINESS.md),
+not a real run. The historical scripted test-fixture walkthrough passed; it
+does not establish current manager facts or live-data readiness.
 Task032A/B in draft PR #2 were designed for an active GW4 monitor and exact
 older revisions; they must be re-scoped and re-reviewed before use for a later
 gameweek. A real public refresh, private manager-fact entry and engine run each

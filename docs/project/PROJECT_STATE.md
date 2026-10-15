@@ -1,7 +1,9 @@
 # Project state
 
-Latest verified `main` checkpoint: 2026-09-29, merge commit
-`8a883eeb6a93b3b160c4d0429aa96be76e0b529b` for Task031. The detailed
+Latest repository checkpoint: 2026-10-15, merge commit
+`688ada6f566cacac0784268d924b87a51e32c114` for PR #7 (decision caveats and
+shared frontend verification). Exact PR-head and merge-head CI passed; see
+CURRENT_HANDOFF for evidence links. Task031 previously merged at `8a883ee`. The detailed
 validation history below includes an earlier 2026-09-11 snapshot at `274e5bb`;
 do not read that historical snapshot as the current HEAD. Identify any later
 work from Git history.
@@ -179,11 +181,7 @@ uv run --locked --no-sync --no-python-downloads python -m unittest discover -s t
 git diff --check
 cd web
 npm ci
-npm run check:contracts
-npm test
-npm run typecheck
-npm run build
-npm run check:boundary
+npm run verify
 ```
 
 Python >=3.10 is declared. Tests use offline inputs; dependency installation

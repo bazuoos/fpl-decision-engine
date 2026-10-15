@@ -1,6 +1,6 @@
 # Roadmap
 
-As of merged Task031 `8a883ee` (2026-09-29). This is a planning map, not
+As of merged PR #7 `688ada6` (2026-10-15). This is a planning map, not
 authorization to execute. The [RFC phased plan](../rfcs/0026a-web-product-architecture.md#28-phased-implementation-plan)
 is the source for Tasks026B–D. Proposed capabilities are not completed merely
 because they appear in an RFC or this file.
@@ -76,7 +76,8 @@ because they appear in an RFC or this file.
 
 ## NEXT — proposed boundaries, not authorization
 
-1. Decide whether to plan a first real Task031 use for a future gameweek.
+1. Complete the [offline weekly-workflow readiness assessment](WEEKLY_WORKFLOW_READINESS.md)
+   before proposing a first real Task031 use for a future gameweek.
    Task032A/B on [draft PR #2](https://github.com/bazuoos/fpl-decision-engine/pull/2)
    were scoped to an active GW4 monitor and older exact commits. Re-scope and
    independently review any reusable safeguards before real execution. A public
@@ -86,9 +87,10 @@ because they appear in an RFC or this file.
    [Task026B follow-ups](CURRENT_HANDOFF.md#unresolved-task026b-follow-ups): keep
    the current shell/navigation disposable and the UX paradigm undecided.
 3. Reconcile RFC scope with the delivered narrower read slice. Decide whether
-   additional artifact read routes are needed. Also record the missing
-   reliability/model-caveat rendering envisaged by the RFC. Neither delivery gap
-   authorizes implementation.
+   additional artifact read routes are needed. PR #7 delivered the
+   reliability/model-caveat panel and shared frontend verification command;
+   broader routes and final UX remain undecided. No broader implementation is
+   authorized by this roadmap.
 4. Task033C3 remains design-only and blocked on source, authority, contract,
    resource and publication gates. Synthetic C1/C2 success is not real
    validation or permission to access outcomes, open confirmation or promote.
