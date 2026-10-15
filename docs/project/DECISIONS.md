@@ -54,10 +54,10 @@ all its ADRs are proposed pending independent review. Human confirmation of
 project policy does not automatically accept every RFC design. IMPLEMENTED
 below describes observable code, not blanket acceptance of the entire ADR.
 
-| RFC decision | Status at `274e5bb` | Boundary / consequence |
+| RFC decision | Implementation status (updated through PR #7) | Boundary / consequence |
 |---|---|---|
 | ADR-026A-01: engine artifacts are authority | IMPLEMENTED for decision reads | Public reader delegates existing validation; no second app/browser optimizer |
-| ADR-026A-02: React/TypeScript/Vite | IMPLEMENTED stack | Static client; no chosen UX paradigm; current view omits RFC-envisaged reliability/model caveats |
+| ADR-026A-02: React/TypeScript/Vite | IMPLEMENTED stack | Static client; no chosen UX paradigm; PR #7 adds reliability/model caveats without changing engine outputs |
 | ADR-026A-03: separate Python/FastAPI app | IMPLEMENTED | One-way dependency; import tests cover the journal and package-member spelling but remain a specific test-time forbidden list |
 | ADR-026A-04: REST envelope and canonical artifact | IMPLEMENTED for health/decision API | Server verifies; checked OpenAPI embeds the authoritative payload schema; browser types are generated and freshness-checked; runtime browser checks remain envelope markers; broader routes are PROPOSED |
 | ADR-026A-05: immutable indexed access | IMPLEMENTED local explicit-ID/hash checks and request-scoped stable snapshots for the current decision route; PARTIAL RFC design | Each original artifact path is captured once per request; process-wide immutability, object storage and verified-by-hash caching remain unimplemented |
